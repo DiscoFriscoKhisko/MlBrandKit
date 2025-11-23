@@ -1,27 +1,20 @@
 import { useState } from "react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
-import { Check, Copy } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { toast } from "sonner@2.0.3";
 
-const lightModeColors = [
-  { name: "Primary Black", hex: "#000000", rgb: "0, 0, 0", usage: "Primary text, logo" },
-  { name: "Neutral 900", hex: "#171717", rgb: "23, 23, 23", usage: "Headings, emphasis" },
-  { name: "Neutral 700", hex: "#404040", rgb: "64, 64, 64", usage: "Secondary text" },
-  { name: "Neutral 500", hex: "#737373", rgb: "115, 115, 115", usage: "Tertiary text, labels" },
-  { name: "Neutral 300", hex: "#D4D4D4", rgb: "212, 212, 212", usage: "Borders, dividers" },
-  { name: "Neutral 100", hex: "#F5F5F5", rgb: "245, 245, 245", usage: "Backgrounds, cards" },
-  { name: "Pure White", hex: "#FFFFFF", rgb: "255, 255, 255", usage: "Primary background" },
+const brandColors = [
+  { name: "Log Cabin", hex: "#090A09", rgb: "9, 10, 9", usage: "Primary Brand Color, Headings, Text" },
+  { name: "Mischka", hex: "#D6D6DE", rgb: "214, 214, 222", usage: "Secondary Brand Color, Borders, Accents" },
+  { name: "White", hex: "#FFFFFF", rgb: "255, 255, 255", usage: "Backgrounds, Negative Space" },
 ];
 
-const darkModeColors = [
-  { name: "Pure White", hex: "#FFFFFF", rgb: "255, 255, 255", usage: "Primary text, logo" },
-  { name: "Neutral 100", hex: "#F5F5F5", rgb: "245, 245, 245", usage: "Headings, emphasis" },
-  { name: "Neutral 300", hex: "#D4D4D4", rgb: "212, 212, 212", usage: "Secondary text" },
-  { name: "Neutral 500", hex: "#737373", rgb: "115, 115, 115", usage: "Tertiary text, labels" },
-  { name: "Neutral 700", hex: "#404040", rgb: "64, 64, 64", usage: "Borders, dividers" },
-  { name: "Neutral 900", hex: "#171717", rgb: "23, 23, 23", usage: "Backgrounds, cards" },
-  { name: "Primary Black", hex: "#000000", rgb: "0, 0, 0", usage: "Primary background" },
+// Derived shades for functional UI needs (based on Log Cabin and Mischka)
+const functionalColors = [
+  { name: "Log Cabin 900", hex: "#090A09", rgb: "9, 10, 9", usage: "Default Text" },
+  { name: "Log Cabin 800", hex: "#1A1B1A", rgb: "26, 27, 26", usage: "Hover States" },
+  { name: "Mischka 500", hex: "#D6D6DE", rgb: "214, 214, 222", usage: "Borders, Dividers" },
+  { name: "Mischka 100", hex: "#F3F3F5", rgb: "243, 243, 245", usage: "Light Backgrounds" },
 ];
 
 interface ColorCardProps {
@@ -34,7 +27,8 @@ interface ColorCardProps {
 }
 
 function ColorCard({ name, hex, rgb, usage, onCopy, copied }: ColorCardProps) {
-  const isDark = name.includes("Black") || name.includes("900") || name.includes("700");
+  // Determine text color based on brightness
+  const isDark = hex.toLowerCase() === "#090a09" || hex.toLowerCase() === "#1a1b1a";
   
   return (
     <Card className="overflow-hidden">
@@ -42,7 +36,7 @@ function ColorCard({ name, hex, rgb, usage, onCopy, copied }: ColorCardProps) {
         className="h-32 flex items-center justify-center"
         style={{ backgroundColor: hex }}
       >
-        <span className={`text-sm uppercase tracking-wider ${isDark ? 'text-white' : 'text-black'}`}>
+        <span className={`text-sm uppercase tracking-wider ${isDark ? 'text-[#D6D6DE]' : 'text-[#090A09]'}`}>
           {name}
         </span>
       </div>
@@ -55,13 +49,9 @@ function ColorCard({ name, hex, rgb, usage, onCopy, copied }: ColorCardProps) {
               variant="ghost"
               size="sm"
               onClick={() => onCopy(hex, `${name}-hex`)}
-              className="h-6 w-6 p-0"
+              className="h-6 px-2 text-xs"
             >
-              {copied === `${name}-hex` ? (
-                <Check className="w-3 h-3" />
-              ) : (
-                <Copy className="w-3 h-3" />
-              )}
+              {copied === `${name}-hex` ? "Copied" : "Copy"}
             </Button>
           </div>
         </div>
@@ -73,13 +63,9 @@ function ColorCard({ name, hex, rgb, usage, onCopy, copied }: ColorCardProps) {
               variant="ghost"
               size="sm"
               onClick={() => onCopy(rgb, `${name}-rgb`)}
-              className="h-6 w-6 p-0"
+              className="h-6 px-2 text-xs"
             >
-              {copied === `${name}-rgb` ? (
-                <Check className="w-3 h-3" />
-              ) : (
-                <Copy className="w-3 h-3" />
-              )}
+              {copied === `${name}-rgb` ? "Copied" : "Copy"}
             </Button>
           </div>
         </div>
@@ -92,131 +78,161 @@ function ColorCard({ name, hex, rgb, usage, onCopy, copied }: ColorCardProps) {
 export function ColorPalette() {
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
 
-  const copyToClipboard = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedColor(id);
-    setTimeout(() => setCopiedColor(null), 2000);
+  const copyToClipboard = async (text: string, id: string) => {
+    const executeCopy = async () => {
+      try {
+        // Try modern Clipboard API first
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+        throw new Error("Clipboard API unavailable");
+      } catch (err) {
+        // Fallback to legacy method
+        try {
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.style.position = "fixed";
+          textarea.style.left = "-999999px";
+          textarea.style.top = "-999999px";
+          document.body.appendChild(textarea);
+          textarea.focus();
+          textarea.select();
+          
+          const successful = document.execCommand("copy");
+          document.body.removeChild(textarea);
+          return successful;
+        } catch (fallbackErr) {
+          console.error("Fallback copy failed:", fallbackErr);
+          return false;
+        }
+      }
+    };
+
+    const success = await executeCopy();
+    
+    if (success) {
+      setCopiedColor(id);
+      setTimeout(() => setCopiedColor(null), 2000);
+      toast.success(`Copied ${text}`);
+    } else {
+      // Manual fallback: show the text in a toast for manual copying
+      toast.error(`Please copy manually: ${text}`);
+    }
   };
 
   return (
     <div className="space-y-12">
       {/* Header */}
       <div>
-        <h2 className="text-4xl mb-4 font-serif">Color Palette</h2>
-        <p className="text-neutral-600 max-w-3xl">
-          Material Lab uses a pure grayscale palette - black, white, and shades of grey. 
-          Our minimal color system supports both light and dark modes for optimal flexibility across all applications.
+        <h2 className="text-4xl mb-4 font-serif text-[#090A09]">Color Palette</h2>
+        <p className="text-[#090A09]/80 max-w-3xl text-lg">
+          Material Lab uses a strict monochrome palette anchored by <strong>Log Cabin</strong> (Black) and <strong>Mischka</strong> (Grey). 
+          These two colors form the foundation of our visual identity.
         </p>
       </div>
 
-      {/* Mode Selector */}
-      <Tabs defaultValue="light" className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="light">Light Mode</TabsTrigger>
-          <TabsTrigger value="dark">Dark Mode</TabsTrigger>
-        </TabsList>
+      {/* Core Identity */}
+      <div className="space-y-6">
+        <h3 className="text-2xl text-[#090A09]">Core Identity</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {brandColors.map((color) => (
+            <ColorCard
+              key={color.hex}
+              {...color}
+              onCopy={copyToClipboard}
+              copied={copiedColor}
+            />
+          ))}
+        </div>
+      </div>
 
-        <TabsContent value="light" className="space-y-12 mt-8">
-          <div>
-            <h3 className="text-2xl mb-6">Light Mode Palette</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {lightModeColors.map((color) => (
-                <ColorCard
-                  key={color.hex}
-                  {...color}
-                  onCopy={copyToClipboard}
-                  copied={copiedColor}
-                />
-              ))}
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="dark" className="space-y-12 mt-8">
-          <div>
-            <h3 className="text-2xl mb-6">Dark Mode Palette</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {darkModeColors.map((color) => (
-                <ColorCard
-                  key={color.hex}
-                  {...color}
-                  onCopy={copyToClipboard}
-                  copied={copiedColor}
-                />
-              ))}
-            </div>
-          </div>
-        </TabsContent>
-      </Tabs>
+      {/* Functional Palette */}
+      <div className="space-y-6">
+        <h3 className="text-2xl text-[#090A09]">Functional Shades</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+           {functionalColors.map((color) => (
+            <ColorCard
+              key={color.hex}
+              {...color}
+              onCopy={copyToClipboard}
+              copied={copiedColor}
+            />
+          ))}
+        </div>
+      </div>
 
       {/* Usage Examples */}
       <div>
-        <h3 className="text-2xl mb-6">Usage Examples</h3>
+        <h3 className="text-2xl mb-6 text-[#090A09]">Usage Examples</h3>
         <div className="grid md:grid-cols-2 gap-6">
-          <Card className="p-6">
-            <h4 className="mb-4">Button Styles</h4>
+          <Card className="p-6 bg-white border-[#D6D6DE]">
+            <h4 className="mb-4 text-[#090A09]">Button Styles</h4>
             <div className="space-y-3">
-              <Button className="w-full bg-black hover:bg-neutral-800 text-white">
-                Primary Button (Black)
+              <Button className="w-full bg-[#090A09] hover:bg-[#090A09]/90 text-white">
+                Log Cabin Button
               </Button>
-              <Button variant="outline" className="w-full">
-                Secondary Button (Outline)
+              <Button className="w-full bg-[#D6D6DE] hover:bg-[#D6D6DE]/90 text-[#090A09]">
+                Mischka Button
               </Button>
-              <Button variant="ghost" className="w-full">
-                Ghost Button
+              <Button variant="outline" className="w-full border-[#D6D6DE] text-[#090A09] hover:bg-[#D6D6DE]/20">
+                Outline Button
               </Button>
             </div>
           </Card>
 
-          <Card className="p-6">
-            <h4 className="mb-4">Text Hierarchy</h4>
+          <Card className="p-6 bg-[#090A09] text-[#D6D6DE]">
+            <h4 className="mb-4 text-white">Dark Mode / High Contrast</h4>
             <div className="space-y-2">
-              <p className="text-black">Primary text - #000000</p>
-              <p className="text-neutral-700">Secondary text - #404040</p>
-              <p className="text-neutral-500">Tertiary text - #737373</p>
-              <p className="text-neutral-300">Disabled text - #D4D4D4</p>
+              <p className="text-white text-xl font-serif">Log Cabin & Mischka</p>
+              <p className="text-[#D6D6DE]">
+                The quick, brown, log cabin, and mischka fox jumped over the lazy dog.
+              </p>
+              <div className="mt-4 pt-4 border-t border-[#D6D6DE]/30">
+                <p className="text-xs text-[#D6D6DE]/70">Dark background pairing</p>
+              </div>
             </div>
           </Card>
         </div>
       </div>
 
-      {/* Color Combinations */}
+      {/* Background Combinations */}
       <div>
-        <h3 className="text-2xl mb-6">Background Combinations</h3>
+        <h3 className="text-2xl mb-6 text-[#090A09]">Background Combinations</h3>
         <div className="grid md:grid-cols-3 gap-6">
-          <Card className="overflow-hidden">
-            <div className="h-48 bg-white flex items-center justify-center border-b">
+          <Card className="overflow-hidden border-[#D6D6DE]">
+            <div className="h-48 bg-white flex items-center justify-center border-b border-[#D6D6DE]">
               <div className="text-center">
-                <p className="text-black mb-2">White Background</p>
-                <p className="text-neutral-500 text-sm">Light & clean</p>
+                <p className="text-[#090A09] mb-2 font-bold">White</p>
+                <p className="text-[#090A09]/60 text-sm">Standard Background</p>
               </div>
             </div>
-            <div className="p-4">
-              <code className="text-xs">#FFFFFF</code>
+            <div className="p-4 bg-white">
+              <code className="text-xs text-[#090A09]">#FFFFFF</code>
             </div>
           </Card>
 
-          <Card className="overflow-hidden">
-            <div className="h-48 bg-neutral-100 flex items-center justify-center border-b">
+          <Card className="overflow-hidden border-[#D6D6DE]">
+            <div className="h-48 bg-[#D6D6DE] flex items-center justify-center border-b border-[#D6D6DE]">
               <div className="text-center">
-                <p className="text-black mb-2">Light Grey Background</p>
-                <p className="text-neutral-500 text-sm">Subtle sections</p>
+                <p className="text-[#090A09] mb-2 font-bold">Mischka</p>
+                <p className="text-[#090A09]/60 text-sm">Secondary / Accent</p>
               </div>
             </div>
-            <div className="p-4">
-              <code className="text-xs">#F5F5F5</code>
+            <div className="p-4 bg-[#D6D6DE]">
+              <code className="text-xs text-[#090A09]">#D6D6DE</code>
             </div>
           </Card>
 
-          <Card className="overflow-hidden">
-            <div className="h-48 bg-black flex items-center justify-center border-b">
+          <Card className="overflow-hidden border-[#D6D6DE]">
+            <div className="h-48 bg-[#090A09] flex items-center justify-center border-b border-[#090A09]">
               <div className="text-center">
-                <p className="text-white mb-2">Black Background</p>
-                <p className="text-neutral-300 text-sm">Bold & dramatic</p>
+                <p className="text-white mb-2 font-bold">Log Cabin</p>
+                <p className="text-[#D6D6DE] text-sm">Primary Dark</p>
               </div>
             </div>
-            <div className="p-4">
-              <code className="text-xs">#000000</code>
+            <div className="p-4 bg-[#090A09]">
+              <code className="text-xs text-[#D6D6DE]">#090A09</code>
             </div>
           </Card>
         </div>
