@@ -1,0 +1,1 @@
+export const MASTER_LOGO_URL = "https://img.notionusercontent.com/ext/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fpublic.notion-static.com%2F0c2aa0c2-6343-48c9-bef0-31a6e04e45bb%2Flogo_static.svg/size/?exp=1763637781&sig=lpSzeJ9hnq_Tk2rEwf6jWebPv3ONXuRT1Vu76bGsDrg&id=2a320d43-82ef-80a5-87cf-007a2b11c48c&table=custom_emoji";
