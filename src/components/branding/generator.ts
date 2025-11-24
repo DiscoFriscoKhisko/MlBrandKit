@@ -84,7 +84,7 @@ export async function generateBusinessCardSVG() {
       
       <!-- Vertical Handle (Material Lab): inset-[17.59%_11.47%_17.08%_47.51%] -->
       <!-- Center approx x=180, y=77. Rotated 90deg -->
-      <text x="180" y="77" font-family="Merriweather, serif" font-weight="bold" font-size="12" fill="#0b0c0b" text-anchor="middle" transform="rotate(90, 180, 77)">Material Lab</text>
+      <text x="180" y="77" font-family="Merriweather, serif" font-weight="bold" font-size="12" fill="#0b0c0b" text-anchor="middle" transform="rotate(90, 180, 77)">material lab</text>
     </svg>
   `.trim();
 }
@@ -117,13 +117,17 @@ export async function generateBusinessCardBackSVG() {
   `.trim();
 }
 
-export async function generateAppIconSVG() {
+export async function generateAppIconSVG(size: number = 1024) {
   const logoDataUri = await getBase64Image(MASTER_LOGO_URL);
   
+  // Calculate padding (approx 11% of size, similar to original 112/1024)
+  const padding = Math.round(size * 0.109);
+  const imageSize = size - (padding * 2);
+  
   return `
-    <svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-      <rect width="1024" height="1024" fill="#FFFFFF"/>
-      <image href="${logoDataUri}" x="112" y="112" width="800" height="800" />
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+      <rect width="${size}" height="${size}" fill="#FFFFFF"/>
+      <image href="${logoDataUri}" x="${padding}" y="${padding}" width="${imageSize}" height="${imageSize}" />
     </svg>
   `.trim();
 }
@@ -134,6 +138,17 @@ export async function generateWordmarkSVG(variant: "black" | "white") {
   return `
     <svg width="600" height="150" viewBox="0 0 600 150" xmlns="http://www.w3.org/2000/svg">
       <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Merriweather, serif" font-weight="bold" font-size="72" fill="${fillColor}">material lab</text>
+    </svg>
+  `.trim();
+}
+
+export async function generateMicroLogoSVG(variant: "black" | "white") {
+  const fillColor = variant === "black" ? "#090A09" : "#FFFFFF";
+  
+  return `
+    <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <rect width="512" height="512" fill="none"/>
+      <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Merriweather, serif" font-weight="bold" font-size="400" fill="${fillColor}" dy=".1em">m</text>
     </svg>
   `.trim();
 }

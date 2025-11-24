@@ -7,7 +7,8 @@ import {
   generateInstagramPostSVG, 
   generateTwitterHeaderSVG,
   generateAppIconSVG,
-  generateWordmarkSVG
+  generateWordmarkSVG,
+  generateMicroLogoSVG
 } from "./branding/generator";
 import { toast } from "sonner@2.0.3";
 
@@ -35,8 +36,17 @@ export function DigitalAssets() {
   const handleDownloadAppIcons = async () => {
     try {
       toast.info("Generating app icons...");
-      const iconSvg = await generateAppIconSVG();
-      downloadSVG(iconSvg, "material-lab-app-icon.svg");
+      
+      const [ios, android, pwa] = await Promise.all([
+        generateAppIconSVG(1024),
+        generateAppIconSVG(512),
+        generateAppIconSVG(192)
+      ]);
+      
+      downloadSVG(ios, "material-lab-icon-ios-1024.svg");
+      setTimeout(() => downloadSVG(android, "material-lab-icon-android-512.svg"), 100);
+      setTimeout(() => downloadSVG(pwa, "material-lab-icon-pwa-192.svg"), 200);
+      
       toast.success("App icons downloaded");
     } catch (error) {
       console.error(error);
@@ -212,7 +222,7 @@ export function DigitalAssets() {
                   src={METEOR_GLYPH_URL} 
                   alt="Meteor Glyph Inverse"
                   className="w-full h-full object-contain"
-                  style={{ filter: 'brightness(0) invert(1)' }}
+                  style={{ filter: 'invert(1)' }}
                 />
               </div>
                <div className="flex items-center justify-between mt-4">
@@ -235,11 +245,9 @@ export function DigitalAssets() {
           <div className="space-y-6">
             <Card className="p-6 border-border">
               <div className="aspect-square rounded-lg mb-4 flex items-center justify-center bg-white border border-border p-12">
-                <img 
-                  src={MICRO_LOGO_URL} 
-                  alt="Micro Logo"
-                  className="w-full h-full object-contain"
-                />
+                <svg viewBox="0 0 512 512" className="w-full h-full">
+                  <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontFamily="Merriweather, serif" fontWeight="bold" fontSize="400" fill="#090A09" dy=".1em">m</text>
+                </svg>
               </div>
               <div className="flex items-center justify-between mt-4">
                 <div>
@@ -249,7 +257,10 @@ export function DigitalAssets() {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => downloadAsset(MICRO_LOGO_URL, "material-lab-micro-logo.png")}
+                  onClick={async () => {
+                    const svg = await generateMicroLogoSVG("black");
+                    downloadSVG(svg, "material-lab-micro-logo-black.svg");
+                  }}
                 >
                   Download
                 </Button>
@@ -258,12 +269,9 @@ export function DigitalAssets() {
             
             <Card className="p-6 border-border">
               <div className="aspect-square rounded-lg mb-4 flex items-center justify-center bg-[#090A09] border border-border p-12">
-                <img 
-                  src={MICRO_LOGO_URL} 
-                  alt="Micro Logo Inverse"
-                  className="w-full h-full object-contain"
-                  style={{ filter: 'brightness(0) invert(1)' }}
-                />
+                <svg viewBox="0 0 512 512" className="w-full h-full">
+                  <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontFamily="Merriweather, serif" fontWeight="bold" fontSize="400" fill="#FFFFFF" dy=".1em">m</text>
+                </svg>
               </div>
                <div className="flex items-center justify-between mt-4">
                 <div>
@@ -273,7 +281,10 @@ export function DigitalAssets() {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => downloadAsset(MICRO_LOGO_URL, "material-lab-micro-logo.png")}
+                  onClick={async () => {
+                    const svg = await generateMicroLogoSVG("white");
+                    downloadSVG(svg, "material-lab-micro-logo-white.svg");
+                  }}
                 >
                   Download
                 </Button>
@@ -394,66 +405,6 @@ export function DigitalAssets() {
             </Button>
           </div>
         </Card>
-      </div>
-
-      {/* Website Components */}
-      <div>
-        <h3 className="text-2xl mb-6 text-foreground">Website Components</h3>
-        <div className="space-y-6">
-          {/* Header */}
-          <Card className="p-6 border-border">
-            <p className="text-sm text-muted-foreground mb-4">Header / Navigation</p>
-            <div className="bg-white border border-border rounded-lg p-6 flex items-center justify-between">
-              <img 
-                src={MASTER_LOGO_URL} 
-                alt="Material Lab"
-                className="h-10 object-contain"
-              />
-              <div className="flex gap-6 text-sm">
-                <a href="#" className="text-[#737373] hover:text-[#090A09]">Work</a>
-                <a href="#" className="text-[#737373] hover:text-[#090A09]">About</a>
-                <a href="#" className="text-[#737373] hover:text-[#090A09]">Contact</a>
-              </div>
-            </div>
-          </Card>
-
-          {/* CTA Button */}
-          <Card className="p-6 border-border">
-            <p className="text-sm text-muted-foreground mb-4">Call-to-Action Buttons</p>
-            <div className="bg-muted rounded-lg p-8 flex flex-wrap gap-4 justify-center">
-              <Button size="lg" className="bg-[#090A09] hover:bg-[#090A09]/90 text-white">
-                Get Started
-              </Button>
-              <Button size="lg" variant="outline" className="border-[#D6D6DE] text-[#090A09] hover:bg-[#D6D6DE]/20">
-                Learn More
-              </Button>
-            </div>
-          </Card>
-
-          {/* Footer */}
-          <Card className="p-6 border-border">
-            <p className="text-sm text-muted-foreground mb-4">Footer</p>
-            <div className="bg-[#090A09] rounded-lg p-8 text-white">
-              <div className="max-w-4xl mx-auto">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-                  <img 
-                    src={MASTER_LOGO_URL} 
-                    alt="Material Lab"
-                    className="h-12 object-contain invert brightness-0"
-                  />
-                  <div className="flex gap-4 text-sm">
-                    <a href="#" className="text-[#D6D6DE] hover:text-white">LinkedIn</a>
-                    <a href="#" className="text-[#D6D6DE] hover:text-white">Twitter</a>
-                    <a href="#" className="text-[#D6D6DE] hover:text-white">GitHub</a>
-                  </div>
-                </div>
-                <div className="border-t border-[#D6D6DE]/20 pt-6 text-sm text-[#D6D6DE]/60">
-                  <p>© 2025 Material Lab. Building delightful things for good people.</p>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </div>
       </div>
 
       {/* Mobile App Icon */}

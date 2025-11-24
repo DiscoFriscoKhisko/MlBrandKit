@@ -39,7 +39,7 @@ export function UsageGuidelines() {
             </Card>
 
             <Card className="p-6 border-border bg-card">
-              <div className="bg-[#1A1B1A] rounded p-8 mb-3 flex items-center justify-center">
+              <div className="bg-[#090A09] rounded p-8 mb-3 flex items-center justify-center">
                 <img 
                   src={logo} 
                   alt="Material Lab Logo White"
@@ -141,16 +141,16 @@ export function UsageGuidelines() {
         <div className="grid md:grid-cols-2 gap-6 mb-6">
           <Card className="p-8 border-border bg-white">
             <div className="h-32 flex flex-col items-center justify-center">
-              <h4 className="text-4xl font-serif font-bold text-[#090A09]">Material Lab</h4>
+              <h4 className="text-4xl font-serif font-bold text-[#090A09]">material lab</h4>
             </div>
             <p className="text-sm text-muted-foreground mt-4">
               <strong>Black Wordmark:</strong> Use on light backgrounds.
             </p>
           </Card>
 
-          <Card className="p-8 border-border bg-[#1A1B1A]">
+          <Card className="p-8 border-border bg-[#090A09]">
             <div className="h-32 flex flex-col items-center justify-center">
-              <h4 className="text-4xl font-serif font-bold text-white">Material Lab</h4>
+              <h4 className="text-4xl font-serif font-bold text-white">material lab</h4>
             </div>
             <p className="text-sm text-[#D6D6DE] mt-4">
               <strong>White Wordmark:</strong> Use on dark backgrounds.
@@ -164,7 +164,7 @@ export function UsageGuidelines() {
               className="absolute inset-0 w-full h-full object-cover"
             />
             <div className="absolute inset-0 flex items-center justify-center">
-              <h4 className="text-4xl font-serif font-bold text-white drop-shadow-lg">Material Lab</h4>
+              <h4 className="text-4xl font-serif font-bold text-white drop-shadow-lg">material lab</h4>
             </div>
             <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
               <p className="text-sm text-white/90">
@@ -180,7 +180,7 @@ export function UsageGuidelines() {
               className="absolute inset-0 w-full h-full object-cover"
             />
             <div className="absolute inset-0 flex items-center justify-center">
-              <h4 className="text-4xl font-serif font-bold text-[#090A09]">Material Lab</h4>
+              <h4 className="text-4xl font-serif font-bold text-[#090A09]">material lab</h4>
             </div>
             <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white/80 to-transparent">
               <p className="text-sm text-[#090A09]/90">
@@ -194,7 +194,7 @@ export function UsageGuidelines() {
           <div className="bg-muted rounded-lg p-6">
             <h4 className="text-lg font-semibold mb-2 text-foreground">Wordmark Rules</h4>
             <p className="text-sm text-muted-foreground mb-4">
-              The "Material Lab" wordmark is available in black and white versions. It can be placed on dark and white backgrounds, as long as the logo remains recognizable and legible.
+              The "material lab" wordmark is available in black and white versions. It can be placed on dark and white backgrounds, as long as the logo remains recognizable and legible.
             </p>
             <p className="text-sm text-muted-foreground">
                It can also be placed on images (e.g., universe, cloud), where the text should be in black or white to contrast the background appropriately.
@@ -254,14 +254,6 @@ export function UsageGuidelines() {
                     <p className="font-serif font-bold text-[#090A09]">Nickel</p>
                     <p className="font-mono text-sm text-gray-500">#737373</p>
                     <p className="text-sm text-gray-500">Muted Text / Borders</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-[#1A1B1A] shadow-sm border border-gray-200"></div>
-                  <div>
-                    <p className="font-serif font-bold text-[#090A09]">Rangoon Green</p>
-                    <p className="font-mono text-sm text-gray-500">#1A1B1A</p>
-                    <p className="text-sm text-gray-500">Dark Surface / Hover States</p>
                   </div>
                 </div>
               </div>

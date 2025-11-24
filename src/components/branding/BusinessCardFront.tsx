@@ -29,7 +29,7 @@ export function BusinessCardFront() {
       <p className="absolute font-['Inter',sans-serif] font-semibold inset-[33.27%_74.85%_56.93%_10.39%] leading-[normal] not-italic text-[#0b0c0b] text-[12px] text-nowrap whitespace-pre">RATHI</p>
       <div className="absolute flex inset-[17.59%_11.47%_17.08%_47.51%] items-center justify-center">
         <div className="flex-none rotate-[90deg] size-[100px] flex items-center justify-center">
-          <p className="font-['Merriweather',serif] font-bold leading-[normal] not-italic relative text-[#0b0c0b] text-[12px] text-nowrap whitespace-pre">Material Lab</p>
+          <p className="font-['Merriweather',serif] font-bold leading-[normal] not-italic relative text-[#0b0c0b] text-[12px] text-nowrap whitespace-pre">material lab</p>
         </div>
       </div>
       <p className="absolute font-['Inter',sans-serif] font-normal inset-[44.04%_34.96%_44.2%_32.64%] leading-[normal] not-italic text-[#0b0c0b] text-[15px] text-nowrap whitespace-pre">CoFounder</p>
