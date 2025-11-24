@@ -127,3 +127,13 @@ export async function generateAppIconSVG() {
     </svg>
   `.trim();
 }
+
+export async function generateWordmarkSVG(variant: "black" | "white") {
+  const fillColor = variant === "black" ? "#090A09" : "#FFFFFF";
+  
+  return `
+    <svg width="600" height="150" viewBox="0 0 600 150" xmlns="http://www.w3.org/2000/svg">
+      <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Merriweather, serif" font-weight="bold" font-size="72" fill="${fillColor}">material lab</text>
+    </svg>
+  `.trim();
+}

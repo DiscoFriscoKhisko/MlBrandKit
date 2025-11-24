@@ -6,6 +6,7 @@ import { ColorPalette } from "./ColorPalette";
 import { Typography } from "./Typography";
 import { PhysicalMockups } from "./PhysicalMockups";
 import { DigitalAssets } from "./DigitalAssets";
+import { MotionAssets } from "./MotionAssets";
 import { UsageGuidelines } from "./UsageGuidelines";
 import { toast } from "sonner@2.0.3";
 
@@ -50,11 +51,12 @@ export function BrandKit() {
       <div className="max-w-7xl mx-auto px-6 py-12">
         <Tabs defaultValue="colors" className="w-full">
           <div className="sticky top-0 bg-background/80 backdrop-blur-sm z-10 pb-6 mb-8 border-b border-border">
-            <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 gap-2 bg-muted text-muted-foreground">
+            <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 gap-2 bg-muted text-muted-foreground">
               <TabsTrigger value="colors">Colors</TabsTrigger>
               <TabsTrigger value="typography">Typography</TabsTrigger>
               <TabsTrigger value="physical">Physical</TabsTrigger>
               <TabsTrigger value="digital">Digital</TabsTrigger>
+              <TabsTrigger value="motion">Motion</TabsTrigger>
               <TabsTrigger value="usage">Usage</TabsTrigger>
             </TabsList>
           </div>
@@ -73,6 +75,10 @@ export function BrandKit() {
 
           <TabsContent value="digital">
             <DigitalAssets />
+          </TabsContent>
+
+          <TabsContent value="motion">
+            <MotionAssets />
           </TabsContent>
 
           <TabsContent value="usage">

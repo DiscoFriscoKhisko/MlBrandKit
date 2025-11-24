@@ -6,7 +6,8 @@ import {
   generateLinkedInPostSVG, 
   generateInstagramPostSVG, 
   generateTwitterHeaderSVG,
-  generateAppIconSVG
+  generateAppIconSVG,
+  generateWordmarkSVG
 } from "./branding/generator";
 import { toast } from "sonner@2.0.3";
 
@@ -40,6 +41,24 @@ export function DigitalAssets() {
     } catch (error) {
       console.error(error);
       toast.error("Failed to generate icons");
+    }
+  };
+
+  const handleDownloadWordmarks = async () => {
+    try {
+      toast.info("Generating wordmarks...");
+      const [black, white] = await Promise.all([
+        generateWordmarkSVG("black"),
+        generateWordmarkSVG("white")
+      ]);
+      
+      downloadSVG(black, "material-lab-wordmark-black.svg");
+      setTimeout(() => downloadSVG(white, "material-lab-wordmark-white.svg"), 100);
+      
+      toast.success("Wordmarks downloaded");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to generate wordmarks");
     }
   };
 
@@ -87,6 +106,75 @@ export function DigitalAssets() {
           Digital branding guidelines for web, mobile, and social media applications. 
           Maintain consistency across all digital touchpoints.
         </p>
+      </div>
+
+      {/* Wordmarks */}
+      <div>
+        <h3 className="text-2xl mb-6 text-foreground">Wordmarks</h3>
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Black Wordmark */}
+          <div className="space-y-6">
+            <Card className="p-6 border-border">
+              <div className="aspect-[3/1] rounded-lg mb-4 flex items-center justify-center bg-white border border-border p-8">
+                <div className="w-full h-full flex items-center justify-center">
+                   <h1 className="font-serif font-bold text-4xl md:text-5xl text-[#090A09]">material lab</h1>
+                </div>
+              </div>
+              <div className="flex items-center justify-between mt-4">
+                <div>
+                   <p className="text-sm font-semibold text-foreground">Primary Wordmark</p>
+                   <p className="text-xs text-muted-foreground">Log Cabin / Light Background</p>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={async () => {
+                    const svg = await generateWordmarkSVG("black");
+                    downloadSVG(svg, "material-lab-wordmark-black.svg");
+                  }}
+                >
+                  Download
+                </Button>
+              </div>
+            </Card>
+          </div>
+
+          {/* White Wordmark */}
+          <div className="space-y-6">
+            <Card className="p-6 border-border">
+              <div className="aspect-[3/1] rounded-lg mb-4 flex items-center justify-center bg-[#090A09] border border-border p-8">
+                <div className="w-full h-full flex items-center justify-center">
+                   <h1 className="font-serif font-bold text-4xl md:text-5xl text-white">material lab</h1>
+                </div>
+              </div>
+              <div className="flex items-center justify-between mt-4">
+                <div>
+                   <p className="text-sm font-semibold text-foreground">Inverse Wordmark</p>
+                   <p className="text-xs text-muted-foreground">White / Dark Background</p>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={async () => {
+                    const svg = await generateWordmarkSVG("white");
+                    downloadSVG(svg, "material-lab-wordmark-white.svg");
+                  }}
+                >
+                  Download
+                </Button>
+              </div>
+            </Card>
+          </div>
+        </div>
+        <div className="mt-4">
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={handleDownloadWordmarks}
+          >
+            Download All Wordmarks
+          </Button>
+        </div>
       </div>
 
       {/* Brand Glyphs */}
