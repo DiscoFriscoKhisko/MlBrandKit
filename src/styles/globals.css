@@ -109,10 +109,10 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: radial-gradient(circle at center, var(--aura-color, rgba(23, 247, 247, 0.1)), transparent 60%);
+  background: radial-gradient(circle at center, var(--aura-color, rgba(23, 247, 247, 0.03)), transparent 70%);
   filter: blur(0px);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.5s ease;
   border-radius: inherit;
 }
 
@@ -125,16 +125,16 @@
   opacity: 0;
   mix-blend-mode: overlay;
   pointer-events: none;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.5s ease;
   border-radius: inherit;
 }
 
 .grainy-aura:hover::before {
-  opacity: 1;
+  opacity: 0.8;
 }
 
 .grainy-aura:hover::after {
-  opacity: 0.2;
+  opacity: 0.05;
 }
 
 @theme inline {

@@ -68,36 +68,49 @@ export async function generateTwitterHeaderSVG() {
 }
 
 export async function generateBusinessCardSVG() {
-  // Using the logo optimized for dark backgrounds since we are moving to Dark Mode Luxury
   const logoDataUri = await getBase64Image(CARD_BACK_LOGO_URL);
   
+  // Icosahedron Path Data (normalized to 100x100)
+  const isohedronPaths = `
+    <g stroke="#17f7f7" stroke-width="0.8" fill="none" stroke-opacity="0.4">
+      <path d="M50 5 L93.3 30 L93.3 80 L50 105 L6.7 80 L6.7 30 Z" />
+      <path d="M50 80 L21 30 L79 30 Z" />
+      <path d="M50 5 L21 30 M50 5 L79 30" />
+      <path d="M93.3 30 L79 30 M93.3 30 L50 80" />
+      <path d="M93.3 80 L50 80" />
+      <path d="M6.7 80 L50 80" />
+      <path d="M6.7 30 L21 30 M6.7 30 L50 80" />
+    </g>
+  `;
+
   // Front of the card - Dark Mode Luxury
-  // 85.6mm x 54mm (Approx 244x154 aspect ratio)
   return `
     <svg width="85.6mm" height="54mm" viewBox="0 0 244 154" xmlns="http://www.w3.org/2000/svg">
       <rect width="244" height="154" fill="#090909"/>
       
-      <!-- DAMINI -->
-      <text x="25" y="48" font-family="Inter, sans-serif" font-weight="700" font-size="24" letter-spacing="-0.5" fill="#fefefe">DAMINI </text>
+      <!-- Background Motif: Oversized Icosahedron -->
+      <g transform="translate(140, 10) scale(1.4)">
+        ${isohedronPaths}
+      </g>
+      
+      <!-- Content Group -->
+      <g transform="translate(20, 0)">
+        <!-- DAMINI -->
+        <text x="0" y="55" font-family="Inter, sans-serif" font-weight="700" font-size="20" letter-spacing="-0.5" fill="#fefefe">DAMINI</text>
 
-      <!-- RATHI -->
-      <text x="25" y="76" font-family="Inter, sans-serif" font-weight="700" font-size="24" letter-spacing="-0.5" fill="#fefefe">RATHI</text>
+        <!-- RATHI -->
+        <text x="0" y="78" font-family="Inter, sans-serif" font-weight="300" font-size="20" letter-spacing="-0.5" fill="#fefefe">RATHI</text>
+        
+        <!-- CoFounder with Accent Line -->
+        <line x1="0" y1="92" x2="20" y2="92" stroke="#17f7f7" stroke-width="2" />
+        <text x="0" y="108" font-family="Inter, sans-serif" font-weight="500" font-size="8" letter-spacing="2" fill="#d5dada" text-transform="uppercase">CoFounder</text>
+      </g>
       
-      <!-- Line -->
-      <line x1="25" y1="92" x2="55" y2="92" stroke="#fefefe" stroke-width="1.5" stroke-opacity="0.3" stroke-linecap="square" />
+      <!-- Logo Mark (Bottom Left) -->
+      <image href="${logoDataUri}" x="20" y="120" width="16" height="18" />
       
-      <!-- CoFounder -->
-      <text x="25" y="108" font-family="Inter, sans-serif" font-weight="400" font-size="9" letter-spacing="2" fill="#d5dada" text-transform="uppercase">CoFounder</text>
-      
-      <!-- Logo Image -->
-      <image href="${logoDataUri}" x="200" y="108" width="24" height="28" />
-      
-      <!-- Vertical Handle (Material Lab) - Repositioned or Removed? 
-           Let's keep it but move it to be subtle on the right or remove if it clashes with drama.
-           Let's move it to bottom right aligned with logo maybe?
-           Or keep vertical on right edge.
-      -->
-      <text x="225" y="77" font-family="Merriweather, serif" font-weight="bold" font-size="8" letter-spacing="1" fill="#333333" text-anchor="middle" transform="rotate(90, 225, 77)">material lab</text>
+      <!-- Wordmark (Bottom Left next to logo) -->
+      <text x="44" y="133" font-family="Merriweather, serif" font-weight="bold" font-size="8" fill="#fefefe">material lab</text>
     </svg>
   `.trim();
 }
@@ -109,23 +122,31 @@ export async function generateBusinessCardBackSVG() {
     <svg width="85.6mm" height="54mm" viewBox="0 0 244 154" xmlns="http://www.w3.org/2000/svg">
       <rect width="244" height="154" fill="#090909"/>
       
-      <!-- Contact Intro -->
-      <text x="25" y="35" font-family="Inter, sans-serif" font-weight="400" font-size="9" fill="#666666" letter-spacing="0.5">Please contact me at </text>
+      <!-- Grid Pattern Background -->
+      <defs>
+        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.05"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#grid)" />
       
-      <!-- Email -->
-      <text x="25" y="55" font-family="Inter, sans-serif" font-weight="600" font-size="13" fill="#fefefe" letter-spacing="0.2">damini@materiallab.io</text>
-      
-      <!-- Or -->
-      <text x="180" y="55" font-family="Inter, sans-serif" font-weight="400" font-size="9" fill="#666666" font-style="italic">or</text>
-      
-      <!-- Phone -->
-      <text x="25" y="78" font-family="Inter, sans-serif" font-weight="600" font-size="13" fill="#fefefe" letter-spacing="0.2">+91-805-013-1733</text>
-      
-      <!-- Logo Image -->
-      <image href="${logoDataUri}" x="25" y="105" width="24" height="28" />
-      
-      <!-- Website with Jewel Cyan accent -->
-      <text x="65" y="124" font-family="Merriweather, serif" font-weight="bold" font-size="10" fill="#17f7f7">materiallab.io</text>
+      <!-- Central Content -->
+      <g transform="translate(122, 77)" text-anchor="middle">
+        
+        <!-- Logo Centered -->
+        <image href="${logoDataUri}" x="-12" y="-50" width="24" height="28" />
+        
+        <!-- Name/Title -->
+        <text x="0" y="0" font-family="Inter, sans-serif" font-weight="600" font-size="12" fill="#fefefe" letter-spacing="0.5">Damini Rathi</text>
+        <text x="0" y="15" font-family="Inter, sans-serif" font-weight="400" font-size="9" fill="#17f7f7" letter-spacing="1" text-transform="uppercase">Creative Director</text>
+        
+        <!-- Divider -->
+        <line x1="-10" y1="28" x2="10" y2="28" stroke="#333" stroke-width="1" />
+        
+        <!-- Contact Details -->
+        <text x="0" y="45" font-family="Inter, sans-serif" font-weight="300" font-size="8" fill="#d5dada">damini@materiallab.io</text>
+        <text x="0" y="58" font-family="Inter, sans-serif" font-weight="300" font-size="8" fill="#d5dada">+91 805 013 1733</text>
+      </g>
     </svg>
   `.trim();
 }

@@ -15,6 +15,7 @@ import { KineticTriakis } from "./branding/primitives/KineticTriakis";
 import { KineticGreatDodecahedron } from "./branding/primitives/KineticGreatDodecahedron";
 import { KineticRhombic } from "./branding/primitives/KineticRhombic";
 import { KineticStellationCycle } from "./branding/primitives/KineticStellationCycle";
+import { StellatedIcosidodecahedron } from "./branding/primitives/StellatedIcosidodecahedron";
 import { KineticGrid } from "./branding/interactive/KineticGrid";
 import { MagneticBadge } from "./branding/interactive/MagneticBadge";
 import { GrainyCursor } from "./branding/interactive/GrainyCursor";
@@ -157,6 +158,22 @@ export function DigitalAssets() {
                 <div>
                     <p className="text-sm font-serif text-white">59 Icosahedra</p>
                     <p className="text-[10px] text-[#d5dada]/50 mt-1">Stellation Cycle</p>
+                </div>
+             </div>
+           </div>
+
+           {/* Stellated Icosidodecahedron */}
+           <div className="group cursor-pointer">
+             <div className="aspect-square bg-[#090909] border border-white/[0.1] flex items-center justify-center p-12 mb-6 transition-transform duration-500 relative overflow-hidden grainy-aura">
+                <StellatedIcosidodecahedron size={120} color="#17f7f7" />
+                <div className="absolute inset-x-0 bottom-0 p-6 flex justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
+                   <span className="bg-white/10 backdrop-blur-sm text-white border border-white/20 text-[10px] font-mono uppercase tracking-widest px-4 py-2">Animated</span>
+                </div>
+             </div>
+             <div className="flex justify-between items-baseline border-t border-white/[0.1] pt-4">
+                <div>
+                    <p className="text-sm font-serif text-white">Icosidodeca</p>
+                    <p className="text-[10px] text-[#d5dada]/50 mt-1">Stellation Series</p>
                 </div>
              </div>
            </div>
@@ -429,23 +446,32 @@ export function DigitalAssets() {
         <div className="grid md:grid-cols-2 gap-8">
           {/* Front Card */}
           <div className="group cursor-pointer" onClick={() => handleDownload('Business Card Front', generateBusinessCardSVG, 'business-card-front.svg')}>
-             <div className="aspect-[1.58/1] bg-[#090909] relative overflow-hidden mb-4 border border-white/[0.1] grainy-aura p-8 flex flex-col justify-between">
-                <div>
-                  <p className="font-sans font-bold text-3xl text-white tracking-tight leading-none mb-1">DAMINI</p>
-                  <p className="font-sans font-bold text-3xl text-white tracking-tight leading-none">RATHI</p>
-                  <div className="h-px w-8 bg-white/30 my-4"></div>
-                  <p className="font-sans font-normal text-[9px] uppercase tracking-[0.2em] text-[#d5dada]">CoFounder</p>
+             <div className="aspect-[1.58/1] bg-[#090909] relative overflow-hidden mb-4 border border-white/[0.1] grainy-aura p-8 flex flex-col justify-center">
+                {/* Oversized Icosahedron Motif */}
+                <div className="absolute right-[-20%] top-[-10%] opacity-40 pointer-events-none">
+                   <svg width="200" height="200" viewBox="0 0 100 100" fill="none">
+                      <g stroke="#17f7f7" strokeWidth="0.5">
+                        <path d="M50 5 L93.3 30 L93.3 80 L50 105 L6.7 80 L6.7 30 Z" />
+                        <path d="M50 80 L21 30 L79 30 Z" />
+                        <path d="M50 5 L21 30 M50 5 L79 30" />
+                        <path d="M93.3 30 L79 30 M93.3 30 L50 80" />
+                        <path d="M93.3 80 L50 80" />
+                        <path d="M6.7 80 L50 80" />
+                        <path d="M6.7 30 L21 30 M6.7 30 L50 80" />
+                      </g>
+                   </svg>
+                </div>
+
+                <div className="relative z-10">
+                  <p className="font-sans font-bold text-2xl text-white tracking-tight leading-none mb-1">DAMINI</p>
+                  <p className="font-sans font-light text-2xl text-white tracking-tight leading-none">RATHI</p>
+                  <div className="h-px w-8 bg-[#17f7f7] my-4"></div>
+                  <p className="font-sans font-medium text-[9px] uppercase tracking-[0.2em] text-[#d5dada]">CoFounder</p>
                 </div>
                 
-                <div className="flex justify-between items-end">
-                   {/* Logo moved to bottom right for drama or keep hidden? SVG has it at x=200. Preview should match. */}
-                   {/* SVG code puts logo at 200, 108 (bottom right ish). */}
-                   <div className="flex-1"></div>
-                   <img src={MASTER_LOGO_URL} className="w-6 h-7 object-contain opacity-80 invert" alt="Logo" />
-                </div>
-                
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-[40%] rotate-90">
-                   <span className="font-serif font-bold text-[8px] tracking-widest text-[#333333] uppercase">material lab</span>
+                <div className="absolute bottom-8 left-8 flex items-center gap-3">
+                   <img src={MASTER_LOGO_URL} className="w-4 h-5 object-contain opacity-100 invert" alt="Logo" />
+                   <span className="font-serif font-bold text-[9px] text-white">material lab</span>
                 </div>
 
                 <div className="absolute inset-0 flex items-center justify-center bg-white/5 opacity-0 group-hover:opacity-100 transition-all duration-500">
@@ -460,26 +486,20 @@ export function DigitalAssets() {
 
           {/* Back Card */}
           <div className="group cursor-pointer" onClick={() => handleDownload('Business Card Back', generateBusinessCardBackSVG, 'business-card-back.svg')}>
-             <div className="aspect-[1.58/1] bg-[#090909] relative overflow-hidden mb-4 border border-white/[0.1] grainy-aura p-8 flex flex-col justify-between">
-                <div className="space-y-4">
-                  <div>
-                     <p className="font-sans font-normal text-[9px] text-[#666] tracking-wide mb-1">Please contact me at</p>
-                     <p className="font-sans font-semibold text-sm text-white tracking-wide">damini@materiallab.io</p>
-                  </div>
-                  
-                  <div className="flex items-center">
-                     <div className="flex-1"></div>
-                     <span className="font-sans font-light text-[9px] text-[#666] italic pr-8">or</span>
-                  </div>
+             <div className="aspect-[1.58/1] bg-[#090909] relative overflow-hidden mb-4 border border-white/[0.1] grainy-aura p-8 flex flex-col items-center justify-center text-center">
+                {/* Grid Background */}
+                <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
 
-                  <div>
-                     <p className="font-sans font-semibold text-sm text-white tracking-wide">+91-805-013-1733</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-end gap-4 mt-auto">
-                   <img src={MASTER_LOGO_URL} className="w-6 h-7 object-contain opacity-80 invert" alt="Logo" />
-                   <span className="font-serif font-bold text-[10px] text-[#17f7f7] mb-1">materiallab.io</span>
+                <div className="relative z-10 flex flex-col items-center">
+                   <img src={MASTER_LOGO_URL} className="w-6 h-7 object-contain mb-4 invert" alt="Logo" />
+                   
+                   <p className="font-sans font-semibold text-sm text-white tracking-wide mb-1">Damini Rathi</p>
+                   <p className="font-sans font-normal text-[9px] text-[#17f7f7] uppercase tracking-widest mb-4">Creative Director</p>
+                   
+                   <div className="w-4 h-px bg-[#333] mb-4"></div>
+
+                   <p className="font-sans font-light text-[9px] text-[#d5dada] mb-1">damini@materiallab.io</p>
+                   <p className="font-sans font-light text-[9px] text-[#d5dada]">+91 805 013 1733</p>
                 </div>
 
                 <div className="absolute inset-0 flex items-center justify-center bg-white/5 opacity-0 group-hover:opacity-100 transition-all duration-500">
