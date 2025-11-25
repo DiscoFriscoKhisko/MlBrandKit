@@ -1,10 +1,34 @@
 import { BrandKit } from "./components/BrandKit";
 import { Toaster } from "sonner@2.0.3";
+import { useState, lazy, Suspense } from "react";
+
+// Lazy load PrismScene to isolate Three.js context and improve performance
+const PrismScene = lazy(() => 
+  import("./components/branding/interactive/PrismScene").then(module => ({ default: module.PrismScene }))
+);
 
 export default function App() {
+  const [view, setView] = useState<'kit' | 'prism'>('kit');
+
   return (
     <>
-      <BrandKit />
+      {view === 'kit' ? (
+        <BrandKit onLaunchLab={() => setView('prism')} />
+      ) : (
+        <Suspense fallback={
+          <div className="h-screen w-full bg-[#050505] flex items-center justify-center">
+            <div className="text-[#17f7f7] font-mono text-xs uppercase tracking-widest animate-pulse">Initializing Optical Array...</div>
+          </div>
+        }>
+          <PrismScene />
+          <button 
+            onClick={() => setView('kit')}
+            className="fixed top-8 right-8 z-50 text-white/50 hover:text-white font-mono text-xs uppercase tracking-widest transition-colors"
+          >
+            Exit Lab
+          </button>
+        </Suspense>
+      )}
       <Toaster position="bottom-right" />
       
       {/* Global SVG Filters */}

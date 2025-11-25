@@ -8,7 +8,7 @@ import { UsageGuidelines } from "./UsageGuidelines";
 import { MASTER_LOGO_URL } from "./branding/constants";
 import { Button } from "./ui/button";
 
-export function BrandKit() {
+export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
   return (
     <div className="min-h-screen bg-[#050505] text-foreground font-sans selection:bg-primary/30 selection:text-primary-foreground overflow-x-hidden">
       {/* Ultra-Subtle Grain - Barely Perceptible */}
@@ -35,6 +35,13 @@ export function BrandKit() {
           </div>
           
           <div className="flex gap-8 pb-2">
+            <Button 
+              onClick={onLaunchLab}
+              variant="link" 
+              className="text-[#d5dada]/60 hover:text-[#17f7f7] p-0 h-auto font-mono text-[10px] uppercase tracking-[0.2em] decoration-0 transition-colors duration-500"
+            >
+              Launch Prism Lab
+            </Button>
             <Button variant="link" className="text-[#d5dada]/60 hover:text-white p-0 h-auto font-mono text-[10px] uppercase tracking-[0.2em] decoration-0 transition-colors duration-500" asChild>
               <a href="mailto:damini@materiallab.io">Contact</a>
             </Button>

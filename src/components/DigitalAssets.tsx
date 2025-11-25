@@ -45,6 +45,12 @@ const generateIsohedronSVG = (color: string) => `
 </svg>
 `;
 
+// Images from Unsplash
+const IMG_ABSTRACT_CYAN = "https://images.unsplash.com/photo-1630756377422-7cfae60dd550?auto=format&fit=crop&w=800&q=80";
+const IMG_DARK_STONE = "https://images.unsplash.com/photo-1764006157515-4d81d9bcec57?auto=format&fit=crop&w=800&q=80";
+const IMG_BRUSHED_METAL = "https://images.unsplash.com/photo-1637681241471-de08fe750e94?auto=format&fit=crop&w=800&q=80";
+const IMG_GEOMETRIC_CYAN = "https://images.unsplash.com/photo-1669479412055-103edfb64cc4?auto=format&fit=crop&w=800&q=80";
+
 export function DigitalAssets() {
   const [showCursorDemo, setShowCursorDemo] = useState(false);
 
@@ -81,9 +87,9 @@ export function DigitalAssets() {
       <div>
         <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Identity Primitives</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-           {/* Kinetic Isohedron */}
+            {/* Kinetic Isohedron */}
            <div className="group cursor-pointer" onClick={() => handleDownload("Kinetic Isohedron", () => generateIsohedronSVG("#fefefe"), "kinetic-isohedron-white.svg")}>
-             <div className="aspect-square bg-[#090909] border border-white/[0.1] flex items-center justify-center p-12 mb-6 transition-transform duration-500 relative overflow-hidden grainy-aura">
+             <div className="aspect-square depth-card flex items-center justify-center p-12 mb-6 transition-transform duration-500 relative overflow-hidden grainy-aura">
                 <KineticIcosahedron size={120} color="#fefefe" />
                 
                 <div className="absolute inset-x-0 bottom-0 p-6 flex justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
@@ -100,7 +106,7 @@ export function DigitalAssets() {
 
            {/* Kinetic Triakis */}
            <div className="group cursor-pointer">
-             <div className="aspect-square bg-[#090909] border border-white/[0.1] flex items-center justify-center p-12 mb-6 transition-transform duration-500 relative overflow-hidden grainy-aura">
+             <div className="aspect-square depth-card flex items-center justify-center p-12 mb-6 transition-transform duration-500 relative overflow-hidden grainy-aura">
                 <KineticTriakis size={120} color="#fefefe" />
                 <div className="absolute inset-x-0 bottom-0 p-6 flex justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
                    <span className="bg-white/10 backdrop-blur-sm text-white border border-white/20 text-[10px] font-mono uppercase tracking-widest px-4 py-2">Locked</span>
@@ -116,7 +122,7 @@ export function DigitalAssets() {
 
            {/* Kinetic Great Dodecahedron */}
            <div className="group cursor-pointer">
-             <div className="aspect-square bg-[#090909] border border-white/[0.1] flex items-center justify-center p-12 mb-6 transition-transform duration-500 relative overflow-hidden grainy-aura">
+             <div className="aspect-square depth-card flex items-center justify-center p-12 mb-6 transition-transform duration-500 relative overflow-hidden grainy-aura">
                 <KineticGreatDodecahedron size={120} color="#fefefe" />
                 <div className="absolute inset-x-0 bottom-0 p-6 flex justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
                    <span className="bg-white/10 backdrop-blur-sm text-white border border-white/20 text-[10px] font-mono uppercase tracking-widest px-4 py-2">Locked</span>
@@ -132,7 +138,7 @@ export function DigitalAssets() {
 
            {/* Kinetic Rhombic */}
            <div className="group cursor-pointer">
-             <div className="aspect-square bg-[#090909] border border-white/[0.1] flex items-center justify-center p-12 mb-6 transition-transform duration-500 relative overflow-hidden grainy-aura">
+             <div className="aspect-square depth-card flex items-center justify-center p-12 mb-6 transition-transform duration-500 relative overflow-hidden grainy-aura">
                 <KineticRhombic size={120} color="#fefefe" />
                 <div className="absolute inset-x-0 bottom-0 p-6 flex justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
                    <span className="bg-white/10 backdrop-blur-sm text-white border border-white/20 text-[10px] font-mono uppercase tracking-widest px-4 py-2">Locked</span>
@@ -148,7 +154,7 @@ export function DigitalAssets() {
 
            {/* Kinetic Stellation Cycle */}
            <div className="group cursor-pointer">
-             <div className="aspect-square bg-[#090909] border border-white/[0.1] flex items-center justify-center p-12 mb-6 transition-transform duration-500 relative overflow-hidden grainy-aura">
+             <div className="aspect-square depth-card flex items-center justify-center p-12 mb-6 transition-transform duration-500 relative overflow-hidden grainy-aura">
                 <KineticStellationCycle size={120} color="#fefefe" />
                 <div className="absolute inset-x-0 bottom-0 p-6 flex justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
                    <span className="bg-white text-black text-[10px] font-mono uppercase tracking-widest px-4 py-2">Sequenced</span>
@@ -164,7 +170,7 @@ export function DigitalAssets() {
 
            {/* Stellated Icosidodecahedron */}
            <div className="group cursor-pointer">
-             <div className="aspect-square bg-[#090909] border border-white/[0.1] flex items-center justify-center p-12 mb-6 transition-transform duration-500 relative overflow-hidden grainy-aura">
+             <div className="aspect-square depth-card flex items-center justify-center p-12 mb-6 transition-transform duration-500 relative overflow-hidden grainy-aura">
                 <StellatedIcosidodecahedron size={120} color="#17f7f7" />
                 <div className="absolute inset-x-0 bottom-0 p-6 flex justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
                    <span className="bg-white/10 backdrop-blur-sm text-white border border-white/20 text-[10px] font-mono uppercase tracking-widest px-4 py-2">Animated</span>
@@ -266,35 +272,86 @@ export function DigitalAssets() {
         </div>
       </div>
 
-      {/* Textures & Materials (New Section) */}
+      {/* Textures & Materials (Expanded with Images) */}
       <div className="border-t border-white/[0.05] pt-24">
-        <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Material Textures</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {/* OLED Noise */}
-            <div className="group cursor-pointer">
-               <div className="aspect-square bg-[#050505] border border-white/[0.1] relative mb-4 overflow-hidden grainy-aura">
-                  <div className="absolute inset-0 opacity-50 mix-blend-overlay" style={{ 
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  }}></div>
-                  <div className="absolute inset-0 flex items-center justify-center bg-white/5 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                    <span className="bg-white text-black text-[9px] font-mono uppercase tracking-widest px-2 py-1">SVG Pattern</span>
+        <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Visual Language</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            {/* Column 1: Textures */}
+            <div className="space-y-8">
+               {/* OLED Noise */}
+               <div className="group cursor-pointer">
+                  <div className="aspect-square bg-[#050505] border border-white/[0.1] relative mb-4 overflow-hidden depth-card">
+                     <div className="absolute inset-0 opacity-50 mix-blend-overlay" style={{ 
+                       backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                     }}></div>
+                     <div className="absolute inset-0 flex items-center justify-center bg-white/5 opacity-0 group-hover:opacity-100 transition-all duration-500">
+                       <span className="bg-white text-black text-[9px] font-mono uppercase tracking-widest px-2 py-1">SVG Pattern</span>
+                     </div>
                   </div>
+                  <p className="text-xs font-medium text-white font-serif">OLED Grain</p>
+                  <p className="text-[9px] font-mono text-[#d5dada]/40 uppercase tracking-widest mt-1">Texture 01</p>
                </div>
-               <p className="text-xs font-medium text-white font-serif">OLED Grain</p>
-               <p className="text-[9px] font-mono text-[#d5dada]/40 uppercase tracking-widest mt-1">Texture 01</p>
+
+               {/* Dark Stone Image */}
+               <div className="group cursor-pointer">
+                  <div className="aspect-[3/4] bg-[#090909] border border-white/[0.1] relative mb-4 overflow-hidden depth-card">
+                     <img src={IMG_DARK_STONE} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-700 grayscale hover:grayscale-0" alt="Stone Texture" />
+                     <div className="absolute inset-0 flex items-center justify-center bg-white/5 opacity-0 group-hover:opacity-100 transition-all duration-500">
+                       <span className="bg-white text-black text-[9px] font-mono uppercase tracking-widest px-2 py-1">Unsplash</span>
+                     </div>
+                  </div>
+                  <p className="text-xs font-medium text-white font-serif">Basalt Form</p>
+                  <p className="text-[9px] font-mono text-[#d5dada]/40 uppercase tracking-widest mt-1">Photography</p>
+               </div>
             </div>
 
-            {/* Jewel Cyan Gradient */}
-            <div className="group cursor-pointer">
-               <div className="aspect-square bg-[#090909] border border-white/[0.1] relative mb-4 overflow-hidden grainy-aura">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#17f7f7]/20 via-transparent to-[#050505]"></div>
-                  <div className="absolute inset-0 flex items-center justify-center bg-white/5 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                    <span className="bg-white text-black text-[9px] font-mono uppercase tracking-widest px-2 py-1">CSS</span>
-                  </div>
-               </div>
-               <p className="text-xs font-medium text-white font-serif">Jewel Gradient</p>
-               <p className="text-[9px] font-mono text-[#d5dada]/40 uppercase tracking-widest mt-1">Texture 02</p>
+            {/* Column 2: Materials */}
+            <div className="space-y-8 md:pt-12">
+                {/* Jewel Cyan Gradient */}
+                <div className="group cursor-pointer">
+                   <div className="aspect-square bg-[#090909] border border-white/[0.1] relative mb-4 overflow-hidden depth-card">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#17f7f7]/20 via-transparent to-[#050505]"></div>
+                      <div className="absolute inset-0 flex items-center justify-center bg-white/5 opacity-0 group-hover:opacity-100 transition-all duration-500">
+                        <span className="bg-white text-black text-[9px] font-mono uppercase tracking-widest px-2 py-1">CSS</span>
+                      </div>
+                   </div>
+                   <p className="text-xs font-medium text-white font-serif">Jewel Gradient</p>
+                   <p className="text-[9px] font-mono text-[#d5dada]/40 uppercase tracking-widest mt-1">Texture 02</p>
+                </div>
+
+                {/* Brushed Metal Image */}
+                <div className="group cursor-pointer">
+                   <div className="aspect-video bg-[#090909] border border-white/[0.1] relative mb-4 overflow-hidden depth-card">
+                      <img src={IMG_BRUSHED_METAL} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-700 grayscale hover:grayscale-0" alt="Metal Texture" />
+                   </div>
+                   <p className="text-xs font-medium text-white font-serif">Anodized Aluminum</p>
+                   <p className="text-[9px] font-mono text-[#d5dada]/40 uppercase tracking-widest mt-1">Material Ref</p>
+                </div>
             </div>
+
+            {/* Column 3: Abstract */}
+            <div className="space-y-8">
+                {/* Geometric Cyan Image */}
+                <div className="group cursor-pointer">
+                   <div className="aspect-[3/4] bg-[#090909] border border-white/[0.1] relative mb-4 overflow-hidden depth-card">
+                      <img src={IMG_GEOMETRIC_CYAN} className="absolute inset-0 w-full h-full object-cover opacity-80 transition-transform duration-700 group-hover:scale-105" alt="Abstract Light" />
+                      <div className="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors duration-500"></div>
+                   </div>
+                   <p className="text-xs font-medium text-white font-serif">Cyber Noir Light</p>
+                   <p className="text-[9px] font-mono text-[#d5dada]/40 uppercase tracking-widest mt-1">Mood</p>
+                </div>
+
+                {/* Abstract Cyan Image */}
+                 <div className="group cursor-pointer">
+                   <div className="aspect-square bg-[#090909] border border-white/[0.1] relative mb-4 overflow-hidden depth-card">
+                      <img src={IMG_ABSTRACT_CYAN} className="absolute inset-0 w-full h-full object-cover opacity-70 transition-opacity duration-700 mix-blend-lighten" alt="Abstract Texture" />
+                   </div>
+                   <p className="text-xs font-medium text-white font-serif">Refraction</p>
+                   <p className="text-[9px] font-mono text-[#d5dada]/40 uppercase tracking-widest mt-1">Abstract</p>
+                </div>
+            </div>
+
         </div>
       </div>
 
