@@ -46,10 +46,10 @@ const generateIsohedronSVG = (color: string) => `
 `;
 
 // Images from Unsplash
-const IMG_ABSTRACT_CYAN = "https://images.unsplash.com/photo-1630756377422-7cfae60dd550?auto=format&fit=crop&w=800&q=80";
-const IMG_DARK_STONE = "https://images.unsplash.com/photo-1764006157515-4d81d9bcec57?auto=format&fit=crop&w=800&q=80";
-const IMG_BRUSHED_METAL = "https://images.unsplash.com/photo-1637681241471-de08fe750e94?auto=format&fit=crop&w=800&q=80";
-const IMG_GEOMETRIC_CYAN = "https://images.unsplash.com/photo-1669479412055-103edfb64cc4?auto=format&fit=crop&w=800&q=80";
+const IMG_ABSTRACT_CYAN = "https://images.unsplash.com/photo-1573655349936-de6bed86f839?auto=format&fit=crop&w=800&q=80";
+const IMG_DARK_STONE = "https://images.unsplash.com/photo-1574505371939-de03b2e174f4?auto=format&fit=crop&w=800&q=80";
+const IMG_BRUSHED_METAL = "https://images.unsplash.com/photo-1509311375768-01b361cf6cc3?auto=format&fit=crop&w=800&q=80";
+const IMG_GEOMETRIC_CYAN = "https://images.unsplash.com/photo-1601654661685-a54e794246f7?auto=format&fit=crop&w=800&q=80";
 
 export function DigitalAssets() {
   const [showCursorDemo, setShowCursorDemo] = useState(false);
@@ -440,132 +440,58 @@ export function DigitalAssets() {
       </div>
 
       {/* Social Templates */}
-      <div className="border-t border-white/[0.05] pt-24">
+      <div className="border-t border-white/[0.05] pt-24 pb-24">
         <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Social Media</h3>
         <div className="grid md:grid-cols-3 gap-8">
           {/* LinkedIn */}
           <div className="group cursor-pointer" onClick={() => handleDownload('LinkedIn Template', generateLinkedInPostSVG, 'linkedin-post.svg')}>
-             <div className="aspect-square bg-[#fefefe] relative overflow-hidden mb-4 grainy-aura" style={{ '--aura-color': 'rgba(0,0,0,0.15)' } as React.CSSProperties}>
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[#17f7f7]/20 rounded-bl-full z-0"></div>
-                <div className="absolute inset-0 flex flex-col justify-between p-8 z-10">
-                   <img src={MASTER_LOGO_URL} alt="Logo" className="h-5 w-auto object-contain self-start opacity-80" />
-                   <p className="font-serif text-3xl text-black leading-none tracking-tighter">Ship<br/>faster.</p>
+             <div className="aspect-square bg-[#fefefe] relative overflow-hidden mb-4 grainy-aura shadow-2xl" style={{ '--aura-color': 'rgba(0,0,0,0.15)' } as React.CSSProperties}>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#17f7f7]/20 rounded-bl-[100px] z-0"></div>
+                <div className="absolute inset-0 flex flex-col justify-between p-10 z-10">
+                   <img src={MASTER_LOGO_URL} alt="Logo" className="h-6 w-auto object-contain self-start opacity-100 mix-blend-multiply" />
+                   <p className="font-serif text-4xl text-black leading-[0.9] tracking-tighter">Ship<br/>faster.</p>
                 </div>
-                <div className="absolute inset-0 flex items-center justify-center bg-black/5 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                   <span className="bg-black text-white text-[10px] font-mono uppercase tracking-widest px-4 py-2">Download</span>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/5 transition-colors duration-500">
+                   <span className="bg-black text-white text-[10px] font-mono uppercase tracking-widest px-6 py-3 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">Download</span>
                 </div>
              </div>
              <div className="flex justify-between items-baseline border-t border-white/[0.1] pt-3">
-              <span className="text-xs font-medium text-white font-serif">LinkedIn</span>
-              <span className="text-[9px] font-mono text-[#d5dada]/40 uppercase tracking-widest">1200 × 1200</span>
+              <span className="text-sm font-medium text-white font-serif">LinkedIn</span>
+              <span className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-widest">1200 × 1200</span>
             </div>
           </div>
           
           {/* Instagram */}
           <div className="group cursor-pointer" onClick={() => handleDownload('Instagram Template', generateInstagramPostSVG, 'instagram-post.svg')}>
-             <div className="aspect-square bg-[#090909] relative overflow-hidden mb-4 border border-white/[0.1] grainy-aura">
+             <div className="aspect-square bg-[#000000] relative overflow-hidden mb-4 border border-white/[0.1] grainy-aura shadow-2xl">
                 <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-                   <img src={MASTER_LOGO_URL} alt="Logo" className="h-12 w-auto object-contain mb-6 opacity-90 invert" />
-                   <div className="h-px w-8 bg-[#17f7f7]"></div>
+                   <img src={MASTER_LOGO_URL} alt="Logo" className="h-16 w-auto object-contain mb-6 opacity-100 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" />
+                   <div className="h-[1px] w-8 bg-[#17f7f7]"></div>
                 </div>
-                <div className="absolute inset-0 flex items-center justify-center bg-white/5 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                   <span className="bg-white text-black text-[10px] font-mono uppercase tracking-widest px-4 py-2">Download</span>
+                <div className="absolute inset-0 flex items-center justify-center bg-white/0 group-hover:bg-white/5 transition-colors duration-500">
+                   <span className="bg-white text-black text-[10px] font-mono uppercase tracking-widest px-6 py-3 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">Download</span>
                 </div>
              </div>
              <div className="flex justify-between items-baseline border-t border-white/[0.1] pt-3">
-              <span className="text-xs font-medium text-white font-serif">Instagram</span>
-              <span className="text-[9px] font-mono text-[#d5dada]/40 uppercase tracking-widest">1080 × 1080</span>
+              <span className="text-sm font-medium text-white font-serif">Instagram</span>
+              <span className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-widest">1080 × 1080</span>
             </div>
           </div>
 
           {/* Twitter */}
           <div className="group cursor-pointer" onClick={() => handleDownload('Twitter Template', generateTwitterHeaderSVG, 'twitter-header.svg')}>
-             <div className="aspect-square bg-[#090909] relative overflow-hidden mb-4 border border-white/[0.1] grainy-aura">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#17f7f7]/30 via-[#17f7f7]/5 to-transparent"></div>
+             <div className="aspect-square bg-[#090909] relative overflow-hidden mb-4 border border-white/[0.1] grainy-aura shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#17f7f7]/20 via-[#050505] to-[#000000]"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                   <h1 className="font-serif text-4xl text-white tracking-tight">Launch.</h1>
+                   <h1 className="font-serif text-4xl text-white tracking-tight drop-shadow-lg">Launch.</h1>
                 </div>
-                <div className="absolute inset-0 flex items-center justify-center bg-white/5 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                   <span className="bg-white text-black text-[10px] font-mono uppercase tracking-widest px-4 py-2">Download</span>
-                </div>
-             </div>
-             <div className="flex justify-between items-baseline border-t border-white/[0.1] pt-3">
-              <span className="text-xs font-medium text-white font-serif">X / Twitter</span>
-              <span className="text-[9px] font-mono text-[#d5dada]/40 uppercase tracking-widest">Header</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Business Cards */}
-      <div className="border-t border-white/[0.05] pt-24 pb-24">
-        <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Business Cards</h3>
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Front Card */}
-          <div className="group cursor-pointer" onClick={() => handleDownload('Business Card Front', generateBusinessCardSVG, 'business-card-front.svg')}>
-             <div className="aspect-[1.58/1] bg-[#090909] relative overflow-hidden mb-4 border border-white/[0.1] grainy-aura p-8 flex flex-col justify-center">
-                {/* Oversized Icosahedron Motif */}
-                <div className="absolute right-[-20%] top-[-10%] opacity-40 pointer-events-none">
-                   <svg width="200" height="200" viewBox="0 0 100 100" fill="none">
-                      <g stroke="#17f7f7" strokeWidth="0.5">
-                        <path d="M50 5 L93.3 30 L93.3 80 L50 105 L6.7 80 L6.7 30 Z" />
-                        <path d="M50 80 L21 30 L79 30 Z" />
-                        <path d="M50 5 L21 30 M50 5 L79 30" />
-                        <path d="M93.3 30 L79 30 M93.3 30 L50 80" />
-                        <path d="M93.3 80 L50 80" />
-                        <path d="M6.7 80 L50 80" />
-                        <path d="M6.7 30 L21 30 M6.7 30 L50 80" />
-                      </g>
-                   </svg>
-                </div>
-
-                <div className="relative z-10">
-                  <p className="font-sans font-bold text-2xl text-white tracking-tight leading-none mb-1">DAMINI</p>
-                  <p className="font-sans font-light text-2xl text-white tracking-tight leading-none">RATHI</p>
-                  <div className="h-px w-8 bg-[#17f7f7] my-4"></div>
-                  <p className="font-sans font-medium text-[9px] uppercase tracking-[0.2em] text-[#d5dada]">CoFounder</p>
-                </div>
-                
-                <div className="absolute bottom-8 left-8 flex items-center gap-3">
-                   <img src={MASTER_LOGO_URL} className="w-4 h-5 object-contain opacity-100 invert" alt="Logo" />
-                   <span className="font-serif font-bold text-[9px] text-white">material lab</span>
-                </div>
-
-                <div className="absolute inset-0 flex items-center justify-center bg-white/5 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                   <span className="bg-white text-black text-[10px] font-mono uppercase tracking-widest px-4 py-2">SVG Front</span>
+                <div className="absolute inset-0 flex items-center justify-center bg-white/0 group-hover:bg-white/5 transition-colors duration-500">
+                   <span className="bg-white text-black text-[10px] font-mono uppercase tracking-widest px-6 py-3 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">Download</span>
                 </div>
              </div>
              <div className="flex justify-between items-baseline border-t border-white/[0.1] pt-3">
-              <span className="text-xs font-medium text-white font-serif">Card Front</span>
-              <span className="text-[9px] font-mono text-[#d5dada]/40 uppercase tracking-widest">85mm × 55mm</span>
-            </div>
-          </div>
-
-          {/* Back Card */}
-          <div className="group cursor-pointer" onClick={() => handleDownload('Business Card Back', generateBusinessCardBackSVG, 'business-card-back.svg')}>
-             <div className="aspect-[1.58/1] bg-[#090909] relative overflow-hidden mb-4 border border-white/[0.1] grainy-aura p-8 flex flex-col items-center justify-center text-center">
-                {/* Grid Background */}
-                <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-
-                <div className="relative z-10 flex flex-col items-center">
-                   <img src={MASTER_LOGO_URL} className="w-6 h-7 object-contain mb-4 invert" alt="Logo" />
-                   
-                   <p className="font-sans font-semibold text-sm text-white tracking-wide mb-1">Damini Rathi</p>
-                   <p className="font-sans font-normal text-[9px] text-[#17f7f7] uppercase tracking-widest mb-4">Creative Director</p>
-                   
-                   <div className="w-4 h-px bg-[#333] mb-4"></div>
-
-                   <p className="font-sans font-light text-[9px] text-[#d5dada] mb-1">damini@materiallab.io</p>
-                   <p className="font-sans font-light text-[9px] text-[#d5dada]">+91 805 013 1733</p>
-                </div>
-
-                <div className="absolute inset-0 flex items-center justify-center bg-white/5 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                   <span className="bg-white text-black text-[10px] font-mono uppercase tracking-widest px-4 py-2">SVG Back</span>
-                </div>
-             </div>
-             <div className="flex justify-between items-baseline border-t border-white/[0.1] pt-3">
-              <span className="text-xs font-medium text-white font-serif">Card Back</span>
-              <span className="text-[9px] font-mono text-[#d5dada]/40 uppercase tracking-widest">85mm × 55mm</span>
+              <span className="text-sm font-medium text-white font-serif">X / Twitter</span>
+              <span className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-widest">Header</span>
             </div>
           </div>
         </div>

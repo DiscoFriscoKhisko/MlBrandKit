@@ -1,94 +1,89 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Typography default scale */
+  /* "Void" Theme - Strict Dark Mode Luxury */
   --font-size: 16px;
 
-  /* New Light Mode Palette Mapping */
-  --background: #f3f4f4; /* White Smoke */
-  --foreground: #050505; /* Deep Black */
-  
-  --card: #fefefe; /* White */
-  --card-foreground: #050505;
-  
-  --popover: #fefefe;
-  --popover-foreground: #050505;
-  
-  --primary: #050505;
-  --primary-foreground: #fefefe;
-  
-  --secondary: #e0e0e0;
-  --secondary-foreground: #050505;
-  
-  --muted: #e0e0e0;
-  --muted-foreground: #050505;
-  
-  --accent: #e0e0e0;
-  --accent-foreground: #050505;
-  
-  --destructive: #ff2a6d; /* Neon Red as Destructive */
-  --destructive-foreground: #fefefe;
-  
-  --border: #e0e0e0;
-  --input: #e0e0e0;
-  --input-background: #fefefe;
-  
-  --ring: #050505;
-  
-  --radius: 0px; /* Sharp, brutalist */
-
-  /* Sidebar defaults */
-  --sidebar: #f3f4f4;
-  --sidebar-foreground: #050505;
-  --sidebar-primary: #050505;
-  --sidebar-primary-foreground: #fefefe;
-  --sidebar-accent: #e0e0e0;
-  --sidebar-accent-foreground: #050505;
-  --sidebar-border: #e0e0e0;
-  --sidebar-ring: #050505;
-}
-
-.dark {
-  /* "Spectral Lab" Dark Mode Palette */
-  --background: #050505; /* Deepest Void (matches PrismScene) */
+  --background: #050505; /* Deepest Void */
   --foreground: #fefefe; /* Pure White */
   
-  --card: #050505;
+  --card: #090909; /* Slightly elevated void */
   --card-foreground: #fefefe;
   
-  --popover: #050505;
+  --popover: #090909;
   --popover-foreground: #fefefe;
   
-  --primary: #17f7f7; /* Cyan Laser */
-  --primary-foreground: #050505;
+  --primary: #17f7f7; /* Electric Cyan */
+  --primary-foreground: #000000;
   
-  --secondary: #1a1d21; /* Dark Grey */
+  --secondary: #1a1d21; /* Dark Metal */
   --secondary-foreground: #fefefe;
   
-  --muted: #050505;
+  --muted: #0a0a0a;
   --muted-foreground: #888888;
   
   --accent: #17f7f7;
-  --accent-foreground: #050505;
+  --accent-foreground: #000000;
   
   --destructive: #ff2a6d; /* Neon Red */
   --destructive-foreground: #fefefe;
   
-  --border: #333333; /* Subtle Dark Border */
+  --border: rgba(255, 255, 255, 0.08); /* Subtle Frost */
   --input: #1a1d21;
+  --input-background: #090909;
   
   --ring: #17f7f7;
+  
+  --radius: 0px; /* Brutalist/Precision */
 
+  /* Sidebar defaults matching Void */
   --sidebar: #050505;
   --sidebar-foreground: #fefefe;
   --sidebar-primary: #17f7f7;
-  --sidebar-primary-foreground: #050505;
+  --sidebar-primary-foreground: #000000;
   --sidebar-accent: #1a1d21;
   --sidebar-accent-foreground: #17f7f7;
-  --sidebar-border: #333333;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
   --sidebar-ring: #17f7f7;
   
   --noise-pattern: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.dark {
+  /* Explicit Dark Mode (same as root) */
+  --background: #050505;
+  --foreground: #fefefe;
+  --card: #090909;
+  --card-foreground: #fefefe;
+  --popover: #090909;
+  --popover-foreground: #fefefe;
+  --primary: #17f7f7;
+  --primary-foreground: #000000;
+  --secondary: #1a1d21;
+  --secondary-foreground: #fefefe;
+  --muted: #0a0a0a;
+  --muted-foreground: #888888;
+  --accent: #17f7f7;
+  --accent-foreground: #000000;
+  --destructive: #ff2a6d;
+  --destructive-foreground: #fefefe;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: #1a1d21;
+  --ring: #17f7f7;
+  --sidebar: #050505;
+  --sidebar-foreground: #fefefe;
+  --sidebar-primary: #17f7f7;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #1a1d21;
+  --sidebar-accent-foreground: #17f7f7;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #17f7f7;
+}
+
+/* Global Text Selection */
+::selection {
+  background: rgba(23, 247, 247, 0.2);
+  color: #17f7f7;
 }
 
 .grainy-aura {
@@ -131,23 +126,23 @@
 
 .depth-card {
   position: relative;
-  background: #050505;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: #090909;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 
     0 0 0 1px rgba(0, 0, 0, 1),
     0 4px 12px rgba(0, 0, 0, 0.8),
     0 12px 24px rgba(0, 0, 0, 0.8);
-  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.5s ease;
+  transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .depth-card:hover {
   transform: translateY(-2px);
   box-shadow: 
-    0 0 0 1px rgba(23, 247, 247, 0.3), /* Cyan rim light */
+    0 0 0 1px rgba(23, 247, 247, 0.2), /* Cyan rim light */
     0 8px 24px rgba(0, 0, 0, 0.8),
     0 24px 48px rgba(0, 0, 0, 0.8),
-    0 0 60px rgba(23, 247, 247, 0.05);
-  border-color: rgba(23, 247, 247, 0.2);
+    0 0 60px rgba(23, 247, 247, 0.05); /* Ambient glow */
+  border-color: rgba(23, 247, 247, 0.3);
 }
 
 @theme inline {
@@ -192,6 +187,9 @@
 
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 }
 
