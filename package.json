@@ -17,8 +17,7 @@
           "react": "^18.3.1",
           "react-dom": "^18.3.1",
           "sonner": "^2.0.3",
-          "tailwind-merge": "*",
-          "three": "*"
+          "tailwind-merge": "*"
       },
       "devDependencies": {
           "@types/node": "^20.10.0",

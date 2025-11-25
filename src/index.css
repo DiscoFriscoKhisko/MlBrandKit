@@ -118,7 +118,6 @@
     --tracking-wider: .05em;
     --tracking-widest: .1em;
     --leading-relaxed: 1.625;
-    --drop-shadow-lg: 0 4px 4px #00000026;
     --ease-out: cubic-bezier(0, 0, .2, 1);
     --animate-pulse: pulse 2s cubic-bezier(.4, 0, .6, 1) infinite;
     --blur-sm: 8px;
@@ -786,10 +785,6 @@
     height: 2px;
   }
 
-  .h-\[300px\] {
-    height: 300px;
-  }
-
   .h-\[calc\(100\%-1px\)\] {
     height: calc(100% - 1px);
   }
@@ -866,10 +861,6 @@
     width: calc(var(--spacing) * 64);
   }
 
-  .w-\[300px\] {
-    width: 300px;
-  }
-
   .w-auto {
     width: auto;
   }
@@ -944,20 +935,12 @@
     transform: var(--tw-rotate-x) var(--tw-rotate-y) var(--tw-rotate-z) var(--tw-skew-x) var(--tw-skew-y);
   }
 
-  .animate-\[ping_3s_ease-in-out_infinite\] {
-    animation: 3s ease-in-out infinite ping;
-  }
-
   .animate-in {
     animation: enter var(--tw-duration, .15s) var(--tw-ease, ease);
   }
 
   .animate-pulse {
     animation: var(--animate-pulse);
-  }
-
-  .cursor-crosshair {
-    cursor: crosshair;
   }
 
   .cursor-none {
@@ -1184,10 +1167,6 @@
 
   .border-\[\#17f7f7\] {
     border-color: #17f7f7;
-  }
-
-  .border-\[\#17f7f7\]\/10 {
-    border-color: oklab(88.4754% -.144082 -.0380579 / .1);
   }
 
   .border-\[\#17f7f7\]\/30 {
@@ -2059,12 +2038,6 @@
   .drop-shadow-\[0_0_8px_rgba\(23\,247\,247\,0\.3\)\] {
     --tw-drop-shadow-size: drop-shadow(0 0 8px var(--tw-drop-shadow-color, #17f7f74d));
     --tw-drop-shadow: var(--tw-drop-shadow-size);
-    filter: var(--tw-blur, ) var(--tw-brightness, ) var(--tw-contrast, ) var(--tw-grayscale, ) var(--tw-hue-rotate, ) var(--tw-invert, ) var(--tw-saturate, ) var(--tw-sepia, ) var(--tw-drop-shadow, );
-  }
-
-  .drop-shadow-lg {
-    --tw-drop-shadow-size: drop-shadow(0 4px 4px var(--tw-drop-shadow-color, #00000026));
-    --tw-drop-shadow: drop-shadow(var(--drop-shadow-lg));
     filter: var(--tw-blur, ) var(--tw-brightness, ) var(--tw-contrast, ) var(--tw-grayscale, ) var(--tw-hue-rotate, ) var(--tw-invert, ) var(--tw-saturate, ) var(--tw-sepia, ) var(--tw-drop-shadow, );
   }
 
@@ -3332,13 +3305,6 @@ html {
   syntax: "*";
   inherits: false;
   initial-value: "";
-}
-
-@keyframes ping {
-  75%, 100% {
-    opacity: 0;
-    transform: scale(2);
-  }
 }
 
 @keyframes pulse {
