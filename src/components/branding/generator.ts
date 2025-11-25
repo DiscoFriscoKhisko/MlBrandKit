@@ -21,6 +21,9 @@ export async function generateLinkedInPostSVG() {
   return `
     <svg width="1200" height="1200" viewBox="0 0 1200 1200" xmlns="http://www.w3.org/2000/svg">
       <rect width="1200" height="1200" fill="#FFFFFF"/>
+      <!-- Electric Blue accent -->
+      <path d="M1050 0 H1200 V150 L1050 0Z" fill="#00F0FF" opacity="0.2"/>
+      
       <image href="${logoDataUri}" x="80" y="80" width="150" height="150" />
       
       <g transform="translate(80, 1000)">
@@ -39,7 +42,8 @@ export async function generateInstagramPostSVG() {
       <rect width="1080" height="1080" fill="#090A09"/>
       <g transform="translate(540, 540)">
         <image href="${logoDataUri}" x="-150" y="-200" width="300" height="300" style="filter: brightness(0) invert(1);" />
-        <rect x="-64" y="150" width="128" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
+        <!-- Electric Blue accent bar -->
+        <rect x="-64" y="150" width="128" height="8" rx="4" fill="#00F0FF"/>
       </g>
     </svg>
   `.trim();
@@ -51,40 +55,49 @@ export async function generateTwitterHeaderSVG() {
   return `
     <svg width="1500" height="500" viewBox="0 0 1500 500" xmlns="http://www.w3.org/2000/svg">
       <rect width="1500" height="500" fill="#090A09"/>
+      <!-- Subtle Electric Blue gradient overlay via opacity -->
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style="stop-color:#00F0FF;stop-opacity:0.1" />
+        <stop offset="100%" style="stop-color:#090A09;stop-opacity:0" />
+      </linearGradient>
+      <rect width="1500" height="500" fill="url(#grad1)"/>
+      
       <image href="${logoDataUri}" x="650" y="150" width="200" height="200" style="filter: brightness(0) invert(1);" />
     </svg>
   `.trim();
 }
 
 export async function generateBusinessCardSVG() {
-  const logoDataUri = await getBase64Image(CARD_FRONT_LOGO_URL);
+  // Using the logo optimized for dark backgrounds since we are moving to Dark Mode Luxury
+  const logoDataUri = await getBase64Image(CARD_BACK_LOGO_URL);
   
-  // Front of the card
+  // Front of the card - Dark Mode Luxury
   // 85.6mm x 54mm (Approx 244x154 aspect ratio)
   return `
     <svg width="85.6mm" height="54mm" viewBox="0 0 244 154" xmlns="http://www.w3.org/2000/svg">
-      <rect width="244" height="154" fill="#FFFFFF"/>
+      <rect width="244" height="154" fill="#090909"/>
       
-      <!-- DAMINI: inset-[18.71%_71.56%_71.49%_10.39%] -->
-      <text x="25.35" y="35" font-family="Inter, sans-serif" font-weight="600" font-size="12" fill="#0b0c0b">DAMINI </text>
+      <!-- DAMINI -->
+      <text x="25" y="48" font-family="Inter, sans-serif" font-weight="700" font-size="24" letter-spacing="-0.5" fill="#fefefe">DAMINI </text>
 
-      <!-- RATHI: inset-[33.27%_74.85%_56.93%_10.39%] -->
-      <text x="25.35" y="58" font-family="Inter, sans-serif" font-weight="600" font-size="12" fill="#0b0c0b">RATHI</text>
+      <!-- RATHI -->
+      <text x="25" y="76" font-family="Inter, sans-serif" font-weight="700" font-size="24" letter-spacing="-0.5" fill="#fefefe">RATHI</text>
       
-      <!-- Line: inset-[53.95%_68.67%_46.05%_10.39%] -->
-      <line x1="25.35" y1="83.5" x2="76.9" y2="83.5" stroke="#000000" stroke-width="1" stroke-linecap="round" />
+      <!-- Line -->
+      <line x1="25" y1="92" x2="55" y2="92" stroke="#fefefe" stroke-width="1.5" stroke-opacity="0.3" stroke-linecap="square" />
       
-      <!-- CoFounder: inset-[44.04%_34.96%_44.2%_32.64%] -->
-      <text x="79.6" y="78" font-family="Inter, sans-serif" font-weight="400" font-size="15" fill="#0b0c0b">CoFounder</text>
+      <!-- CoFounder -->
+      <text x="25" y="108" font-family="Inter, sans-serif" font-weight="400" font-size="9" letter-spacing="2" fill="#d5dada" text-transform="uppercase">CoFounder</text>
       
-      <!-- Logo Image: inset-[66.91%_76.7%_9.49%_10.46%] -->
-      <!-- Width ~ 31px (12.8%), Height ~ 36px (23.6%) based on aspect or just fit box -->
-      <!-- Container is top 103, left 25.5. Size: 31x36 approx -->
-      <image href="${logoDataUri}" x="25.5" y="103" width="32" height="37" />
+      <!-- Logo Image -->
+      <image href="${logoDataUri}" x="200" y="108" width="24" height="28" />
       
-      <!-- Vertical Handle (Material Lab): inset-[17.59%_11.47%_17.08%_47.51%] -->
-      <!-- Center approx x=180, y=77. Rotated 90deg -->
-      <text x="180" y="77" font-family="Merriweather, serif" font-weight="bold" font-size="12" fill="#0b0c0b" text-anchor="middle" transform="rotate(90, 180, 77)">material lab</text>
+      <!-- Vertical Handle (Material Lab) - Repositioned or Removed? 
+           Let's keep it but move it to be subtle on the right or remove if it clashes with drama.
+           Let's move it to bottom right aligned with logo maybe?
+           Or keep vertical on right edge.
+      -->
+      <text x="225" y="77" font-family="Merriweather, serif" font-weight="bold" font-size="8" letter-spacing="1" fill="#333333" text-anchor="middle" transform="rotate(90, 225, 77)">material lab</text>
     </svg>
   `.trim();
 }
@@ -94,33 +107,31 @@ export async function generateBusinessCardBackSVG() {
 
   return `
     <svg width="85.6mm" height="54mm" viewBox="0 0 244 154" xmlns="http://www.w3.org/2000/svg">
-      <rect width="244" height="154" fill="#0B0C0B"/>
+      <rect width="244" height="154" fill="#090909"/>
       
-      <!-- Contact Intro: inset-[13.71%_28.92%_74.53%_10.37%] -->
-      <text x="25.3" y="28" font-family="Inter, sans-serif" font-weight="300" font-size="12" fill="#d6d6de">Please contact me at </text>
+      <!-- Contact Intro -->
+      <text x="25" y="35" font-family="Inter, sans-serif" font-weight="400" font-size="9" fill="#666666" letter-spacing="0.5">Please contact me at </text>
       
-      <!-- Email: inset-[26.45%_23.17%_61.79%_10.37%] -->
-      <text x="25.3" y="49" font-family="Inter, sans-serif" font-weight="600" font-size="15" fill="#FFFFFF">damini@materiallab.io</text>
+      <!-- Email -->
+      <text x="25" y="55" font-family="Inter, sans-serif" font-weight="600" font-size="13" fill="#fefefe" letter-spacing="0.2">damini@materiallab.io</text>
       
-      <!-- Or: inset-[32.21%_11.04%_56.03%_82.81%] -->
-      <text x="202" y="57" font-family="Inter, sans-serif" font-weight="300" font-size="15" fill="#d6d6de">or</text>
+      <!-- Or -->
+      <text x="180" y="55" font-family="Inter, sans-serif" font-weight="400" font-size="9" fill="#666666" font-style="italic">or</text>
       
-      <!-- Phone: inset-[44.04%_33.53%_44.2%_9.86%] -->
-      <text x="24" y="75" font-family="Inter, sans-serif" font-weight="500" font-size="15" fill="#FFFFFF">+91-805-013-1733</text>
+      <!-- Phone -->
+      <text x="25" y="78" font-family="Inter, sans-serif" font-weight="600" font-size="13" fill="#fefefe" letter-spacing="0.2">+91-805-013-1733</text>
       
-      <!-- Logo Image: inset-[66.91%_76.52%_9.49%_10.64%] -->
-      <image href="${logoDataUri}" x="26" y="103" width="32" height="37" />
+      <!-- Logo Image -->
+      <image href="${logoDataUri}" x="25" y="105" width="24" height="28" />
       
-      <!-- Website: inset-[77.64%_25.49%_12.56%_39.65%] -->
-      <text x="96.7" y="127" font-family="Merriweather, serif" font-weight="bold" font-size="12" fill="#f3f3f5">materiallab.io</text>
+      <!-- Website with Jewel Cyan accent -->
+      <text x="65" y="124" font-family="Merriweather, serif" font-weight="bold" font-size="10" fill="#17f7f7">materiallab.io</text>
     </svg>
   `.trim();
 }
 
 export async function generateAppIconSVG(size: number = 1024) {
   const logoDataUri = await getBase64Image(MASTER_LOGO_URL);
-  
-  // Calculate padding (approx 11% of size, similar to original 112/1024)
   const padding = Math.round(size * 0.109);
   const imageSize = size - (padding * 2);
   
@@ -132,8 +143,10 @@ export async function generateAppIconSVG(size: number = 1024) {
   `.trim();
 }
 
-export async function generateWordmarkSVG(variant: "black" | "white") {
-  const fillColor = variant === "black" ? "#090A09" : "#FFFFFF";
+export async function generateWordmarkSVG(variant: "black" | "white" | "cyan") {
+  let fillColor = "#090A09";
+  if (variant === "white") fillColor = "#FFFFFF";
+  if (variant === "cyan") fillColor = "#00F0FF";
   
   return `
     <svg width="600" height="150" viewBox="0 0 600 150" xmlns="http://www.w3.org/2000/svg">
@@ -142,13 +155,15 @@ export async function generateWordmarkSVG(variant: "black" | "white") {
   `.trim();
 }
 
-export async function generateMicroLogoSVG(variant: "black" | "white") {
-  const fillColor = variant === "black" ? "#090A09" : "#FFFFFF";
+export async function generateMicroLogoSVG(variant: "black" | "white" | "cyan") {
+  let fillColor = "#090A09";
+  if (variant === "white") fillColor = "#FFFFFF";
+  if (variant === "cyan") fillColor = "#00F0FF";
   
   return `
     <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
       <rect width="512" height="512" fill="none"/>
-      <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Merriweather, serif" font-weight="bold" font-size="400" fill="${fillColor}" dy=".1em">m</text>
+      <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Merriweather, serif" font-weight="bold" font-size="400" fill="${fillColor}" dy=".1em">ml</text>
     </svg>
   `.trim();
 }

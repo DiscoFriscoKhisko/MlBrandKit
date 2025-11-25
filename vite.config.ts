@@ -11,6 +11,7 @@
         'sonner@2.0.3': 'sonner',
         'lucide-react@0.487.0': 'lucide-react',
         'figma:asset/7f8b67c561905b98488a55820f315f5daf697d67.png': path.resolve(__dirname, './src/assets/7f8b67c561905b98488a55820f315f5daf697d67.png'),
+        'figma:asset/7b0237d2897c59c2637d17234831014cabda6fb0.png': path.resolve(__dirname, './src/assets/7b0237d2897c59c2637d17234831014cabda6fb0.png'),
         'figma:asset/658bccfc6e5774439f89351cea319f01f56a583a.png': path.resolve(__dirname, './src/assets/658bccfc6e5774439f89351cea319f01f56a583a.png'),
         'figma:asset/6476e1b10abb071009c199bfce76ba071846b2ef.png': path.resolve(__dirname, './src/assets/6476e1b10abb071009c199bfce76ba071846b2ef.png'),
         'figma:asset/5f027551f5fd9323f35803cda832e8eea8904fc3.png': path.resolve(__dirname, './src/assets/5f027551f5fd9323f35803cda832e8eea8904fc3.png'),

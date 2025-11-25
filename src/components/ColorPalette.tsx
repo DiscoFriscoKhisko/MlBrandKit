@@ -1,241 +1,145 @@
 import { useState } from "react";
-import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { toast } from "sonner@2.0.3";
+import { copyToClipboard } from "./ui/utils";
 
 const brandColors = [
-  { name: "Log Cabin", hex: "#090A09", rgb: "9, 10, 9", usage: "Primary Brand Color, Headings, Text" },
-  { name: "Mischka", hex: "#D6D6DE", rgb: "214, 214, 222", usage: "Secondary Brand Color, Borders, Accents" },
-  { name: "White", hex: "#FFFFFF", rgb: "255, 255, 255", usage: "Backgrounds, Negative Space" },
+  { name: "OLED Black", hex: "#090909", rgb: "9 9 9", usage: "Void" },
+  { name: "White Smoke", hex: "#f3f4f4", rgb: "243 244 244", usage: "Surface" },
+  { name: "Alabaster", hex: "#d5dada", rgb: "213 218 218", usage: "Structure" },
+  { name: "Cyan Laser", hex: "#17f7f7", rgb: "23 247 247", usage: "Energy" },
+  { name: "Pure White", hex: "#fefefe", rgb: "254 254 254", usage: "Signal" },
 ];
 
-// Derived shades for functional UI needs (based on Log Cabin and Mischka)
-const functionalColors = [
-  { name: "Log Cabin 900", hex: "#090A09", rgb: "9, 10, 9", usage: "Default Text" },
-  { name: "Log Cabin 800", hex: "#1A1B1A", rgb: "26, 27, 26", usage: "Hover States" },
-  { name: "Mischka 500", hex: "#D6D6DE", rgb: "214, 214, 222", usage: "Borders, Dividers" },
-  { name: "Mischka 100", hex: "#F3F3F5", rgb: "243, 243, 245", usage: "Light Backgrounds" },
-];
-
-interface ColorCardProps {
+interface ColorBlockProps {
   name: string;
   hex: string;
   rgb: string;
-  usage: string;
+  usage?: string;
   onCopy: (text: string, id: string) => void;
   copied: string | null;
 }
 
-function ColorCard({ name, hex, rgb, usage, onCopy, copied }: ColorCardProps) {
-  // Determine text color based on brightness
-  const isDark = hex.toLowerCase() === "#090a09" || hex.toLowerCase() === "#1a1b1a";
+function ColorBlock({ name, hex, rgb, usage, onCopy, copied }: ColorBlockProps) {
+  const isCopied = copied === `${name}-hex`;
   
   return (
-    <Card className="overflow-hidden">
+    <div className="group cursor-pointer" onClick={() => onCopy(hex, `${name}-hex`)}>
+      {/* Color Square - No Borders, Sharp Edges */}
       <div 
-        className="h-32 flex items-center justify-center"
+        className="aspect-[4/5] w-full relative mb-6 transition-all duration-500 ease-out group-hover:scale-[1.02]"
         style={{ backgroundColor: hex }}
       >
-        <span className={`text-sm uppercase tracking-wider ${isDark ? 'text-[#D6D6DE]' : 'text-[#090A09]'}`}>
-          {name}
-        </span>
+         {/* Floating Usage Label */}
+         {usage && (
+           <span className={`absolute top-4 left-4 text-[9px] uppercase tracking-[0.2em] font-mono opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0 ${['#fefefe', '#f3f4f4', '#d5dada'].includes(hex) ? 'text-black' : 'text-white'}`}>
+             {usage}
+           </span>
+         )}
+         
+         {/* Copied State - Minimal */}
+         {isCopied && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm animate-in fade-in duration-200">
+              <span className="text-[10px] tracking-[0.3em] font-mono text-white">COPIED</span>
+            </div>
+         )}
       </div>
-      <div className="p-4 space-y-3">
-        <div>
-          <p className="text-xs text-neutral-500 mb-1">HEX</p>
-          <div className="flex items-center justify-between">
-            <code className="text-sm">{hex}</code>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onCopy(hex, `${name}-hex`)}
-              className="h-6 px-2 text-xs"
-            >
-              {copied === `${name}-hex` ? "Copied" : "Copy"}
-            </Button>
-          </div>
+      
+      {/* Metadata - Sparse & Clean */}
+      <div className="space-y-2 pl-1 border-l border-transparent group-hover:border-[#17f7f7] transition-colors duration-300">
+        <h4 className="text-sm font-serif text-white font-medium">{name}</h4>
+        <div className="flex flex-col gap-1">
+          <code className="text-[10px] font-mono text-[#d5dada]/60 uppercase group-hover:text-[#17f7f7] transition-colors">{hex}</code>
+          <code className="text-[10px] font-mono text-[#d5dada]/30 uppercase">{rgb}</code>
         </div>
-        <div>
-          <p className="text-xs text-neutral-500 mb-1">RGB</p>
-          <div className="flex items-center justify-between">
-            <code className="text-sm">{rgb}</code>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onCopy(rgb, `${name}-rgb`)}
-              className="h-6 px-2 text-xs"
-            >
-              {copied === `${name}-rgb` ? "Copied" : "Copy"}
-            </Button>
-          </div>
-        </div>
-        <p className="text-xs text-neutral-500 pt-2 border-t">{usage}</p>
       </div>
-    </Card>
+    </div>
   );
 }
 
 export function ColorPalette() {
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
 
-  const copyToClipboard = async (text: string, id: string) => {
-    const executeCopy = async () => {
-      try {
-        // Try modern Clipboard API first
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          await navigator.clipboard.writeText(text);
-          return true;
-        }
-        throw new Error("Clipboard API unavailable");
-      } catch (err) {
-        // Fallback to legacy method
-        try {
-          const textarea = document.createElement("textarea");
-          textarea.value = text;
-          textarea.style.position = "fixed";
-          textarea.style.left = "-999999px";
-          textarea.style.top = "-999999px";
-          document.body.appendChild(textarea);
-          textarea.focus();
-          textarea.select();
-          
-          const successful = document.execCommand("copy");
-          document.body.removeChild(textarea);
-          return successful;
-        } catch (fallbackErr) {
-          console.error("Fallback copy failed:", fallbackErr);
-          return false;
-        }
-      }
-    };
-
-    const success = await executeCopy();
-    
+  const handleCopy = async (text: string, id: string) => {
+    const success = await copyToClipboard(text);
     if (success) {
       setCopiedColor(id);
-      setTimeout(() => setCopiedColor(null), 2000);
+      setTimeout(() => setCopiedColor(null), 1500);
       toast.success(`Copied ${text}`);
     } else {
-      // Manual fallback: show the text in a toast for manual copying
-      toast.error(`Please copy manually: ${text}`);
+      toast.error("Failed to copy");
     }
   };
 
   return (
-    <div className="space-y-12">
-      {/* Header */}
-      <div>
-        <h2 className="text-4xl mb-4 font-serif text-[#090A09]">Color Palette</h2>
-        <p className="text-[#090A09]/80 max-w-3xl text-lg">
-          Material Lab uses a strict monochrome palette anchored by <strong>Log Cabin</strong> (Black) and <strong>Mischka</strong> (Grey). 
-          These two colors form the foundation of our visual identity.
-        </p>
-      </div>
-
-      {/* Core Identity */}
-      <div className="space-y-6">
-        <h3 className="text-2xl text-[#090A09]">Core Identity</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {brandColors.map((color) => (
-            <ColorCard
-              key={color.hex}
-              {...color}
-              onCopy={copyToClipboard}
-              copied={copiedColor}
-            />
-          ))}
+    <div className="space-y-32">
+      {/* Editorial Header */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+        <div className="md:col-span-4">
+          <h2 className="text-3xl font-serif text-white">Chromatic Depth</h2>
+        </div>
+        <div className="md:col-span-8 md:pl-12 border-l border-white/[0.05]">
+          <p className="text-[#d5dada] text-lg font-light leading-relaxed max-w-lg">
+            A palette distilled to its essence. Deep voids, sterile surfaces, and 
+            clinical accents. Color is used not for decoration, but for direction.
+          </p>
         </div>
       </div>
 
-      {/* Functional Palette */}
-      <div className="space-y-6">
-        <h3 className="text-2xl text-[#090A09]">Functional Shades</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-           {functionalColors.map((color) => (
-            <ColorCard
-              key={color.hex}
-              {...color}
-              onCopy={copyToClipboard}
-              copied={copiedColor}
-            />
-          ))}
-        </div>
+      {/* Swatches - Wide Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-8 md:gap-12">
+        {brandColors.map((color) => (
+          <ColorBlock
+            key={color.hex}
+            {...color}
+            onCopy={handleCopy}
+            copied={copiedColor}
+          />
+        ))}
       </div>
 
-      {/* Usage Examples */}
-      <div>
-        <h3 className="text-2xl mb-6 text-[#090A09]">Usage Examples</h3>
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card className="p-6 bg-white border-[#D6D6DE]">
-            <h4 className="mb-4 text-[#090A09]">Button Styles</h4>
-            <div className="space-y-3">
-              <Button className="w-full bg-[#090A09] hover:bg-[#090A09]/90 text-white">
-                Log Cabin Button
-              </Button>
-              <Button className="w-full bg-[#D6D6DE] hover:bg-[#D6D6DE]/90 text-[#090A09]">
-                Mischka Button
-              </Button>
-              <Button variant="outline" className="w-full border-[#D6D6DE] text-[#090A09] hover:bg-[#D6D6DE]/20">
-                Outline Button
-              </Button>
-            </div>
-          </Card>
+      {/* Interaction Study */}
+      <div className="pt-12 border-t border-white/[0.05]">
+         <div className="grid md:grid-cols-2 gap-24">
+            
+            {/* Concept 1: Hierarchy */}
+            <div>
+              <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Interactive States</h3>
+              <div className="flex flex-col gap-6 max-w-xs">
+                  {/* Primary: Outline with Glow */}
+                  <Button className="w-full bg-transparent hover:bg-[#17f7f7]/5 text-[#17f7f7] border border-[#17f7f7]/50 hover:border-[#17f7f7] rounded-none h-14 tracking-[0.1em] text-xs uppercase transition-all duration-300">
+                    Primary System
+                  </Button>
+                  
+                  {/* Secondary: Ghost White */}
+                  <Button className="w-full bg-transparent hover:bg-white/5 text-white border border-white/20 hover:border-white/40 rounded-none h-14 tracking-[0.1em] text-xs uppercase transition-all duration-300">
+                    Secondary Function
+                  </Button>
 
-          <Card className="p-6 bg-[#090A09] text-[#D6D6DE]">
-            <h4 className="mb-4 text-white">Dark Mode / High Contrast</h4>
-            <div className="space-y-2">
-              <p className="text-white text-xl font-serif">Log Cabin & Mischka</p>
-              <p className="text-[#D6D6DE]">
-                The quick, brown, log cabin, and mischka fox jumped over the lazy dog.
-              </p>
-              <div className="mt-4 pt-4 border-t border-[#D6D6DE]/30">
-                <p className="text-xs text-[#D6D6DE]/70">Dark background pairing</p>
+                  {/* Tertiary: Link */}
+                  <Button variant="ghost" className="w-full justify-start px-0 text-[#d5dada] hover:text-white hover:bg-transparent h-auto text-xs uppercase tracking-[0.2em] group">
+                    <span className="border-b border-transparent group-hover:border-[#17f7f7] transition-all duration-300 pb-1">Documentation</span>
+                    <span className="ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[#17f7f7]">&rarr;</span>
+                  </Button>
               </div>
             </div>
-          </Card>
-        </div>
-      </div>
 
-      {/* Background Combinations */}
-      <div>
-        <h3 className="text-2xl mb-6 text-[#090A09]">Background Combinations</h3>
-        <div className="grid md:grid-cols-3 gap-6">
-          <Card className="overflow-hidden border-[#D6D6DE]">
-            <div className="h-48 bg-white flex items-center justify-center border-b border-[#D6D6DE]">
-              <div className="text-center">
-                <p className="text-[#090A09] mb-2 font-bold">White</p>
-                <p className="text-[#090A09]/60 text-sm">Standard Background</p>
-              </div>
+            {/* Concept 2: Usage Context */}
+            <div className="space-y-8 relative">
+               <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Contextual Application</h3>
+               <div className="p-8 border border-white/[0.05] bg-white/[0.01] backdrop-blur-sm space-y-6 grainy-aura">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="h-1.5 w-1.5 bg-[#17f7f7] rounded-full animate-pulse"></div>
+                    <span className="text-[10px] font-mono text-[#17f7f7] tracking-widest uppercase">System Active</span>
+                  </div>
+                  <h4 className="text-2xl font-serif text-white">OLED precision meets brutalist structure.</h4>
+                  <p className="text-sm text-[#d5dada]/60 leading-relaxed">
+                    The interface recedes, allowing content to pierce through the darkness.
+                  </p>
+               </div>
             </div>
-            <div className="p-4 bg-white">
-              <code className="text-xs text-[#090A09]">#FFFFFF</code>
-            </div>
-          </Card>
 
-          <Card className="overflow-hidden border-[#D6D6DE]">
-            <div className="h-48 bg-[#D6D6DE] flex items-center justify-center border-b border-[#D6D6DE]">
-              <div className="text-center">
-                <p className="text-[#090A09] mb-2 font-bold">Mischka</p>
-                <p className="text-[#090A09]/60 text-sm">Secondary / Accent</p>
-              </div>
-            </div>
-            <div className="p-4 bg-[#D6D6DE]">
-              <code className="text-xs text-[#090A09]">#D6D6DE</code>
-            </div>
-          </Card>
-
-          <Card className="overflow-hidden border-[#D6D6DE]">
-            <div className="h-48 bg-[#090A09] flex items-center justify-center border-b border-[#090A09]">
-              <div className="text-center">
-                <p className="text-white mb-2 font-bold">Log Cabin</p>
-                <p className="text-[#D6D6DE] text-sm">Primary Dark</p>
-              </div>
-            </div>
-            <div className="p-4 bg-[#090A09]">
-              <code className="text-xs text-[#D6D6DE]">#090A09</code>
-            </div>
-          </Card>
-        </div>
+         </div>
       </div>
     </div>
   );

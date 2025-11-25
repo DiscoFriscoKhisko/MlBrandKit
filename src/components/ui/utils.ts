@@ -64,11 +64,6 @@ export function downloadSVGAsPNG(svgContent: string, filename: string, width: nu
   const url = URL.createObjectURL(blob);
 
   img.onload = () => {
-    ctx.fillStyle = "white"; // Optional background? Or transparent? User asked for transparent PNG usually.
-    // If user wants transparent, don't fill rect.
-    // But for "JPG (solid background)" we'd need fill.
-    // Default to transparent for PNG.
-    
     ctx.scale(2, 2);
     ctx.drawImage(img, 0, 0, width, height);
     
@@ -83,4 +78,72 @@ export function downloadSVGAsPNG(svgContent: string, filename: string, width: nu
   };
 
   img.src = url;
+}
+
+export function downloadRecoloredImage(imageUrl: string, filename: string, color: string) {
+  const img = new Image();
+  img.crossOrigin = "Anonymous"; 
+  
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    
+    // Draw original image
+    ctx.drawImage(img, 0, 0);
+    
+    // Composite color over it
+    ctx.globalCompositeOperation = 'source-in';
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    const pngUrl = canvas.toDataURL("image/png");
+    
+    const link = document.createElement("a");
+    link.href = pngUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
+  img.src = imageUrl;
+}
+
+/**
+ * Robust copy to clipboard that handles iframe permissions by falling back to execCommand
+ */
+export async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (err) {
+    // Fallback for environments where Clipboard API is blocked (e.g. iframes without permission)
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      
+      // Ensure it's not visible but is part of the DOM
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      textarea.style.top = '0';
+      textarea.setAttribute('readonly', '');
+      
+      document.body.appendChild(textarea);
+      textarea.select();
+      textarea.setSelectionRange(0, 99999); // For mobile devices
+      
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textarea);
+      
+      if (successful) return true;
+      return false;
+    } catch (fallbackErr) {
+      console.error('Fallback copy failed', fallbackErr);
+      return false;
+    }
+  }
 }

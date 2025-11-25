@@ -1,245 +1,163 @@
-import { Card } from "./ui/card";
 import { Button } from "./ui/button";
+import { toast } from "sonner@2.0.3";
+import { copyToClipboard } from "./ui/utils";
 
 const typographySpecs = [
   {
     level: "Display",
-    example: "Building the Future",
     font: "Merriweather",
-    weight: "700 (Bold)",
-    size: "60px / 3.75rem",
+    weight: "Bold",
+    weightClass: "font-bold",
+    size: "64px",
+    sizeClass: "text-6xl md:text-7xl",
+    lineHeight: "1.05",
+    tracking: "-0.02em",
+    example: "Vision",
+  },
+  {
+    level: "Heading 1",
+    font: "Merriweather",
+    weight: "Bold",
+    weightClass: "font-bold",
+    size: "48px",
+    sizeClass: "text-5xl",
     lineHeight: "1.1",
-    usage: "Hero sections, landing pages",
+    tracking: "-0.01em",
+    example: "Editorial Depth",
   },
   {
-    level: "H1",
-    example: "Main Page Heading",
+    level: "Heading 2",
     font: "Merriweather",
-    weight: "700 (Bold)",
-    size: "48px / 3rem",
+    weight: "Regular",
+    weightClass: "font-normal",
+    size: "32px",
+    sizeClass: "text-3xl",
     lineHeight: "1.2",
-    usage: "Page titles",
-  },
-  {
-    level: "H2",
-    example: "Section Heading",
-    font: "Merriweather",
-    weight: "700 (Bold)",
-    size: "36px / 2.25rem",
-    lineHeight: "1.3",
-    usage: "Major sections",
-  },
-  {
-    level: "H3",
-    example: "Subsection Heading",
-    font: "Inter",
-    weight: "600 (Semi-bold)",
-    size: "24px / 1.5rem",
-    lineHeight: "1.4",
-    usage: "Subsections, cards",
+    tracking: "0",
+    example: "The silence of space",
   },
   {
     level: "Body Large",
-    example: "This is body text for reading. Clear, comfortable, and accessible.",
     font: "Inter",
-    weight: "400 (Regular)",
-    size: "18px / 1.125rem",
+    weight: "Light",
+    weightClass: "font-light",
+    size: "20px",
+    sizeClass: "text-xl",
     lineHeight: "1.6",
-    usage: "Introductions, lead paragraphs",
+    tracking: "0",
+    example: "Design is the silent ambassador of your brand.",
   },
   {
     level: "Body",
-    example: "This is the default body text used throughout the application and website for general content.",
     font: "Inter",
-    weight: "400 (Regular)",
-    size: "16px / 1rem",
+    weight: "Regular",
+    weightClass: "font-normal",
+    size: "16px",
+    sizeClass: "text-base",
     lineHeight: "1.6",
-    usage: "Default body text",
+    tracking: "0",
+    example: "Precision is not just a detail. It is the foundation.",
   },
   {
-    level: "Body Small",
-    example: "Smaller text for captions and supporting information that doesn't need as much prominence.",
+    level: "Mono Label",
     font: "Inter",
-    weight: "400 (Regular)",
-    size: "14px / 0.875rem",
-    lineHeight: "1.5",
-    usage: "Captions, metadata, labels",
-  },
-  {
-    level: "Caption",
-    example: "UPPERCASE LABELS AND TAGS",
-    font: "Inter",
-    weight: "500 (Medium)",
-    size: "12px / 0.75rem",
+    weight: "Medium",
+    weightClass: "font-medium",
+    size: "11px",
+    sizeClass: "text-[11px] uppercase tracking-[0.2em] font-mono",
     lineHeight: "1.4",
-    usage: "Labels, tags, small UI elements",
+    tracking: "0.2em",
+    example: "SPECIFICATION 01",
   },
 ];
 
 export function Typography() {
+  const handleCopy = async (text: string) => {
+    const success = await copyToClipboard(text);
+    if (success) {
+      toast.success("Copied style classes");
+    } else {
+      toast.error("Failed to copy");
+    }
+  };
+
   return (
-    <div className="space-y-12">
+    <div className="space-y-32">
       {/* Header */}
-      <div>
-        <h2 className="text-4xl mb-4 font-serif text-foreground">Typography</h2>
-        <p className="text-muted-foreground max-w-3xl">
-          Material Lab uses Merriweather for display and headings to add personality, 
-          paired with Inter for body text to ensure readability and clarity.
-        </p>
-      </div>
-
-      {/* Font Families */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card className="p-8 bg-card border-border">
-          <div className="mb-6">
-            <h3 className="text-2xl mb-2 font-serif text-foreground">Merriweather</h3>
-            <p className="text-sm text-muted-foreground">Display & Headings</p>
-          </div>
-          <div className="space-y-4 mb-6">
-            <p className="font-serif text-4xl text-foreground">
-              Aa Bb Cc
-            </p>
-            <p className="font-serif text-2xl text-foreground">
-              The quick brown fox jumps over the lazy dog
-            </p>
-          </div>
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <p>ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
-            <p>abcdefghijklmnopqrstuvwxyz</p>
-            <p>0123456789 !@#$%^&*()</p>
-          </div>
-          <Button variant="outline" className="mt-6 w-full" asChild>
-            <a href="https://fonts.google.com/specimen/Merriweather" target="_blank" rel="noopener noreferrer">
-              View on Google Fonts
-            </a>
-          </Button>
-        </Card>
-
-        <Card className="p-8 bg-card border-border">
-          <div className="mb-6">
-            <h3 className="text-2xl mb-2 text-foreground">Inter</h3>
-            <p className="text-sm text-muted-foreground">Body & UI Text</p>
-          </div>
-          <div className="space-y-4 mb-6">
-            <p className="text-4xl text-foreground">
-              Aa Bb Cc
-            </p>
-            <p className="text-2xl text-foreground">
-              The quick brown fox jumps over the lazy dog
-            </p>
-          </div>
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <p>ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
-            <p>abcdefghijklmnopqrstuvwxyz</p>
-            <p>0123456789 !@#$%^&*()</p>
-          </div>
-          <Button variant="outline" className="mt-6 w-full" asChild>
-            <a href="https://fonts.google.com/specimen/Inter" target="_blank" rel="noopener noreferrer">
-              View on Google Fonts
-            </a>
-          </Button>
-        </Card>
-      </div>
-
-      {/* Type Scale */}
-      <div>
-        <h3 className="text-2xl mb-6 text-foreground">Type Scale</h3>
-        <Card className="divide-y divide-border border-border">
-          {typographySpecs.map((spec) => (
-            <div key={spec.level} className="p-6">
-              <div className="grid md:grid-cols-[200px_1fr_300px] gap-6 items-start">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">{spec.level}</p>
-                  <p className="text-xs text-muted-foreground/70">{spec.font}</p>
-                </div>
-                <div>
-                  <p 
-                    className={spec.font === "Merriweather" ? "font-serif text-foreground" : "text-foreground"}
-                    style={{ 
-                      fontSize: spec.size.split('/')[0].trim(),
-                      fontWeight: spec.weight.split(' ')[0],
-                      lineHeight: spec.lineHeight
-                    }}
-                  >
-                    {spec.example}
-                  </p>
-                </div>
-                <div className="space-y-1 text-sm text-muted-foreground">
-                  <p><strong className="text-foreground">Weight:</strong> {spec.weight}</p>
-                  <p><strong className="text-foreground">Size:</strong> {spec.size}</p>
-                  <p><strong className="text-foreground">Line Height:</strong> {spec.lineHeight}</p>
-                  <p className="text-xs text-muted-foreground/80 pt-2">{spec.usage}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </Card>
-      </div>
-
-      {/* Pairing Examples */}
-      <div>
-        <h3 className="text-2xl mb-6 text-foreground">Pairing in Context</h3>
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card className="p-8 border-border">
-            <h4 className="text-3xl mb-3 font-serif text-foreground">
-              Build faster with AI
-            </h4>
-            <p className="text-muted-foreground mb-4">
-              Custom workflows, websites, apps, automation, and GTM systems 
-              that move real metrics. No decks, no layers, just results.
-            </p>
-            <p className="text-sm text-muted-foreground/70">
-              Merriweather heading + Inter body text
-            </p>
-          </Card>
-
-          <Card className="p-8 border-border">
-            <div className="inline-block px-3 py-1 bg-muted rounded text-xs uppercase tracking-wider text-muted-foreground mb-4 border border-border">
-              Case Study
-            </div>
-            <h4 className="text-3xl mb-3 font-serif text-foreground">
-              Perhitsiksha
-            </h4>
-            <p className="text-muted-foreground mb-4">
-              Website, tailor-made workflows, CRM automation, and sales systems 
-              for an education platform serving 10,000+ students.
-            </p>
-            <p className="text-sm text-muted-foreground/70">
-              All three levels working together
-            </p>
-          </Card>
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+        <div className="md:col-span-4">
+          <h2 className="text-3xl font-serif text-white">Typographic Voice</h2>
+        </div>
+        <div className="md:col-span-8 md:pl-12 border-l border-white/[0.05]">
+          <p className="text-[#d5dada] text-lg font-light leading-relaxed max-w-lg">
+            Merriweather provides the authority of the printed word. Inter provides the utility of the machine.
+            Together, they form a dialogue between tradition and technology.
+          </p>
         </div>
       </div>
 
-      {/* Best Practices */}
-      <div>
-        <h3 className="text-2xl mb-6 text-foreground">Best Practices</h3>
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card className="p-6 border-foreground/20 bg-muted/50">
-            <div className="flex items-center gap-2 mb-3">
-               <h4 className="text-foreground font-medium">Do</h4>
+      {/* Type Specimen List */}
+      <div className="w-full border-t border-white/[0.05]">
+        {typographySpecs.map((spec, index) => (
+          <div 
+            key={spec.level} 
+            className="group grid grid-cols-1 md:grid-cols-12 gap-8 py-12 border-b border-white/[0.05] hover:bg-white/[0.01] transition-colors duration-500"
+            onClick={() => handleCopy(`${spec.font === "Merriweather" ? "font-serif" : "font-sans"} ${spec.sizeClass} ${spec.weightClass} tracking-[${spec.tracking}]`)}
+          >
+            {/* Meta Column */}
+            <div className="md:col-span-3 flex flex-col justify-between h-full py-1">
+              <div>
+                <span className="text-[10px] font-mono text-[#17f7f7] uppercase tracking-[0.2em] mb-2 block opacity-60 group-hover:opacity-100 transition-opacity">
+                  {spec.level}
+                </span>
+                <div className="flex flex-col gap-1 text-[#d5dada]/40 font-mono text-[10px] uppercase tracking-wider">
+                   <span>{spec.font}</span>
+                   <span>{spec.weight} / {spec.size}</span>
+                   <span>LH {spec.lineHeight} / TR {spec.tracking}</span>
+                </div>
+              </div>
+              <span className="text-[9px] text-white/20 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0 mt-8 cursor-pointer">
+                Click to Copy
+              </span>
             </div>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>• Use Merriweather for large headings and titles</li>
-              <li>• Use Inter for all body text and UI elements</li>
-              <li>• Maintain consistent line heights for readability</li>
-              <li>• Use weight variations to create hierarchy</li>
-              <li>• Keep body text between 16-18px for optimal reading</li>
-            </ul>
-          </Card>
 
-          <Card className="p-6 border-border bg-transparent opacity-70">
-             <div className="flex items-center gap-2 mb-3">
-               <h4 className="text-muted-foreground font-medium">Don't</h4>
+            {/* Example Column */}
+            <div className="md:col-span-9 flex items-center overflow-hidden">
+               <span 
+                 className={`${spec.font === "Merriweather" ? "font-serif" : "font-sans"} text-white block`}
+                 style={{ 
+                   fontSize: spec.size,
+                   fontWeight: spec.weight === "Bold" ? 700 : spec.weight === "Light" ? 300 : spec.weight === "Medium" ? 500 : 400,
+                   lineHeight: spec.lineHeight,
+                   letterSpacing: spec.tracking
+                 }}
+               >
+                 {spec.example}
+               </span>
             </div>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>• Don't use Merriweather for body text</li>
-              <li>• Don't mix with other font families</li>
-              <li>• Don't use too many font weights (stick to 400, 600, 700)</li>
-              <li>• Don't make body text smaller than 14px</li>
-              <li>• Don't use all caps for long paragraphs</li>
-            </ul>
-          </Card>
+          </div>
+        ))}
+      </div>
+
+      {/* Editorial Layout Example */}
+      <div className="grid md:grid-cols-2 gap-24 pt-16">
+        <div>
+          <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Editorial Application</h3>
+          <div className="space-y-8 border-l-2 border-[#17f7f7] pl-8">
+            <h1 className="font-serif text-5xl md:text-6xl text-white leading-[1.05] tracking-tight">
+              Luxury is<br/>
+              <span className="italic text-[#d5dada]">Subtractive.</span>
+            </h1>
+            <p className="text-lg font-light text-[#d5dada]/80 leading-relaxed max-w-md">
+              By removing the noise, we allow the signal to be heard. 
+              Every pixel must justify its existence.
+            </p>
+            <div className="pt-4">
+              <Button variant="link" className="text-[#17f7f7] p-0 h-auto hover:text-white transition-colors uppercase tracking-[0.2em] text-[10px] font-bold decoration-0">
+                Read Manifesto &rarr;
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

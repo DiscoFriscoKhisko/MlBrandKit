@@ -1,81 +1,140 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  /* Typography default scale */
   --font-size: 16px;
-  --background: #ffffff;
-  --foreground: #090A09;
-  --card: #ffffff;
-  --card-foreground: #090A09;
-  --popover: #ffffff;
-  --popover-foreground: #090A09;
-  --primary: #090A09;
-  --primary-foreground: #ffffff;
-  --secondary: #D6D6DE;
-  --secondary-foreground: #090A09;
-  --muted: #f3f3f5;
-  --muted-foreground: #737373;
-  --accent: #D6D6DE;
-  --accent-foreground: #090A09;
+
+  /* New Light Mode Palette Mapping */
+  --background: #f3f4f4; /* White Smoke */
+  --foreground: #090909; /* Black */
+  
+  --card: #fefefe; /* White */
+  --card-foreground: #090909; /* Black */
+  
+  --popover: #fefefe; /* White */
+  --popover-foreground: #090909; /* Black */
+  
+  --primary: #090909; /* Black for primary actions in light mode */
+  --primary-foreground: #fefefe; /* White text */
+  
+  --secondary: #d5dada; /* Alabaster Grey */
+  --secondary-foreground: #090909; /* Black */
+  
+  --muted: #d5dada; /* Alabaster Grey */
+  --muted-foreground: #090909; /* Black - high contrast */
+  
+  --accent: #d5dada; /* Alabaster Grey */
+  --accent-foreground: #090909;
+  
   --destructive: #d4183d;
-  --destructive-foreground: #ffffff;
-  --border: #D6D6DE;
-  --input: #D6D6DE;
-  --input-background: #f3f3f5;
-  --switch-background: #cbced4;
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-  --ring: #090A09;
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: #f8f9fa;
-  --sidebar-foreground: #090A09;
-  --sidebar-primary: #090A09;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #D6D6DE;
-  --sidebar-accent-foreground: #090A09;
-  --sidebar-border: #D6D6DE;
-  --sidebar-ring: #090A09;
+  --destructive-foreground: #fefefe;
+  
+  --border: #d5dada; /* Alabaster Grey */
+  --input: #d5dada;
+  --input-background: #fefefe;
+  
+  --ring: #090909;
+  
+  --radius: 0px; /* Box-free editorial layout implies sharp or minimal radius, usually 0 for brutalist */
+
+  /* Sidebar defaults */
+  --sidebar: #f3f4f4;
+  --sidebar-foreground: #090909;
+  --sidebar-primary: #090909;
+  --sidebar-primary-foreground: #fefefe;
+  --sidebar-accent: #d5dada;
+  --sidebar-accent-foreground: #090909;
+  --sidebar-border: #d5dada;
+  --sidebar-ring: #090909;
 }
 
 .dark {
-  --background: #090A09;
-  --foreground: #D6D6DE;
-  --card: #090A09;
-  --card-foreground: #D6D6DE;
-  --popover: #090A09;
-  --popover-foreground: #D6D6DE;
-  --primary: #D6D6DE;
-  --primary-foreground: #090A09;
-  --secondary: #1A1B1A;
-  --secondary-foreground: #D6D6DE;
-  --muted: #1A1B1A;
-  --muted-foreground: #9ca3af;
-  --accent: #1A1B1A;
-  --accent-foreground: #D6D6DE;
+  /* New Dark Mode Palette Mapping (Cyber-Noir) */
+  --background: #090909; /* Black */
+  --foreground: #fefefe; /* White */
+  
+  --card: #090909; /* Black */
+  --card-foreground: #fefefe; /* White */
+  
+  --popover: #090909; /* Black */
+  --popover-foreground: #fefefe; /* White */
+  
+  --primary: #17f7f7; /* Cyan Glow */
+  --primary-foreground: #090909; /* Black text on Cyan */
+  
+  --secondary: #17f7f7; /* Cyan Glow for secondary in dark mode? Or stick to Black with Border? */
+  /* Let's use Alabaster Grey for Secondary elements to keep the palette strict, or maybe a dark grey if we had one. 
+     Since we only have these colors, let's make secondary elements distinct. 
+     Maybe use Alabaster Grey but it will be bright. 
+     Alternative: Transparent with Border. 
+     Let's set secondary to Black with White Border conceptually, but here we define bg color.
+     Let's use the Alabaster Grey as a muted element or secondary action.
+  */
+  --secondary: #d5dada; 
+  --secondary-foreground: #090909;
+  
+  --muted: #090909; /* Keep background dark */
+  --muted-foreground: #d5dada; /* Alabaster Grey text */
+  
+  --accent: #17f7f7; /* Cyan Glow */
+  --accent-foreground: #090909;
+  
   --destructive: #7f1d1d;
-  --destructive-foreground: #D6D6DE;
-  --border: #1A1B1A;
-  --input: #1A1B1A;
-  --ring: #D6D6DE;
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: #090A09;
-  --sidebar-foreground: #D6D6DE;
-  --sidebar-primary: #D6D6DE;
-  --sidebar-primary-foreground: #090A09;
-  --sidebar-accent: #1A1B1A;
-  --sidebar-accent-foreground: #D6D6DE;
-  --sidebar-border: #1A1B1A;
-  --sidebar-ring: #D6D6DE;
+  --destructive-foreground: #fefefe;
+  
+  --border: #d5dada; /* Alabaster Grey - Visible borders in dark mode */
+  --input: #090909;
+  
+  --ring: #17f7f7; /* Cyan Glow */
+
+  --sidebar: #090909;
+  --sidebar-foreground: #fefefe;
+  --sidebar-primary: #17f7f7;
+  --sidebar-primary-foreground: #090909;
+  --sidebar-accent: #090909; /* Dark accent bg */
+  --sidebar-accent-foreground: #17f7f7;
+  --sidebar-border: #d5dada;
+  --sidebar-ring: #17f7f7;
+  
+  --noise-pattern: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.grainy-aura {
+  position: relative;
+  isolation: isolate;
+}
+
+.grainy-aura::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(circle at center, var(--aura-color, rgba(23, 247, 247, 0.1)), transparent 60%);
+  filter: blur(0px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+}
+
+.grainy-aura::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--noise-pattern);
+  opacity: 0;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  border-radius: inherit;
+}
+
+.grainy-aura:hover::before {
+  opacity: 1;
+}
+
+.grainy-aura:hover::after {
+  opacity: 0.2;
 }
 
 @theme inline {
@@ -98,13 +157,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-input-background: var(--input-background);
-  --color-switch-background: var(--switch-background);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
