@@ -140,25 +140,69 @@ export function Typography() {
       </div>
 
       {/* Editorial Layout Example */}
-      <div className="grid md:grid-cols-2 gap-24 pt-16">
-        <div>
-          <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Editorial Application</h3>
-          <div className="space-y-8 border-l-2 border-[#17f7f7] pl-8">
-            <h1 className="font-serif text-5xl md:text-6xl text-white leading-[1.05] tracking-tight">
-              Luxury is<br/>
-              <span className="italic text-[#d5dada]">Subtractive.</span>
-            </h1>
-            <p className="text-lg font-light text-[#d5dada]/80 leading-relaxed max-w-md">
-              By removing the noise, we allow the signal to be heard. 
-              Every pixel must justify its existence.
-            </p>
-            <div className="pt-4">
+      <div className="pt-24 border-t border-white/[0.05]">
+        <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Editorial Applications</h3>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-24 gap-y-16">
+          {/* Web Interface: Hero */}
+          <div className="space-y-8">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="w-2 h-2 rounded-full bg-[#17f7f7]"></span>
+              <span className="text-[10px] font-mono text-[#d5dada]/60 uppercase tracking-widest">Web Interface / Hero</span>
+            </div>
+            <div className="border-l-2 border-[#17f7f7] pl-8 py-2">
+              <h1 className="font-serif text-5xl md:text-6xl text-white leading-[1.05] tracking-tight mb-6">
+                Luxury is<br/>
+                <span className="italic text-[#d5dada]">Subtractive.</span>
+              </h1>
+              <p className="text-lg font-light text-[#d5dada]/80 leading-relaxed max-w-md mb-8">
+                By removing the noise, we allow the signal to be heard. 
+                Every pixel must justify its existence in the void.
+              </p>
               <Button variant="link" className="text-[#17f7f7] p-0 h-auto hover:text-white transition-colors uppercase tracking-[0.2em] text-[10px] font-bold decoration-0">
                 Read Manifesto &rarr;
               </Button>
             </div>
           </div>
+
+          {/* Print: Magazine Column */}
+          <div className="space-y-8">
+             <div className="flex items-center gap-2 mb-6">
+              <span className="w-2 h-2 rounded-full bg-white border border-white/20"></span>
+              <span className="text-[10px] font-mono text-[#d5dada]/60 uppercase tracking-widest">Print / Vertical Spread</span>
+            </div>
+            <div className="columns-1 md:columns-2 gap-8 text-[11px] text-[#d5dada]/70 leading-[1.8] text-justify">
+              <p className="mb-4">
+                <span className="float-left text-4xl font-serif text-white mr-2 mt-[-6px]">T</span>
+                he refractive index of the glass determines the angle of the beam. In our simulations, we set this to 1.52—identical to crown glass. This creates a distinct separation of the spectral lines, allowing the "Neon Red" warnings to bleed into the "Laser Cyan" safe zones without mixing.
+              </p>
+              <p>
+                It is this precision that defines the Material Lab aesthetic. We do not fake the glow; we calculate it. Every shadow is a result of a ray trace, every highlight a consequence of a photon hitting a surface.
+              </p>
+            </div>
+            <div className="mt-8 pt-8 border-t border-white/10">
+              <p className="font-mono text-[9px] text-[#17f7f7] uppercase tracking-[0.2em]">Fig 1.2 — Light Transport</p>
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Digital Product: Data Visualization */}
+      <div className="pt-24 border-t border-white/[0.05]">
+         <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Data Density</h3>
+         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { label: "System Status", value: "Optimal", color: "text-[#17f7f7]" },
+              { label: "Ray Depth", value: "128", color: "text-white" },
+              { label: "Refraction", value: "1.52", color: "text-white" },
+              { label: "Spectral Shift", value: "+0.04nm", color: "text-[#ff2a6d]" }
+            ].map((stat, i) => (
+              <div key={i} className="border-l border-white/10 pl-6">
+                 <p className="text-[9px] font-mono text-[#d5dada]/40 uppercase tracking-widest mb-2">{stat.label}</p>
+                 <p className={`text-2xl font-mono ${stat.color} tracking-tighter`}>{stat.value}</p>
+              </div>
+            ))}
+         </div>
       </div>
     </div>
   );

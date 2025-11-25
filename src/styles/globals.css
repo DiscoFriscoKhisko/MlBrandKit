@@ -6,94 +6,86 @@
 
   /* New Light Mode Palette Mapping */
   --background: #f3f4f4; /* White Smoke */
-  --foreground: #090909; /* Black */
+  --foreground: #050505; /* Deep Black */
   
   --card: #fefefe; /* White */
-  --card-foreground: #090909; /* Black */
+  --card-foreground: #050505;
   
-  --popover: #fefefe; /* White */
-  --popover-foreground: #090909; /* Black */
+  --popover: #fefefe;
+  --popover-foreground: #050505;
   
-  --primary: #090909; /* Black for primary actions in light mode */
-  --primary-foreground: #fefefe; /* White text */
+  --primary: #050505;
+  --primary-foreground: #fefefe;
   
-  --secondary: #d5dada; /* Alabaster Grey */
-  --secondary-foreground: #090909; /* Black */
+  --secondary: #e0e0e0;
+  --secondary-foreground: #050505;
   
-  --muted: #d5dada; /* Alabaster Grey */
-  --muted-foreground: #090909; /* Black - high contrast */
+  --muted: #e0e0e0;
+  --muted-foreground: #050505;
   
-  --accent: #d5dada; /* Alabaster Grey */
-  --accent-foreground: #090909;
+  --accent: #e0e0e0;
+  --accent-foreground: #050505;
   
-  --destructive: #d4183d;
+  --destructive: #ff2a6d; /* Neon Red as Destructive */
   --destructive-foreground: #fefefe;
   
-  --border: #d5dada; /* Alabaster Grey */
-  --input: #d5dada;
+  --border: #e0e0e0;
+  --input: #e0e0e0;
   --input-background: #fefefe;
   
-  --ring: #090909;
+  --ring: #050505;
   
-  --radius: 0px; /* Box-free editorial layout implies sharp or minimal radius, usually 0 for brutalist */
+  --radius: 0px; /* Sharp, brutalist */
 
   /* Sidebar defaults */
   --sidebar: #f3f4f4;
-  --sidebar-foreground: #090909;
-  --sidebar-primary: #090909;
+  --sidebar-foreground: #050505;
+  --sidebar-primary: #050505;
   --sidebar-primary-foreground: #fefefe;
-  --sidebar-accent: #d5dada;
-  --sidebar-accent-foreground: #090909;
-  --sidebar-border: #d5dada;
-  --sidebar-ring: #090909;
+  --sidebar-accent: #e0e0e0;
+  --sidebar-accent-foreground: #050505;
+  --sidebar-border: #e0e0e0;
+  --sidebar-ring: #050505;
 }
 
 .dark {
-  /* New Dark Mode Palette Mapping (Cyber-Noir) */
-  --background: #090909; /* Black */
-  --foreground: #fefefe; /* White */
+  /* "Spectral Lab" Dark Mode Palette */
+  --background: #050505; /* Deepest Void (matches PrismScene) */
+  --foreground: #fefefe; /* Pure White */
   
-  --card: #090909; /* Black */
-  --card-foreground: #fefefe; /* White */
+  --card: #050505;
+  --card-foreground: #fefefe;
   
-  --popover: #090909; /* Black */
-  --popover-foreground: #fefefe; /* White */
+  --popover: #050505;
+  --popover-foreground: #fefefe;
   
-  --primary: #17f7f7; /* Cyan Glow */
-  --primary-foreground: #090909; /* Black text on Cyan */
+  --primary: #17f7f7; /* Cyan Laser */
+  --primary-foreground: #050505;
   
-  --secondary: #17f7f7; /* Cyan Glow for secondary in dark mode? Or stick to Black with Border? */
-  /* Let's use Alabaster Grey for Secondary elements to keep the palette strict, or maybe a dark grey if we had one. 
-     Since we only have these colors, let's make secondary elements distinct. 
-     Maybe use Alabaster Grey but it will be bright. 
-     Alternative: Transparent with Border. 
-     Let's set secondary to Black with White Border conceptually, but here we define bg color.
-     Let's use the Alabaster Grey as a muted element or secondary action.
-  */
-  --secondary: #d5dada; 
-  --secondary-foreground: #090909;
+  --secondary: #1a1d21; /* Dark Grey */
+  --secondary-foreground: #fefefe;
   
-  --muted: #090909; /* Keep background dark */
-  --muted-foreground: #d5dada; /* Alabaster Grey text */
+  --muted: #050505;
+  --muted-foreground: #888888;
   
-  --accent: #17f7f7; /* Cyan Glow */
-  --accent-foreground: #090909;
+  --accent: #17f7f7;
+  --accent-foreground: #050505;
   
-  --destructive: #7f1d1d;
+  --destructive: #ff2a6d; /* Neon Red */
   --destructive-foreground: #fefefe;
   
-  --border: #d5dada; /* Alabaster Grey - Visible borders in dark mode */
-  --input: #090909;
+  --border: #333333; /* Subtle Dark Border */
+  --input: #1a1d21;
   
-  --ring: #17f7f7; /* Cyan Glow */
+  --ring: #17f7f7;
 
-  --sidebar: #090909;
+  --sidebar: #050505;
   --sidebar-foreground: #fefefe;
   --sidebar-primary: #17f7f7;
-  --sidebar-primary-foreground: #090909;
-  --sidebar-accent: #090909; /* Dark accent bg */
+  --sidebar-primary-foreground: #050505;
+  --sidebar-accent: #1a1d21;
   --sidebar-accent-foreground: #17f7f7;
-  --sidebar-border: #d5dada;
+  --sidebar-border: #333333;
   --sidebar-ring: #17f7f7;
   
   --noise-pattern: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -139,13 +131,12 @@
 
 .depth-card {
   position: relative;
-  background: #090909;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #050505;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: 
     0 0 0 1px rgba(0, 0, 0, 1),
-    0 4px 12px rgba(0, 0, 0, 0.5),
-    0 12px 24px rgba(0, 0, 0, 0.5),
-    0 0 40px rgba(23, 247, 247, 0.02); /* Very subtle cyan ambient */
+    0 4px 12px rgba(0, 0, 0, 0.8),
+    0 12px 24px rgba(0, 0, 0, 0.8);
   transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.5s ease;
 }
 
@@ -153,10 +144,10 @@
   transform: translateY(-2px);
   box-shadow: 
     0 0 0 1px rgba(23, 247, 247, 0.3), /* Cyan rim light */
-    0 8px 24px rgba(0, 0, 0, 0.6),
-    0 24px 48px rgba(0, 0, 0, 0.6),
-    0 0 80px rgba(23, 247, 247, 0.1);
-  border-color: rgba(23, 247, 247, 0.1);
+    0 8px 24px rgba(0, 0, 0, 0.8),
+    0 24px 48px rgba(0, 0, 0, 0.8),
+    0 0 60px rgba(23, 247, 247, 0.05);
+  border-color: rgba(23, 247, 247, 0.2);
 }
 
 @theme inline {
