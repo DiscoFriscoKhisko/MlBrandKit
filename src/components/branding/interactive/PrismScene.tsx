@@ -352,7 +352,7 @@ class Particle {
     }
 }
 
-export const PrismScene: React.FC = () => {
+export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = true }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>();
@@ -697,25 +697,29 @@ export const PrismScene: React.FC = () => {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative w-full h-screen bg-[#050505] overflow-hidden cursor-none">
+    <div ref={containerRef} className={`relative w-full h-screen bg-[#050505] overflow-hidden ${showOverlay ? 'cursor-none' : ''}`}>
       <canvas ref={canvasRef} className="block w-full h-full" />
       
       {/* UI Overlay */}
-      <div className="absolute top-8 left-8 z-10 pointer-events-none select-none mix-blend-difference">
-        <h1 className="text-white font-serif text-4xl tracking-tight mb-2">Spectral Refraction Lab</h1>
-        <div className="flex items-center gap-3">
-           <div className="w-12 h-[1px] bg-[#17f7f7]"></div>
-           <p className="text-[#17f7f7] font-mono text-xs uppercase tracking-widest opacity-90">
-             Volumetric Optics • High-Fidelity Physics
-           </p>
-        </div>
-      </div>
-      
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 pointer-events-none text-center w-full px-4">
-         <p className="text-white/30 font-mono text-[10px] uppercase tracking-[0.3em] animate-pulse">
-           Interact
-         </p>
-      </div>
+      {showOverlay && (
+        <>
+          <div className="absolute top-8 left-8 z-10 pointer-events-none select-none mix-blend-difference">
+            <h1 className="text-white font-serif text-4xl tracking-tight mb-2">Spectral Refraction Lab</h1>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-[1px] bg-[#17f7f7]"></div>
+              <p className="text-[#17f7f7] font-mono text-xs uppercase tracking-widest opacity-90">
+                Volumetric Optics • High-Fidelity Physics
+              </p>
+            </div>
+          </div>
+          
+          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 pointer-events-none text-center w-full px-4">
+            <p className="text-white/30 font-mono text-[10px] uppercase tracking-[0.3em] animate-pulse">
+              Interact
+            </p>
+          </div>
+        </>
+      )}
     </div>
   );
 };

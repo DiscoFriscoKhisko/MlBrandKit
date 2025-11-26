@@ -12,9 +12,13 @@ export default function App() {
 
   return (
     <>
-      {view === 'kit' ? (
-        <BrandKit onLaunchLab={() => setView('prism')} />
-      ) : (
+      {view === 'kit' && (
+        <BrandKit 
+          onLaunchLab={() => setView('prism')} 
+        />
+      )}
+      
+      {view === 'prism' && (
         <Suspense fallback={
           <div className="h-screen w-full bg-[#050505] flex items-center justify-center">
             <div className="text-[#17f7f7] font-mono text-xs uppercase tracking-widest animate-pulse">Initializing Optical Array...</div>
@@ -29,6 +33,7 @@ export default function App() {
           </button>
         </Suspense>
       )}
+
       <Toaster position="bottom-right" />
       
       {/* Global SVG Filters */}

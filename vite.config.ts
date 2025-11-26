@@ -9,7 +9,6 @@
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
         'sonner@2.0.3': 'sonner',
-        'lucide-react@0.487.0': 'lucide-react',
         'figma:asset/7f8b67c561905b98488a55820f315f5daf697d67.png': path.resolve(__dirname, './src/assets/7f8b67c561905b98488a55820f315f5daf697d67.png'),
         'figma:asset/7b0237d2897c59c2637d17234831014cabda6fb0.png': path.resolve(__dirname, './src/assets/7b0237d2897c59c2637d17234831014cabda6fb0.png'),
         'figma:asset/658bccfc6e5774439f89351cea319f01f56a583a.png': path.resolve(__dirname, './src/assets/658bccfc6e5774439f89351cea319f01f56a583a.png'),
@@ -19,9 +18,6 @@
         'figma:asset/4a48ca548bd18aa919107b9d93ce3a1ec8f5690c.png': path.resolve(__dirname, './src/assets/4a48ca548bd18aa919107b9d93ce3a1ec8f5690c.png'),
         'figma:asset/183b8c90c756900e17c36f42abd687a180a7ed4f.png': path.resolve(__dirname, './src/assets/183b8c90c756900e17c36f42abd687a180a7ed4f.png'),
         'figma:asset/1380d8e53d77f1f3fa0ea52b7c3b721803dff059.png': path.resolve(__dirname, './src/assets/1380d8e53d77f1f3fa0ea52b7c3b721803dff059.png'),
-        'class-variance-authority@0.7.1': 'class-variance-authority',
-        '@radix-ui/react-tabs@1.1.3': '@radix-ui/react-tabs',
-        '@radix-ui/react-slot@1.1.2': '@radix-ui/react-slot',
         '@': path.resolve(__dirname, './src'),
       },
     },

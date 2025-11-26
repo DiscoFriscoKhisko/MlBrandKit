@@ -1,6 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { geoGraticule, geoPath } from 'd3-geo';
-import { geoPolyhedralWaterman } from 'd3-geo-projection';
 
 export interface City {
   name: string;
@@ -30,86 +28,122 @@ export const DymaxionMap: React.FC<DymaxionMapProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Setup Projection
-    // Waterman is a good approximation for a "technical unfolded" map if Fuller isn't available
-    const projection = geoPolyhedralWaterman();
+    // Simple 3D Sphere Projection (Orthographic)
+    const spherePoints: {theta: number, phi: number}[] = [];
+    const gridSteps = 24;
     
-    const pathGenerator = geoPath()
-      .projection(projection)
-      .context(ctx);
+    // Generate Latitude Lines
+    for(let i = 1; i < gridSteps; i++) {
+        const phi = (i / gridSteps) * Math.PI; // 0 to PI
+        const ringRadius = Math.sin(phi);
+        const ringY = Math.cos(phi);
+        const pointsInRing = Math.floor(gridSteps * 2 * ringRadius) + 1;
+        
+        for(let j = 0; j < pointsInRing; j++) {
+            const theta = (j / pointsInRing) * Math.PI * 2;
+            spherePoints.push({theta, phi});
+        }
+    }
 
-    const graticule = geoGraticule();
+    // Cities to Spherical
+    const cityPoints = cities.map(c => {
+        const phi = (90 - c.lat) * (Math.PI / 180);
+        const theta = (c.lng + 180) * (Math.PI / 180);
+        return { ...c, phi, theta };
+    });
 
-    let rotation = 0;
+    let time = 0;
 
     const render = () => {
-      // Clear canvas
       ctx.clearRect(0, 0, size, size);
+      time += 0.01;
+
+      const cx = size / 2;
+      const cy = size / 2;
+      const radius = size * 0.45;
+
+      const rotY = time * rotationSpeed;
+      const rotX = 0.3; // Tilt
+
+      ctx.fillStyle = color;
+      ctx.strokeStyle = color;
       
-      // Update rotation
-      rotation += rotationSpeed;
-      projection.rotate([rotation, -30, 0]); // Rotate world, tilt slightly
-      projection.fitSize([size, size], { type: "Sphere" }); // Fit to canvas
+      // Draw Grid Points (World)
+      spherePoints.forEach(p => {
+         // Spherical to Cartesian
+         let x = radius * Math.sin(p.phi) * Math.cos(p.theta);
+         let y = radius * Math.cos(p.phi);
+         let z = radius * Math.sin(p.phi) * Math.sin(p.theta);
 
-      // Style
-      ctx.lineWidth = 0.5;
-      ctx.lineJoin = 'round';
-      ctx.lineCap = 'round';
+         // Rotate Y
+         let x1 = x * Math.cos(rotY) - z * Math.sin(rotY);
+         let z1 = x * Math.sin(rotY) + z * Math.cos(rotY);
+         let y1 = y;
 
-      // Draw Graticule (The "World" Grid)
-      ctx.beginPath();
-      ctx.strokeStyle = color;
-      ctx.globalAlpha = 0.3;
-      pathGenerator(graticule());
-      ctx.stroke();
+         // Rotate X
+         let y2 = y1 * Math.cos(rotX) - z1 * Math.sin(rotX);
+         let z2 = y1 * Math.sin(rotX) + z1 * Math.cos(rotX);
+         let x2 = x1;
 
-      // Draw Outline (The Projection Shape)
-      ctx.beginPath();
-      ctx.strokeStyle = color;
+         // Draw only front facing
+         if (z2 > 0) {
+             const alpha = (z2 / radius); 
+             ctx.globalAlpha = alpha * 0.3;
+             ctx.beginPath();
+             ctx.arc(cx + x2, cy + y2, 1, 0, Math.PI * 2);
+             ctx.fill();
+         }
+      });
+
+      // Draw Outer Circle
       ctx.globalAlpha = 0.8;
-      pathGenerator({ type: "Sphere" });
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
       ctx.stroke();
 
       // Draw Cities
-      if (cities.length > 0) {
-        cities.forEach(city => {
-          const coords = [city.lng, city.lat] as [number, number];
-          // Check if point is visible (not clipped) - Waterman handles clipping?
-          // Projections in d3 usually return null if clipped, but pathGenerator handles it.
-          // We can manually project to get coordinates for custom drawing (circles/text)
-          const projected = projection(coords);
-          
-          if (projected) {
-            const [x, y] = projected;
-            
-            // Draw Point
-            ctx.beginPath();
-            ctx.fillStyle = "#fefefe"; // White hot
-            ctx.globalAlpha = 1;
-            ctx.arc(x, y, 2, 0, Math.PI * 2);
-            ctx.fill();
+      cityPoints.forEach(c => {
+         // Spherical to Cartesian
+         let x = radius * Math.sin(c.phi) * Math.cos(c.theta);
+         let y = radius * Math.cos(c.phi);
+         let z = radius * Math.sin(c.phi) * Math.sin(c.theta);
 
-            // Draw Label
-            ctx.font = "10px monospace";
-            ctx.fillStyle = color;
-            ctx.fillText(city.name.toUpperCase(), x + 5, y + 3);
-            
-            // Draw Leader Line?
-            ctx.beginPath();
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 0.5;
-            ctx.moveTo(x, y);
-            ctx.lineTo(x + 4, y + 2);
-            ctx.stroke();
-          }
-        });
-      }
+         // Rotate Y
+         let x1 = x * Math.cos(rotY) - z * Math.sin(rotY);
+         let z1 = x * Math.sin(rotY) + z * Math.cos(rotY);
+         let y1 = y;
+
+         // Rotate X
+         let y2 = y1 * Math.cos(rotX) - z1 * Math.sin(rotX);
+         let z2 = y1 * Math.sin(rotX) + z1 * Math.cos(rotX);
+         let x2 = x1;
+
+         if (z2 > 0) {
+             ctx.globalAlpha = 1;
+             ctx.beginPath();
+             ctx.fillStyle = "#fefefe";
+             ctx.arc(cx + x2, cy + y2, 3, 0, Math.PI * 2);
+             ctx.fill();
+             
+             ctx.font = "10px monospace";
+             ctx.fillStyle = color;
+             ctx.fillText(c.name.toUpperCase(), cx + x2 + 6, cy + y2 + 3);
+             
+             // Leader
+             ctx.beginPath();
+             ctx.strokeStyle = color;
+             ctx.lineWidth = 0.5;
+             ctx.moveTo(cx + x2, cy + y2);
+             ctx.lineTo(cx + x2 + 4, cy + y2);
+             ctx.stroke();
+         }
+      });
 
       requestRef.current = requestAnimationFrame(render);
     };
 
-    // High DPI setup
     const dpr = window.devicePixelRatio || 1;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     canvas.width = size * dpr;
     canvas.height = size * dpr;
     canvas.style.width = `${size}px`;
