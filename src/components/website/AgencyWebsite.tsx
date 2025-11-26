@@ -22,112 +22,149 @@ import {
   Cpu,
   Database,
   Globe,
-  Shield
+  Shield,
+  Check
 } from "lucide-react";
 import { PrismScene } from "./PrismScene";
 import { CustomCursor } from "./CustomCursor";
 import { GrainOverlay } from "./GrainOverlay";
-import { SlackNotification, FigmaCanvas, GithubCommits } from "../visuals/ProofOfWork";
 import { VerticalParallaxScroll } from "./scroll/VerticalParallaxScroll";
 import { HorizontalScrollText } from "./scroll/HorizontalScrollText";
 import { ParallaxLogoCarousel } from "./scroll/ParallaxLogoCarousel";
+import { Card, ImageContainer } from "../ui/CardSystem";
+import { CapabilitiesPage } from "./pages/CapabilitiesPage";
+import { TOKENS, LAYOUT, TYPOGRAPHY } from "./design-system";
+import { SystemButton } from "./ui/SystemButton";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// --- Design System Tokens ---
-
-const TOKENS = {
-  padding: {
-    section: "py-20 lg:py-32",
-    container: "px-7 md:px-14", // p-7 (~28px) / px-14 (~56px)
-    card: "p-7 md:p-12",
-  },
-  grid: {
-    main: "grid grid-cols-1 lg:grid-cols-20 gap-y-10 lg:gap-x-10", // The 20-column grid
-    thirds: "grid grid-cols-1 md:grid-cols-3 gap-10",
-  },
-  geometry: {
-    rounded: "rounded-3xl", // rounded-2xl / rounded-3xl
-    roundedSection: "rounded-[2.5rem]",
-  },
-  heights: {
-    hero: "min-h-screen",
-    cardMobile: "h-[50vh]", // increased for iceberg
-    cardDesktop: "lg:h-[90vh]",
-  }
-};
-
-const LAYOUT = {
-  container: `w-full mx-auto relative z-10 ${TOKENS.padding.container}`,
-  section: `${TOKENS.padding.section} relative overflow-hidden`,
-  sectionCurved: `${TOKENS.padding.section} relative overflow-hidden ${TOKENS.geometry.roundedSection} my-4 mx-2 md:mx-4 bg-[#090909] border border-white/5`,
-  card: `bg-[#090909] border border-white/10 ${TOKENS.geometry.rounded} ${TOKENS.padding.card}`,
-};
-
-const TYPOGRAPHY = {
-  // Huge responsive sizes for billboard effect
-  display: "font-serif text-[16vw] font-bold tracking-[-0.04em] leading-[0.85]", 
-  h1: "font-serif text-4xl md:text-5xl lg:text-6xl font-bold tracking-[-0.02em] leading-[1.1]",
-  h2: "font-serif text-2xl md:text-3xl font-normal tracking-normal leading-[1.3]",
-  bodyLarge: "font-sans text-lg md:text-2xl font-light tracking-wide leading-[1.6]",
-  body: "font-sans text-sm md:text-base font-normal tracking-normal leading-[1.7]",
-  label: "font-mono text-[10px] md:text-[11px] font-medium uppercase tracking-[0.25em] leading-[1.4]"
-};
-
 // --- Data ---
 
-const capabilities = [
+const capabilitiesData = [
   {
-    title: 'AUTOMATE',
-    description: 'We tuck LLMs and autonomous agents into the tools you already use.',
-    image: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80',
+    title: "The Vision Sprint",
+    subhead: "For founders with a napkin sketch who need a smart first stab.",
+    description: "Validate before you build. In just two weeks, we turn your raw concept into a tangible roadmap. You walk away with a high-fidelity prototype you can put in front of investors and a technical plan that proves it’s actually buildable. Low risk, high clarity.",
+    features: [
+      { label: "Deliverables", text: "Clickable UI Prototype, User Journey Mapping, Technical Feasibility Audit" },
+      { label: "Tools", text: "Figma, FigJam, System Architecture Design" },
+      { label: "Timeline", text: "2 Weeks Fixed Price" }
+    ]
   },
   {
-    title: 'BUILD',
-    description: 'Go from "I have an idea" to people actually using it.',
-    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80',
+    title: "The MVP Launchpad",
+    subhead: "For founders ready to go from zero to one.",
+    description: "A market-ready product, not just a demo. We handle the security, database structure, and API architecture so you can focus on your first customers. We build to launch, but we architect for scale to ensure you don't have to rebuild the moment you find traction.",
+    features: [
+      { label: "Deliverables", text: "Fully functional Web or Mobile App, Admin Dashboard, Analytics Integration" },
+      { label: "Stack", text: "React/Next.js, React Native, Supabase/Postgres, Vercel" },
+      { label: "Timeline", text: "8–12 Weeks Typical" }
+    ]
   },
   {
-    title: 'SCALE',
-    description: 'Scale your sales engine without scaling headcount.',
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80',
+    title: "The Growth Engine",
+    subhead: "For companies that need to convert traffic into revenue.",
+    description: "Websites that pull their weight. We combine clear storytelling with performance engineering to build digital experiences that convert. We don't deliver empty templates; we use AI to structure content and programmatic pages that keep up with your growth.",
+    features: [
+      { label: "Deliverables", text: "High-Performance Website, Brand Identity System, Headless CMS" },
+      { label: "Stack", text: "Framer, Webflow, or Custom Next.js; Programmatic SEO Setup" },
+      { label: "Timeline", text: "4–8 Weeks" }
+    ]
   },
   {
-    title: 'CONVERT',
-    description: 'We build websites and brand systems that actually pull their weight.',
-    image: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=800&q=80',
+    title: "Workflow OS",
+    subhead: "For teams drowning in busywork.",
+    description: "Your operations, on autopilot. We tuck autonomous agents into the tools you already use, like Slack, Email, and CRM, to handle the messy, manual work. Your team focuses on judgment; the software handles the rest.",
+    features: [
+      { label: "Deliverables", text: "Custom RAG Agents Chat with your data, CRM Automations, Support Triage Bots" },
+      { label: "Stack", text: "Python, LangChain, OpenAI API, Zapier/Make" },
+      { label: "Timeline", text: "Rolling Implementation" }
+    ]
+  },
+  {
+    title: "The Partner Pod Retainer",
+    subhead: "For founders who need a technical co-founder, without the equity split.",
+    description: "A dedicated product team, integrated into your Slack. You don't get hours; you get a Pod, a Strategist, Designer, and Engineer who attend your standups and obsess over your metrics. We build clean, maintainable code because we know we’ll be the ones maintaining it.",
+    features: [
+      { label: "Team", text: "1 Product Manager, 1 Product Designer, 1 Full-Stack Engineer" },
+      { label: "Rituals", text: "Daily Standups, Weekly Sprints, Shared Slack Channel" },
+      { label: "Terms", text: "Monthly Subscription. Pause or cancel anytime." }
+    ]
+  }
+];
+
+const methodology = [
+  {
+    title: 'Ideation: The Whiteboard Session',
+    description: 'Got a napkin sketch? Let\'s talk. No pitch decks, no sales scripts. Just a working session to see if your idea has legs. We help you take a smart first stab at the concept before you commit a real budget.',
+    image: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&q=80',
+  },
+  {
+    title: 'Build: Transparency & Quality',
+    description: 'Quality You Feel. We don\'t throw specs over a wall. We join your Slack, attend your standups, and integrate with your workflow. We handle the complex engineering under the hood so your users get an experience that just works.',
+    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80',
+  },
+  {
+    title: 'Grow: The Outcome',
+    description: 'Impact Outcomes, Not Outputs. We don\'t just ship code; we build engines for revenue. Under the hood, it’s complex, state-of-the-art tech. On the surface, it’s friction-free and built to scale.',
+    image: 'https://images.unsplash.com/photo-1693216266103-3420af48c937?w=800&q=80',
   }
 ];
 
 const clientLogos = [
+   { name: 'Y Combinator', src: '' },
+   { name: 'TechStars', src: '' },
    { name: 'Linear', src: '' },
    { name: 'Basecamp', src: '' },
    { name: 'Vercel', src: '' },
    { name: 'Supabase', src: '' },
    { name: 'OpenAI', src: '' },
-   { name: 'Framer', src: '' },
 ];
 
-const caseStudies = [
-  { name: 'Perhitsiksha', tag: 'Website, CRM, Sales', tagColor: 'text-[#17f7f7]', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80', description: 'Website, tailor-made workflows, CRM automation', badge: 'Full Stack', badgeIcon: Bot },
-  { name: 'White Space Studio', tag: 'AI Automation', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80', description: 'AI automation for project costing & docs', badge: 'Architecture', badgeIcon: AppWindow },
-  { name: 'CargoSphere', tag: 'GTM & Website', image: 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=800&q=80', description: 'Go-to-market for global cargo-tech expansion' },
-  { name: 'TMEN Systems', tag: 'Sales Enablement', image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80', description: 'Sales enablement and GTM systems' },
-  { name: 'Cargomen', tag: 'ERP Automation', image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80', description: 'Automated credit control, support workflows, dashboards' },
-  { name: 'Alamirap Nutrition', tag: 'Lead Funnels', image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&q=80', description: 'End-to-end automation for lead funnels & CRM' },
-  { name: 'JB Singh & Sons', tag: 'Website + AI', image: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=800&q=80', description: 'Website and AI automation workflows' },
-  { name: 'Numbers', tag: 'Learning App', image: 'https://images.unsplash.com/photo-1509228627152-72ae9ae6848d?w=800&q=80', description: 'Custom learning app to practice mental maths' },
-  { name: 'Birdsong', tag: 'Mobile App', image: 'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=800&q=80', description: 'Location-aware birding app; collect birds by listening', badge: 'Mobile App', badgeIcon: Users },
-  { name: 'Troupex', tag: 'Coming Soon', image: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=800&q=80', description: 'Social network for entertainment professionals', badge: 'Coming Soon', badgeIcon: RefreshCw }
+const featuredWork = [
+    {
+        id: 1,
+        name: 'Cargomen',
+        headline: 'Taming the ERP Beast',
+        tags: ['Enterprise', 'Logistics'],
+        year: '[2024-2025]',
+        color: '#cb7b3a',
+        image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1200&q=80',
+    },
+    {
+        id: 2,
+        name: 'White Space',
+        headline: 'Pricing Projects on Autopilot',
+        tags: ['AI', 'Operations'],
+        year: '[2024]',
+        color: '#3a8ccb',
+        image: 'https://images.unsplash.com/photo-1664575602276-acd073f104c1?w=1200&q=80',
+    },
+    {
+        id: 3,
+        name: 'Birdsong',
+        headline: '"Shazam" for Nature',
+        tags: ['Consumer', 'App'],
+        year: '[2025]',
+        color: '#d2b59d',
+        image: 'https://images.unsplash.com/photo-1452570053594-1b985d6ea890?w=1200&q=80',
+    }
 ];
 
-const reasons = [
-  { icon: RefreshCw, title: 'Small team, real partnership', description: 'You work with us directly. No layers, no runaround.' },
-  { icon: Hammer, title: 'Built for your workflow', description: 'Everything we build fits how your team already operates: tools, rituals, constraints.' },
-  { icon: Target, title: 'Metric-first delivery', description: 'We don\'t sell features. We solve problems.' },
-  { icon: AppWindow, title: 'Production, not prototypes', description: 'We stay through evaluations, rollout, and reliability so the system is actually used.' },
-  { icon: Bot, title: 'AI where it counts', description: 'We use LLMs and agents only where they reduce cost, time, or complexity. Nowhere else.' },
-  { icon: Users, title: 'A tech team for non-technical teams', description: 'Most of our clients are strong in ops or marketing, not engineering. We handle "everything tech" so you can focus on the business.' }
+const shipLog = [
+    { name: 'Perhitsiksha', desc: 'Tailor-made CRM automation and sales systems for education scaling.' },
+    { name: 'CargoSphere', desc: 'Global Go-to-Market technical strategy for cargo-tech expansion.' },
+    { name: 'Numbers', desc: 'Custom mental math learning app with gamified practice loops.' },
+    { name: 'Alamirap Nutrition', desc: 'End-to-end automation for lead funnels and customer workflows.' },
+    { name: 'JB Singh & Sons', desc: 'Corporate website coupled with internal AI automation workflows.' },
+    { name: 'TMEN Systems', desc: 'Sales enablement tools and GTM system architecture.' },
+    { name: 'Troupex', desc: 'A dedicated social network for entertainment professionals.', tag: 'Coming Soon' },
+];
+
+const coreValues = [
+    { title: "Plain English Defaults", desc: "We replace the Black Box of development with a Glass Box. We explain the architecture in terms that make sense for your business, so you never feel like an outsider." },
+    { title: "Code is a Liability", desc: "More code means more maintenance. We fight to write less code that does more, using automation to handle the heavy lifting." },
+    { title: "People Over Pixels", desc: "We don't design for awards; we design for utility. We obsess over the feel of the software until it works effortlessly." }
 ];
 
 const socialLinks = [
@@ -144,45 +181,13 @@ const founders = [
 ];
 
 const navLinks = [
-  { href: '#services', label: 'Capabilities' },
+  { href: '#how-we-work', label: 'How We Work' },
   { href: '#work', label: 'Work' },
-  { href: '#how-we-work', label: 'The Blueprint' },
-  { href: '#about', label: 'About' }
+  { href: '#manifesto', label: 'Manifesto' },
+  { href: '#contact', label: 'Contact' }
 ];
 
 // --- Components ---
-
-function SystemButton({ children, href, variant = 'primary', className = '' }: { children: React.ReactNode, href?: string, variant?: 'primary' | 'secondary' | 'outline' | 'white', className?: string }) {
-  const baseClasses = "group relative inline-flex items-center justify-center gap-2 overflow-hidden transition-all duration-500 no-underline cursor-pointer tracking-wide interactive";
-  
-  let variantClasses = "";
-  if (variant === 'primary') {
-    variantClasses = "rounded-full px-6 py-3 text-xs font-medium bg-[#17f7f7] text-black hover:bg-white border border-transparent hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]";
-  } else if (variant === 'outline') {
-    variantClasses = "rounded-full px-6 py-3 text-xs font-medium bg-transparent text-white border border-white/20 hover:border-[#17f7f7] hover:text-[#17f7f7]";
-  } else if (variant === 'secondary') {
-    variantClasses = "text-sm font-medium border-b border-white/30 pb-1 gap-2 hover:border-[#17f7f7] hover:text-[#17f7f7] px-0 rounded-none text-white";
-  } else if (variant === 'white') {
-    variantClasses = "rounded-full px-6 py-3 text-xs font-medium bg-black text-white hover:bg-[#17f7f7] hover:text-black border border-transparent";
-  }
-  
-  const Component = href ? 'a' : 'button';
-  
-  return (
-    // @ts-ignore
-    <Component href={href} className={`${baseClasses} ${variantClasses} ${className}`}>
-      <span className="relative z-10 flex items-center gap-2 uppercase tracking-[0.15em]">
-        {children}
-      </span>
-      <div className={`relative overflow-hidden ${variant === 'secondary' ? 'h-3 w-3' : 'h-4 w-4'}`}>
-        <div className="flex transition-transform duration-300 ease-out group-hover:-translate-x-1/2">
-          <ArrowRight className={`shrink-0 ${variant === 'secondary' ? 'h-3 w-3' : 'h-4 w-4'}`} />
-          <ArrowRight className={`shrink-0 ${variant === 'secondary' ? 'h-3 w-3' : 'h-4 w-4'}`} />
-        </div>
-      </div>
-    </Component>
-  );
-}
 
 function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -250,77 +255,13 @@ function Nav() {
   )
 }
 
-// Helper to generate top content for Iceberg
-function getIcebergContent(index: number) {
-   switch(index) {
-      case 0: // Automate
-         return (
-            <div className="bg-[#1A1A1A] border border-white/10 rounded-xl p-4 w-full max-w-xs shadow-2xl font-sans">
-               <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#17f7f7]/20 flex items-center justify-center shrink-0">
-                     <Bot size={16} className="text-[#17f7f7]" />
-                  </div>
-                  <div className="space-y-2 flex-1">
-                     <div className="bg-white/5 rounded p-2 text-[10px] text-[#d5dada]">
-                        Analysis complete. Routing to sales team...
-                     </div>
-                     <div className="bg-[#17f7f7]/10 rounded p-2 text-[10px] text-[#17f7f7] self-end w-fit ml-auto">
-                        Ticket #4092 Created
-                     </div>
-                  </div>
-               </div>
-            </div>
-         );
-      case 1: // Build
-         return (
-            <div className="relative w-full h-full flex items-center justify-center">
-                <div className="w-48 h-64 bg-black border border-white/10 rounded-2xl shadow-2xl overflow-hidden relative transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500">
-                   <div className="h-4 bg-white/10 w-full mb-2"></div>
-                   <div className="p-2 space-y-2">
-                      <div className="h-20 bg-white/5 rounded"></div>
-                      <div className="h-2 bg-white/10 w-2/3 rounded"></div>
-                      <div className="h-2 bg-white/10 w-1/2 rounded"></div>
-                   </div>
-                   <div className="absolute bottom-0 w-full h-1/3 bg-gradient-to-t from-[#17f7f7]/20 to-transparent"></div>
-                </div>
-            </div>
-         );
-      case 2: // Scale
-         return (
-            <div className="w-full h-32 flex items-end gap-2 px-4 pb-4">
-               {[40, 65, 45, 80, 55, 90, 85].map((h, i) => (
-                  <div key={i} className="flex-1 bg-[#17f7f7]/20 hover:bg-[#17f7f7] transition-colors duration-300 rounded-t-sm relative group" style={{ height: `${h}%` }}>
-                     <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity">{h}%</div>
-                  </div>
-               ))}
-            </div>
-         );
-      case 3: // Convert
-         return (
-             <div className="w-full max-w-xs bg-[#090909] border border-white/10 rounded-lg p-4 flex flex-col gap-3">
-                <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                   <span className="text-[10px] text-white/40 uppercase tracking-wider">Conversion Rate</span>
-                   <span className="text-sm text-[#17f7f7] font-mono">+12.4%</span>
-                </div>
-                <div className="flex gap-2 items-center">
-                   <Globe size={12} className="text-white/40" />
-                   <div className="h-1 flex-1 bg-white/5 rounded-full overflow-hidden">
-                      <div className="h-full bg-[#17f7f7] w-[75%]"></div>
-                   </div>
-                </div>
-             </div>
-         );
-      default:
-         return null;
-   }
-}
-
 export function AgencyWebsite() {
+  const [view, setView] = useState<'home' | 'capabilities'>('home');
   const mainRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
-  const [activeCase, setActiveCase] = useState(0);
   const [footerHeight, setFooterHeight] = useState(0);
 
+  // Hooks must run unconditionally
   useEffect(() => {
     if (footerRef.current) {
       let timeoutId: any;
@@ -348,19 +289,15 @@ export function AgencyWebsite() {
       
       // --- Hero ---
       const heroTl = gsap.timeline({ delay: 0.2 });
-      heroTl.from(".hero-badge", {
-        y: -15,
-        opacity: 0,
-        stagger: 0.1,
-        duration: 0.6,
-        ease: "power2.out"
-      })
-      .from(".hero-title", {
-        y: 100, // Increased distance for sliding effect
+      
+      // The .hero-badge class is gone in the new design, so we remove this block to fix the GSAP target error.
+      
+      heroTl.from(".hero-title", {
+        y: 100,
         opacity: 0,
         duration: 1.2,
         ease: "power3.out"
-      }, "-=0.4")
+      })
       .from(".hero-sub", {
         y: 30,
         opacity: 0,
@@ -395,45 +332,14 @@ export function AgencyWebsite() {
         });
       });
 
-      // --- Iceberg Capabilities Stacking (Disabled for stability) ---
-      // const cards = gsap.utils.toArray(".cap-card");
-      // if (cards.length) {
-      //    cards.forEach((card: any, i) => {
-      //       const inner = card.querySelector('.iceberg-wrapper');
-      //        gsap.to(inner, {
-      //          scale: 1 - (cards.length - 1 - i) * 0.05, 
-      //          filter: "brightness(0.5)",
-      //          scrollTrigger: {
-      //             trigger: card,
-      //             start: "top top+=120",
-      //             end: `bottom top+=120`, 
-      //             scrub: true,
-      //          }
-      //       });
-      //    });
-      // }
-
-      // --- Work Item Hover ---
-      const workItems = gsap.utils.toArray('.work-item-row');
-      workItems.forEach((item: any) => {
-         const line = item.querySelector('.line');
-         const arrow = item.querySelector('.arrow');
-         
-         item.addEventListener('mouseenter', () => {
-            gsap.to(line, { width: '100%', duration: 0.4, ease: 'power2.out' });
-            gsap.to(arrow, { x: 0, opacity: 1, duration: 0.3 });
-         });
-         
-         item.addEventListener('mouseleave', () => {
-            gsap.to(line, { width: '0%', duration: 0.4, ease: 'power2.out' });
-            gsap.to(arrow, { x: -10, opacity: 0, duration: 0.3 });
-         });
-      });
-
     }, mainRef);
 
     return () => ctx.revert();
   }, []);
+
+  if (view === 'capabilities') {
+    return <CapabilitiesPage onBack={() => setView('home')} />;
+  }
 
   return (
     <div ref={mainRef} className="bg-[#050505] text-white min-h-screen w-full selection:bg-[#17f7f7]/30 selection:text-white font-sans cursor-none">
@@ -444,22 +350,13 @@ export function AgencyWebsite() {
       {/* --- MAIN CONTENT (Scrolls over footer) --- */}
       <main className="relative z-10 bg-[#050505] shadow-2xl" style={{ marginBottom: footerHeight }}>
         
-        {/* --- HERO --- */}
+        {/* --- SECTION 1: HERO --- */}
         <section className={`hero-section relative min-h-screen flex flex-col justify-center items-center ${TOKENS.padding.container} overflow-hidden pt-20`}>
           <div className="absolute inset-0 z-0">
               <PrismScene />
           </div>
           
           <div className="relative z-10 w-full max-w-none flex flex-col items-center text-center">
-              {/* Badges */}
-              <div className="mb-12 flex justify-center items-center gap-4 flex-wrap">
-                  {["Metric-Obsessed", "Zero Bloat", "100% IP Ownership"].map((text, i) => (
-                      <span key={i} className="hero-badge px-4 py-2 rounded-full border border-white/10 bg-black/30 backdrop-blur text-[10px] md:text-xs font-mono text-[#17f7f7] uppercase tracking-wider interactive">
-                        {text}
-                      </span>
-                  ))}
-              </div>
-
               {/* Billboard Typography */}
               <h1 className={`${TYPOGRAPHY.display} hero-title text-white mix-blend-difference mb-12 max-w-full`}>
                 Your Extended Product Team.
@@ -467,233 +364,284 @@ export function AgencyWebsite() {
 
               <div className="hero-sub max-w-2xl mx-auto text-center space-y-10">
                 <p className={`${TYPOGRAPHY.bodyLarge} text-[#d5dada]`}>
-                    Build for impact, not just for launch. We bridge the gap between "market ready" and "product maturity".
+                    Material Lab turns raw ideas into digital products that feel right. We are the partners you call when you want to take a smart first stab at a new concept, or build a platform that actually moves the needle.
                 </p>
                 <div className="flex justify-center gap-6">
-                    <SystemButton href="#work" variant="primary">See The Work</SystemButton>
-                    <SystemButton href="#how-we-work" variant="secondary">How We Work</SystemButton>
+                    <SystemButton href="#contact" variant="primary">Book a Whiteboard Session</SystemButton>
+                    <SystemButton href="#work" variant="secondary">See The Work</SystemButton>
                 </div>
               </div>
           </div>
         </section>
 
-        {/* --- ABOUT --- */}
-        <section className={LAYOUT.sectionCurved} id="about">
-          <div className={LAYOUT.container}>
-              <div className={TOKENS.grid.main}>
-                  <div className="fade-up space-y-6 lg:col-span-9">
-                    <div className="mb-12">
-                        <span className="font-serif text-2xl italic text-[#17f7f7] block mb-2">Internal Motto</span>
-                        <h3 className="text-4xl md:text-5xl font-bold text-white tracking-tight">Outcomes over Output.</h3>
-                    </div>
-                    <p className={`${TYPOGRAPHY.bodyLarge} text-white leading-relaxed`}>
-                        We started Material Lab because we kept meeting founders who were great at their craft but stuck when it came to tech. So we became the team they can call.
-                    </p>
-                    <p className={`${TYPOGRAPHY.body} text-[#d5dada]/70 leading-relaxed`}>
-                        We come from tech, design, and business. We know how to build things that look good, work well, and actually get used. And we care enough to treat your product like it's our own.
-                    </p>
-                  </div>
-                  <div className="fade-up lg:col-span-11 flex flex-col justify-end">
-                    <h2 className={`${TYPOGRAPHY.h1} text-white mb-8`}>
-                        Good Partners,<br/>Good Software <span className="inline-block w-3 h-3 rounded-full bg-[#17f7f7] align-baseline ml-1"></span>
-                    </h2>
-                    <div className="flex flex-col gap-4">
-                      <SystemButton href="#services" variant="primary" className="self-start">Our Capabilities</SystemButton>
-                    </div>
-                  </div>
-              </div>
-          </div>
-        </section>
-
-        {/* --- WORK (Editorial List) --- */}
-        <section className={LAYOUT.section} id="work">
-          <div className={LAYOUT.container}>
-              <div className="flex justify-between items-end mb-24 fade-up">
-                <div>
-                    <span className={`${TYPOGRAPHY.label} text-[#17f7f7] mb-4 block`}>Selected Work</span>
-                    <h2 className={TYPOGRAPHY.h1}>The Archive</h2>
-                </div>
-              </div>
-
-              <div className="relative">
-                {caseStudies.map((study, index) => (
-                    <div 
-                      key={index} 
-                      className="work-item-row group relative border-t border-white/10 py-10 md:py-14 cursor-pointer transition-colors hover:bg-white/[0.02] interactive"
-                      onMouseEnter={() => setActiveCase(index)}
-                    >
-                      {/* Hover Line */}
-                      <div className="line absolute top-0 left-0 h-[1px] w-0 bg-[#17f7f7]" />
-                      
-                      <div className={`${TOKENS.grid.main} gap-y-4 items-center relative z-10 px-2 md:px-4`}>
-                          <div className="lg:col-span-8">
-                            <h3 className="font-serif text-3xl md:text-5xl text-[#d5dada] group-hover:text-white transition-colors">
-                                {study.name}
-                            </h3>
-                          </div>
-                          <div className="lg:col-span-6">
-                            <p className="font-sans text-sm md:text-base text-[#d5dada]/50 group-hover:text-[#d5dada] transition-colors">
-                                {study.description}
-                            </p>
-                          </div>
-                          <div className="lg:col-span-6 flex justify-end items-center gap-6">
-                            <span className="font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-[#17f7f7] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                {study.tag}
-                            </span>
-                            <ArrowRight className="arrow text-white opacity-0 -translate-x-4" size={24} />
-                          </div>
-                      </div>
-
-                      {/* Floating Image Preview (Desktop Only) */}
-                      <div 
-                          className={`hidden lg:block absolute top-1/2 right-[10%] -translate-y-1/2 w-[450px] aspect-video pointer-events-none transition-all duration-500 z-20
-                            ${activeCase === index ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}
-                          `}
-                      >
-                          <div className={`w-full h-full overflow-hidden ${TOKENS.geometry.rounded} border border-white/10 bg-[#090909]`}>
-                            <img src={study.image} alt={study.name} className="w-full h-full object-cover opacity-80 grayscale group-hover:grayscale-0 transition-all duration-700" />
-                          </div>
-                      </div>
-                    </div>
-                ))}
-              </div>
-          </div>
-        </section>
-
-        {/* --- CAPABILITIES (Vertical Parallax) --- */}
-        <section className="relative bg-[#050505]" id="services">
-            <div className={LAYOUT.container}>
-               <div className="py-24 fade-up">
-                 <span className={`${TYPOGRAPHY.label} text-[#17f7f7] mb-4 block`}>What We Do</span>
-                 <h2 className={`${TYPOGRAPHY.h1} max-w-3xl`}>
-                     Our Capabilities
-                 </h2>
-               </div>
+        {/* --- SECTION 2: MARQUEE (Trust Bar) --- */}
+        <section className="relative bg-[#050505] z-10 border-t border-white/5">
+            <div className="pt-10 text-center">
+                <span className={`${TYPOGRAPHY.label} text-white/40`}>Building alongside founders at:</span>
             </div>
-            <VerticalParallaxScroll items={capabilities} />
+           <ParallaxLogoCarousel logos={clientLogos} className="py-10" />
         </section>
 
-        {/* --- CLIENTS (Logo Parallax) --- */}
-        <ParallaxLogoCarousel logos={clientLogos} />
-
-        {/* --- HOW WE WORK (Proof of Work) --- */}
-        <section className={`${LAYOUT.section} bg-[#050505]`} id="how-we-work">
-          <div className={LAYOUT.container}>
-              <div className="mb-24 text-center fade-up">
-                <span className={`${TYPOGRAPHY.label} text-white/50 mb-4 block`}>The Blueprint</span>
-                <h2 className={`${TYPOGRAPHY.h1} text-white`}>How We Work</h2>
+        {/* --- SECTION 2.5: CAPABILITIES CTA (Redesigned) --- */}
+        <section className="relative bg-[#050505] z-10 pb-32" id="capabilities">
+           <div className={LAYOUT.container}>
+              
+              {/* Header Grid */}
+              <div className="grid grid-cols-12 gap-y-8 mb-12 md:mb-24 pt-24 border-b border-white/10 pb-8">
+                 <div className="col-span-12 md:col-span-9 flex items-end">
+                    <h2 className="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tight text-white flex flex-wrap items-center gap-x-4 md:gap-x-6">
+                       <span>Our</span>
+                       <div className="relative w-16 h-16 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-white/10 rotate-3">
+                          <img 
+                             src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=200&q=80" 
+                             alt="Services" 
+                             className="w-full h-full object-cover"
+                          />
+                       </div>
+                       <span>Services</span>
+                    </h2>
+                 </div>
+                 <div className="col-span-12 md:col-span-3 flex items-end justify-start md:justify-end">
+                    <div onClick={() => setView('capabilities')}>
+                       <SystemButton variant="white" className="rounded-full px-6 py-3 flex flex-row-reverse gap-2 items-center group">
+                          <span>View All Services</span>
+                          <ArrowUpRight className="w-4 h-4 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
+                       </SystemButton>
+                    </div>
+                 </div>
               </div>
 
-              <div className={`${TOKENS.grid.main} gap-10`}>
-                
-                {/* Talk -> Touch */}
-                <div className={`${LAYOUT.card} lg:col-span-10 fade-up interactive min-h-[400px] flex flex-col justify-between relative overflow-hidden`}>
-                    <div className="relative z-10">
-                        <div className="flex items-center gap-4 mb-6">
-                          <div className="p-4 rounded-full bg-[#17f7f7]/10 text-[#17f7f7]">
-                              <MessageSquare size={32} />
+              {/* Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-px bg-white/10 border-t border-white/10">
+                 {capabilitiesData.map((cap, i) => (
+                    <div 
+                       key={i} 
+                       className="group relative bg-[#050505] border-b border-white/10 overflow-hidden h-[300px] md:h-[400px] cursor-pointer"
+                       onClick={() => setView('capabilities')}
+                    >
+                       {/* Default Content */}
+                       <div className="relative z-20 h-full flex flex-col justify-between p-8 md:p-12 transition-colors duration-500 group-hover:text-white">
+                          <div className="flex justify-between items-start">
+                             <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl overflow-hidden bg-white/5">
+                                {/* Placeholder or Icon for each service could go here if we had one in data, using a generic one or index based */}
+                                <div className="w-full h-full flex items-center justify-center text-white/20 font-mono text-xs">
+                                   0{i + 1}
+                                </div>
+                             </div>
+                             <ArrowUpRight className="w-8 h-8 text-white/30 transition-transform duration-500 group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:text-white" />
                           </div>
-                          <h3 className={`${TYPOGRAPHY.h2} text-white`}>Talk → Touch</h3>
-                        </div>
-                        <p className={`${TYPOGRAPHY.bodyLarge} text-[#d5dada]/70 leading-relaxed mb-8`}>
-                          You tell us the goal and how your team actually works today. We map the workflow, pick the core metric, and prototype in days. No decks.
-                        </p>
-                    </div>
-                    
-                    {/* Artifact: Figma/Slack */}
-                    <div className="relative z-10 w-full h-64 md:h-auto mt-auto border border-white/10 rounded-xl overflow-hidden">
-                       <div className="absolute inset-0 bg-[#1A1A1A] flex items-center justify-center p-8">
-                           <FigmaCanvas />
-                           <div className="absolute bottom-4 right-4 z-20">
-                              <SlackNotification className="scale-75 origin-bottom-right" />
-                           </div>
+                          
+                          <div>
+                             <h3 className="text-3xl md:text-4xl lg:text-5xl font-medium text-white mb-4 translate-y-0 transition-transform duration-500 group-hover:-translate-y-2">
+                                {cap.title}
+                             </h3>
+                             <p className="text-[#d5dada]/60 max-w-md opacity-100 transition-opacity duration-500 group-hover:opacity-0">
+                                {cap.subhead}
+                             </p>
+                          </div>
+                       </div>
+
+                       {/* Hover Background Image Reveal */}
+                       <div className="absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                          <div className="absolute inset-0 bg-black/40 z-10" />
+                          <img 
+                             src={[
+                               "https://images.unsplash.com/photo-1680016661694-1cd3faf31c3a?w=800&q=80",
+                               "https://images.unsplash.com/photo-1669023414180-4dcf35d943e1?w=800&q=80",
+                               "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+                               "https://images.unsplash.com/photo-1646583288948-24548aedffd8?w=800&q=80",
+                               "https://images.unsplash.com/photo-1733826544831-ad71d05c8423?w=800&q=80"
+                             ][i] || "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80"}
+                             className="w-full h-full object-cover scale-105 transition-transform duration-700 group-hover:scale-100"
+                             alt={cap.title}
+                          />
                        </div>
                     </div>
-                </div>
+                 ))}
+              </div>
 
-                {/* Evidence -> Ship */}
-                <div className={`${LAYOUT.card} lg:col-span-10 fade-up interactive min-h-[400px] flex flex-col justify-between relative overflow-hidden`}>
-                    <div className="relative z-10">
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="p-4 rounded-full bg-[#17f7f7]/10 text-[#17f7f7]">
-                              <LineChart size={32} />
-                          </div>
-                          <h3 className={`${TYPOGRAPHY.h2} text-white`}>Evidence → Ship</h3>
-                        </div>
-                        <p className={`${TYPOGRAPHY.bodyLarge} text-[#d5dada]/70 leading-relaxed mb-8`}>
-                          We ship when the metric moves: revenue, hours saved, error rate. If we can't link a feature to an outcome, we don't build it.
+           </div>
+        </section>
+
+        {/* --- SECTION 3: THE MANIFESTO --- */}
+        <section className={LAYOUT.sectionCurved} id="manifesto">
+          <div className={LAYOUT.container}>
+              <div className={TOKENS.grid.main}>
+                  <div className="fade-up lg:col-span-8">
+                    <h2 className={`${TYPOGRAPHY.h1} text-white sticky top-32`}>
+                        Software should feel effortless.
+                    </h2>
+                  </div>
+                  <div className="fade-up lg:col-span-12 space-y-12">
+                    <div className="space-y-6">
+                        <h3 className={`${TYPOGRAPHY.h2} text-[#17f7f7]`}>The craft of a studio. The heart of a team.</h3>
+                        <p className={`${TYPOGRAPHY.bodyLarge} text-[#d5dada] leading-relaxed`}>
+                            Too many great ideas fail because of messy execution. We built Material Lab to fix that. We aren't a run-of-the-mill agency. We are professional, accountable, and obsessively collaborative.
+                        </p>
+                        <p className={`${TYPOGRAPHY.bodyLarge} text-[#d5dada] leading-relaxed`}>
+                            We don’t just deliver a service; we co-own the outcome. We integrate with your workflows, debate the strategy, and build software that simply feels better to use.
                         </p>
                     </div>
 
-                     {/* Artifact: Github */}
-                     <div className="relative z-10 w-full h-64 md:h-auto mt-auto border border-white/10 rounded-xl overflow-hidden bg-[#0D1117] flex items-center justify-center p-6">
-                        <GithubCommits />
-                     </div>
-                </div>
-
-              </div>
-          </div>
-        </section>
-
-        {/* --- WHY US --- */}
-        <section className={`${LAYOUT.section} bg-[#050505]`}>
-          <div className={LAYOUT.container}>
-              <div className="mb-24 text-center fade-up">
-                <span className={`${TYPOGRAPHY.label} text-[#17f7f7] mb-4 block`}>Why Us</span>
-                <h2 className={`${TYPOGRAPHY.h1} text-white`}>Why Teams Choose Us</h2>
-              </div>
-
-              <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-4">
-                {reasons.map((reason, index) => (
-                    <div key={index} className={`fade-up text-center p-6 ${TOKENS.geometry.rounded} hover:bg-white/5 transition-colors group interactive`}>
-                      <div className="mb-6 inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#090909] border border-white/10 group-hover:border-[#17f7f7] group-hover:shadow-[0_0_30px_rgba(23,247,247,0.2)] transition-all">
-                          <reason.icon className="text-white group-hover:text-[#17f7f7] transition-colors" size={32} />
-                      </div>
-                      <h3 className="text-lg font-serif font-bold text-white mb-3 leading-tight">{reason.title}</h3>
-                      <p className="text-xs text-[#d5dada]/60 leading-relaxed">{reason.description}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-12 border-t border-white/10">
+                        {coreValues.map((value, i) => (
+                            <div key={i} className="space-y-3">
+                                <h4 className="text-white font-serif text-xl">{value.title}</h4>
+                                <p className={`${TYPOGRAPHY.body} text-white/60`}>{value.desc}</p>
+                            </div>
+                        ))}
                     </div>
-                ))}
+                  </div>
               </div>
           </div>
         </section>
 
-        {/* --- FINE PRINT --- */}
-        <section className={LAYOUT.sectionCurved}>
-          <div className={LAYOUT.container}>
-              <div className="mb-16 text-center fade-up">
-                <span className={`${TYPOGRAPHY.label} text-white/50 mb-4 block`}>Details</span>
-                <h2 className={`${TYPOGRAPHY.h1} text-white`}>The Fine Print</h2>
-              </div>
-
-              <div className={TOKENS.grid.thirds}>
-                <div className="bg-transparent p-7 fade-up interactive">
-                    <h3 className={`${TYPOGRAPHY.h2} text-white mb-4 text-xl`}>Pricing</h3>
-                    <p className={`${TYPOGRAPHY.body} text-[#d5dada]/70 text-sm mb-4`}>
-                      After our first chat, you get a fixed-price proposal. Clear investment, clear return.
-                    </p>
-                    <p className={`${TYPOGRAPHY.label} text-white/30 normal-case tracking-normal`}>
-                      Includes complimentary bug support.
-                    </p>
+        {/* --- SECTION 4: THE HANDSHAKE --- */}
+        <section className={LAYOUT.section} id="handshake">
+            <div className={LAYOUT.container}>
+                <div className="max-w-4xl mx-auto text-center fade-up border border-white/10 rounded-3xl p-10 md:p-20 bg-white/[0.02]">
+                    <span className={`${TYPOGRAPHY.label} text-[#17f7f7] mb-8 block`}>A Note from the Team</span>
+                    <blockquote className="font-serif text-2xl md:text-4xl text-white leading-relaxed mb-8">
+                        "We treat your budget like it’s our own money. If a feature doesn't add value, we’ll kill it before we bill for it. No lock-in contracts. You own the code from Day 1."
+                    </blockquote>
                 </div>
-                <div className="bg-transparent p-7 fade-up interactive">
-                    <h3 className={`${TYPOGRAPHY.h2} text-white mb-4 text-xl`}>Timeline</h3>
-                    <p className={`${TYPOGRAPHY.body} text-[#d5dada]/70 text-sm`}>
-                      <strong className="text-white block mb-1">Small tools:</strong> 1–2 weeks<br />
-                      <strong className="text-white block mt-2 mb-1">Larger platforms:</strong> up to 3 months
-                    </p>
-                </div>
-                <div className="bg-transparent p-7 fade-up interactive">
-                    <h3 className={`${TYPOGRAPHY.h2} text-white mb-4 text-xl`}>Ownership</h3>
-                    <p className={`${TYPOGRAPHY.body} text-[#d5dada]/70 text-sm`}>
-                      <strong className="text-white block mb-1">Who owns the code?</strong> You do. We're here as long as we're useful.
-                    </p>
-                </div>
-              </div>
-          </div>
+            </div>
         </section>
+
+        {/* --- SECTION 5: HOW WE WORK (Methodology) --- */}
+        <section className="relative bg-[#050505]" id="how-we-work">
+            <div className={LAYOUT.container}>
+               <div className="py-24 fade-up">
+                 <span className={`${TYPOGRAPHY.label} text-[#17f7f7] mb-4 block`}>Methodology</span>
+                 <h2 className={`${TYPOGRAPHY.h1} max-w-4xl mb-4`}>
+                     Professional like a firm. Personal like a co-founder.
+                 </h2>
+                 <p className={`${TYPOGRAPHY.bodyLarge} text-white/60`}>You handle the vision. We handle the heavy lifting.</p>
+               </div>
+            </div>
+            <VerticalParallaxScroll items={methodology} />
+        </section>
+
+        {/* --- SECTION 6: SELECTED WORK (Redesigned) --- */}
+        <section className="relative w-full pb-12 xl:pb-24 bg-[#050505]" id="work">
+           <div className={LAYOUT.container}>
+              <div className="w-full relative flex flex-col lg:flex-row gap-8">
+                 
+                 {/* Left Sticky Column (Desktop) */}
+                 <div className="hidden lg:flex flex-col w-full lg:w-5/12 xl:w-5/12 h-screen sticky top-0 justify-center z-10 pointer-events-none">
+                    <div className="relative pointer-events-auto py-20">
+                       <h2 className="text-white text-lg font-medium mb-12">Featured Work</h2>
+                       
+                       <div className="flex flex-col gap-4">
+                          {featuredWork.map((work) => (
+                             <div key={work.id} className="group relative transition-transform duration-300 hover:translate-x-4">
+                                <a href="#" className="block">
+                                   <h3 className="text-6xl xl:text-7xl font-medium tracking-tight text-white transition-colors duration-300 group-hover:text-[#17f7f7]">
+                                      {work.name}
+                                   </h3>
+                                   <div className="text-white/50 text-sm font-medium mt-2 font-mono">
+                                      {work.year}
+                                   </div>
+                                </a>
+                             </div>
+                          ))}
+                       </div>
+                    </div>
+                 </div>
+
+                 {/* Right Column (Scrollable Cards) */}
+                 <div className="w-full lg:w-7/12 xl:w-7/12 pt-0 lg:pt-32 flex flex-col gap-8 lg:gap-24">
+                    
+                    {/* Mobile Heading */}
+                    <div className="lg:hidden mb-8">
+                       <h2 className="text-white text-2xl font-medium">Featured Work</h2>
+                    </div>
+
+                    {featuredWork.map((work) => (
+                       <div key={work.id} className="group relative w-full rounded-3xl overflow-hidden cursor-pointer">
+                          <div className="aspect-[4/3] w-full relative overflow-hidden bg-gray-900">
+                             {/* Image */}
+                             <img 
+                                src={work.image} 
+                                alt={work.name}
+                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                             />
+                             
+                             {/* Mobile Info Overlay (Always Visible) */}
+                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent lg:hidden flex flex-col justify-end p-6">
+                                <div className="text-white/70 text-xs font-mono mb-2">{work.year}</div>
+                                <h3 className="text-white text-3xl font-medium">{work.name}</h3>
+                             </div>
+
+                             {/* Desktop Hover Overlay (Circle Mask Effect) */}
+                             <div 
+                                className="hidden lg:flex absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 items-end p-8"
+                                style={{ backgroundColor: work.color }}
+                             >
+                                <div className="w-full flex flex-col justify-between h-full relative z-10 text-[#111212]">
+                                   <div className="text-3xl xl:text-4xl font-medium tracking-tight leading-tight max-w-md">
+                                      {work.headline}
+                                   </div>
+                                   
+                                   <div className="flex justify-between items-end w-full mt-auto pt-12">
+                                      <div className="hidden xl:block w-24" /> {/* Spacer */}
+                                      
+                                      <div className="inline-flex items-center rounded-full bg-white/20 backdrop-blur-md text-[#111212] px-4 py-2 gap-3 text-sm font-medium">
+                                         <ArrowUpRight className="w-4 h-4" />
+                                         <span>{work.tags[0]}</span>
+                                      </div>
+                                   </div>
+                                </div>
+                             </div>
+                          </div>
+                       </div>
+                    ))}
+
+                    {/* Bottom CTA */}
+                    <div className="flex justify-center mt-12">
+                       <div className="group relative overflow-hidden rounded-full bg-white text-black px-8 py-3 cursor-pointer transition-all hover:px-10">
+                           <span className="relative z-10 flex items-center gap-2 font-medium">
+                              Explore Our Work <ArrowUpRight className="w-4 h-4" />
+                           </span>
+                       </div>
+                    </div>
+
+                 </div>
+              </div>
+           </div>
+        </section>
+
+              {/* The Ship Log */}
+              <div className="fade-up border-t border-white/10 pt-24">
+                 <div className={`${TOKENS.grid.main} items-start`}>
+                    <div className="lg:col-span-6 mb-10 lg:mb-0">
+                        <h3 className={`${TYPOGRAPHY.h2} text-white mb-2`}>The Ship Log</h3>
+                        <p className={`${TYPOGRAPHY.body} text-white/50`}>Other recent shipments.</p>
+                    </div>
+                    <div className="lg:col-span-14 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                        {shipLog.map((item, i) => (
+                            <div key={i} className="group flex flex-col gap-1 interactive">
+                                <div className="flex items-center justify-between">
+                                    <h4 className="text-xl text-white font-medium group-hover:text-[#17f7f7] transition-colors">
+                                        {item.name}
+                                    </h4>
+                                    {item.tag && (
+                                        <span className="text-[9px] font-mono uppercase tracking-wider text-[#17f7f7] bg-[#17f7f7]/10 px-2 py-0.5 rounded">
+                                            {item.tag}
+                                        </span>
+                                    )}
+                                </div>
+                                <p className="text-sm text-[#d5dada]/60 leading-relaxed">
+                                    {item.desc}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                 </div>
+              </div>
       
         {/* --- BOOK A SESSION (Horizontal Scroll) --- */}
-        <section className="relative z-20 bg-[#050505]">
+        <section className="relative z-20 bg-[#050505]" id="contact">
            <HorizontalScrollText text="Book a Whiteboard Session — Let's Build" />
         </section>
       

@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ImageContainer } from '../ui/CardSystem';
+import { ImageContainer } from '../../ui/CardSystem';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -39,51 +39,35 @@ export function VerticalParallaxScroll({ items, className = '' }: VerticalParall
       // Desktop Animation
       ScrollTrigger.matchMedia({
         "(min-width: 1024px)": function() {
-           // 1. Image Column Parallax
-           // The logic from the prompt:
-           // trigger height is set to match images height (done via CSS/content)
-           // We pin the trigger so we can scroll "through" it? 
-           // The prompt says: "On pointer: fine (desktop): The trigger's height is set to match images' height... images is animated vertically".
-           // It DOES NOT explicitly say "pin: true" for desktop, but usually for this "window moving through canvas" effect with that specific math, 
-           // either the container is fixed height (100vh) and we scroll the inner content, OR the container is tall and we parallax the content.
-           
-           // Given the specific GSAP code: 
-           // end: `+=${images.offsetHeight - windowHeight}`
-           // This implies the scroll distance is exactly the overflow amount.
-           
-           // Let's try pinning the container to 100vh, and scrolling the content.
-           // But the prompt says "trigger's height is set to match images' height".
-           
-           // Let's interpret "trigger" as the wrapper.
-           // If I pin the wrapper, the user stays in place while content moves.
+           // Desktop Animation
+           const scrollDistance = imagesHeight - windowHeight;
            
            gsap.to(images, {
-             y: () => -(imagesHeight - windowHeight),
+             y: () => -scrollDistance,
              ease: 'none',
              scrollTrigger: {
                trigger: trigger,
                start: 'top top',
-               end: () => `+=${imagesHeight - windowHeight}`,
+               end: () => `+=${scrollDistance}`,
                scrub: true,
-               pin: true, // I am adding pin: true because otherwise the math suggests we are scrubbing through the overflow.
-               anticipatePin: 1
+               pin: true,
+               anticipatePin: 1,
+               invalidateOnRefresh: true,
              }
            });
 
            // 2. Headings Parallax
-           // "headingsTimeline uses the same trigger... y: (headingsContainer.offsetHeight * -1) + 300"
-           const headings = gsap.utils.toArray('.js-heading');
-           
-           // We want the headings column to move in sync (or parallax) with the images.
-           // The prompt says "text column slides upward as a block".
+           // Align the bottom of the text container with the bottom of the viewport at the end
+           // We add a small offset to ensure the last item is comfortably visible
            gsap.to(headingsContainer, {
-              y: () => -(headingsContainer.offsetHeight - windowHeight + 300), // Modified slightly to keep last item visible
+              y: () => -(headingsContainer.offsetHeight - windowHeight), 
               ease: 'none',
               scrollTrigger: {
                  trigger: trigger,
                  start: 'top top',
-                 end: () => `+=${imagesHeight - windowHeight}`,
-                 scrub: true
+                 end: () => `+=${scrollDistance}`,
+                 scrub: true,
+                 invalidateOnRefresh: true,
               }
            });
            
@@ -117,11 +101,11 @@ export function VerticalParallaxScroll({ items, className = '' }: VerticalParall
   }, [items]);
 
   return (
-    <div ref={triggerRef} className={`relative w-full min-h-screen bg-[#050505] overflow-hidden ${className}`}>
+    <div ref={triggerRef} className={`relative w-full h-screen bg-[#050505] overflow-hidden ${className}`}>
       <div className="grid grid-cols-1 lg:grid-cols-2 h-full">
         
         {/* Text Column */}
-        <div className="relative h-screen flex items-center z-10 pointer-events-none lg:pointer-events-auto px-7 md:px-14">
+        <div className="relative h-screen flex items-start z-10 pointer-events-none lg:pointer-events-auto px-7 md:px-14">
            <div ref={headingsContainerRef} className="w-full space-y-[40vh] lg:space-y-[60vh] py-[20vh]">
               {items.map((item, i) => (
                  <div key={i} className="js-heading max-w-lg">
@@ -136,7 +120,7 @@ export function VerticalParallaxScroll({ items, className = '' }: VerticalParall
         <div className="relative h-full">
            <div ref={imagesRef} className="flex flex-col w-full">
               {items.map((item, i) => (
-                 <div key={i} className="w-full h-[80vh] lg:h-screen relative p-4 lg:p-12">
+                 <div key={i} className={`w-full h-[80vh] ${i === items.length - 1 ? 'lg:h-[80vh]' : 'lg:h-screen'} relative p-4 lg:p-12`}>
                     <div className="w-full h-full relative overflow-hidden rounded-3xl border border-white/10">
                        <ImageContainer src={item.image} alt={item.title} />
                     </div>
