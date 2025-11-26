@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { ArrowButton } from "./ui/ArrowButton";
 import { toast } from "sonner@2.0.3";
 import { copyToClipboard } from "./ui/utils";
+import { MotionCard, MotionFadeText, MotionSplitText } from "./MotionSystem";
 
 const brandColors = [
   { name: "Void Black", hex: "#050505", rgb: "5 5 5", usage: "Deep Background" },
@@ -31,9 +33,9 @@ function ColorBlock({ name, hex, rgb, usage, onCopy, copied }: ColorBlockProps) 
   
   return (
     <div className="group cursor-pointer" onClick={() => onCopy(hex, `${name}-hex`)}>
-      {/* Color Square - No Borders, Sharp Edges */}
-      <div 
-        className="aspect-[4/5] w-full relative mb-6 transition-all duration-500 ease-out group-hover:scale-[1.02]"
+      {/* Color Square - Rounded, Interactive */}
+      <MotionCard 
+        className="aspect-[4/5] w-full relative mb-6 transition-all duration-500 ease-out hover:scale-[1.02] border-none"
         style={{ backgroundColor: hex }}
       >
          {/* Floating Usage Label */}
@@ -49,7 +51,7 @@ function ColorBlock({ name, hex, rgb, usage, onCopy, copied }: ColorBlockProps) 
               <span className="text-[10px] tracking-[0.3em] font-mono text-white">COPIED</span>
             </div>
          )}
-      </div>
+      </MotionCard>
       
       {/* Metadata - Sparse & Clean */}
       <div className="space-y-2 pl-1 border-l border-transparent group-hover:border-[#17f7f7] transition-colors duration-300">
@@ -82,13 +84,13 @@ export function ColorPalette() {
       {/* Editorial Header */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
         <div className="md:col-span-4">
-          <h2 className="text-3xl font-serif text-white">Chromatic Depth</h2>
+          <MotionSplitText className="text-3xl font-serif text-white">Chromatic Depth</MotionSplitText>
         </div>
         <div className="md:col-span-8 md:pl-12 border-l border-white/[0.05]">
-          <p className="text-[#d5dada] text-lg font-light leading-relaxed max-w-lg">
+          <MotionFadeText className="text-[#d5dada] text-lg font-light leading-relaxed max-w-lg">
             The "Spectral" series expands our brutalist void with high-energy neon injections.
             These colors are reserved for active states, refractions, and data visualization.
-          </p>
+          </MotionFadeText>
         </div>
       </div>
 
@@ -113,27 +115,26 @@ export function ColorPalette() {
               <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Interactive States</h3>
               <div className="flex flex-col gap-6 max-w-xs">
                   {/* Primary: Outline with Glow */}
-                  <Button className="w-full bg-transparent hover:bg-[#17f7f7]/5 text-[#17f7f7] border border-[#17f7f7]/50 hover:border-[#17f7f7] rounded-none h-14 tracking-[0.1em] text-xs uppercase transition-all duration-300 shadow-[0_0_0_1px_transparent] hover:shadow-[0_0_15px_rgba(23,247,247,0.3)]">
+                  <Button className="w-full bg-transparent hover:bg-[#17f7f7]/5 text-[#17f7f7] border border-[#17f7f7]/50 hover:border-[#17f7f7] rounded-full h-14 tracking-[0.1em] text-xs uppercase transition-all duration-300 shadow-[0_0_0_1px_transparent] hover:shadow-[0_0_15px_rgba(23,247,247,0.3)]">
                     Primary System
                   </Button>
                   
                   {/* Destructive: Neon Red */}
-                  <Button className="w-full bg-transparent hover:bg-[#ff2a6d]/5 text-[#ff2a6d] border border-[#ff2a6d]/50 hover:border-[#ff2a6d] rounded-none h-14 tracking-[0.1em] text-xs uppercase transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,42,109,0.3)]">
+                  <Button className="w-full bg-transparent hover:bg-[#ff2a6d]/5 text-[#ff2a6d] border border-[#ff2a6d]/50 hover:border-[#ff2a6d] rounded-full h-14 tracking-[0.1em] text-xs uppercase transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,42,109,0.3)]">
                     Critical Action
                   </Button>
 
                   {/* Tertiary: Link */}
-                  <Button variant="ghost" className="w-full justify-start px-0 text-[#d5dada] hover:text-white hover:bg-transparent h-auto text-xs uppercase tracking-[0.2em] group">
-                    <span className="border-b border-transparent group-hover:border-[#17f7f7] transition-all duration-300 pb-1">Documentation</span>
-                    <span className="ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[#17f7f7]">&rarr;</span>
-                  </Button>
+                  <ArrowButton variant="link" className="w-full justify-start text-[#d5dada] hover:text-white text-xs uppercase tracking-[0.2em]">
+                    Documentation
+                  </ArrowButton>
               </div>
             </div>
 
             {/* Concept 2: Usage Context */}
             <div className="space-y-8 relative">
                <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Contextual Application</h3>
-               <div className="p-8 border border-white/[0.05] bg-white/[0.01] backdrop-blur-sm space-y-6 depth-card">
+               <MotionCard className="p-8 border border-white/[0.05] bg-white/[0.01] backdrop-blur-sm space-y-6 depth-card">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="h-1.5 w-1.5 bg-[#05f7a5] rounded-full animate-pulse"></div>
                     <span className="text-[10px] font-mono text-[#05f7a5] tracking-widest uppercase">Optimal State</span>
@@ -142,7 +143,7 @@ export function ColorPalette() {
                   <p className="text-sm text-[#d5dada]/60 leading-relaxed">
                     Utilize the full spectrum for data density. Colors should vibrate against the void.
                   </p>
-               </div>
+               </MotionCard>
             </div>
 
          </div>

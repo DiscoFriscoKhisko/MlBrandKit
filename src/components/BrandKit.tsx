@@ -6,8 +6,11 @@ import { DigitalAssets } from "./DigitalAssets";
 import { Motion } from "./Motion";
 import { UsageGuidelines } from "./UsageGuidelines";
 import { ScrollTypography } from "./experimental/ScrollTypography";
+import { LayoutSystem } from "./LayoutSystem";
 import { MASTER_LOGO_URL } from "./branding/constants";
 import { Button } from "./ui/button";
+import { ArrowButton } from "./ui/ArrowButton";
+import { MotionSection, MotionSplitText, MotionFadeText } from "./MotionSystem";
 
 export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
   return (
@@ -20,44 +23,49 @@ export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
       <Tabs defaultValue="experiments" className="w-full relative z-10">
         
         {/* Header Section - Constrained */}
-        <div className="max-w-[1400px] mx-auto px-8 pt-20 pb-12">
+        <MotionSection className="pt-20 pb-12" curved>
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
             <div className="space-y-8">
                <div className="h-20 w-20 flex items-center justify-center relative group">
                  <img src={MASTER_LOGO_URL} alt="Material Lab" className="h-16 w-16 object-contain opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
                </div>
                <div>
-                 <h1 className="text-6xl md:text-7xl font-serif font-medium text-white tracking-tight mb-2">Material Lab</h1>
-                 <div className="flex items-center gap-3">
+                 <MotionSplitText className="text-6xl md:text-7xl font-serif font-medium text-white tracking-tight mb-2">
+                   Material Lab
+                 </MotionSplitText>
+                 <MotionFadeText className="flex items-center gap-3">
                    <div className="w-12 h-[1px] bg-[#17f7f7]"></div>
                    <span className="text-[#17f7f7] font-mono text-xs uppercase tracking-widest opacity-90">Design System V2.0 • Spectral Edition</span>
-                 </div>
+                 </MotionFadeText>
                </div>
             </div>
             
-            <div className="flex gap-8 pb-2">
-              <Button 
+            <div className="flex gap-4 pb-2 items-center">
+              <ArrowButton 
                 onClick={onLaunchLab}
-                variant="link" 
-                className="text-[#17f7f7] hover:text-white p-0 h-auto font-mono text-[10px] uppercase tracking-[0.2em] decoration-0 transition-all duration-500 border-b border-transparent hover:border-[#17f7f7]"
+                className="font-mono text-[10px] uppercase tracking-[0.2em]"
               >
                 Enter Refraction Lab
-              </Button>
-              <Button variant="link" className="text-[#d5dada]/60 hover:text-white p-0 h-auto font-mono text-[10px] uppercase tracking-[0.2em] decoration-0 transition-colors duration-500" asChild>
-                <a href="mailto:damini@materiallab.io">Contact</a>
-              </Button>
-              <Button variant="link" className="text-[#d5dada]/60 hover:text-[#17f7f7] p-0 h-auto font-mono text-[10px] uppercase tracking-[0.2em] decoration-0 transition-colors duration-500">
-                Download Assets
-              </Button>
+              </ArrowButton>
+              
+              <div className="h-8 w-[1px] bg-white/10 mx-2"></div>
+
+              <ArrowButton 
+                variant="outline" 
+                className="font-mono text-[10px] uppercase tracking-[0.2em] px-5 py-2.5"
+                href="mailto:damini@materiallab.io"
+              >
+                Contact
+              </ArrowButton>
             </div>
           </div>
-        </div>
+        </MotionSection>
 
         {/* Sticky Nav - Full Width Background */}
         <div className="sticky top-0 z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-white/[0.03] mb-0">
           <div className="max-w-[1400px] mx-auto px-8">
             <TabsList className="w-full flex flex-wrap md:flex-nowrap justify-start h-auto py-4 p-0 bg-transparent border-b-0 gap-6 md:gap-12">
-              {['colors', 'typography', 'physical', 'digital', 'motion', 'experiments', 'usage'].map((tab) => (
+              {['colors', 'typography', 'layout', 'physical', 'digital', 'motion', 'experiments', 'usage'].map((tab) => (
                 <TabsTrigger 
                   key={tab}
                   value={tab} 
@@ -116,6 +124,11 @@ export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
             <Typography />
           </TabsContent>
 
+          {/* Layout - Constrained */}
+          <TabsContent value="layout" className="max-w-5xl mx-auto px-8 py-20 animate-in fade-in-30 slide-in-from-bottom-4 duration-1000 outline-none">
+            <LayoutSystem />
+          </TabsContent>
+
           {/* Physical - Wide */}
           <TabsContent value="physical" className="max-w-[1600px] mx-auto px-8 py-20 animate-in fade-in-30 slide-in-from-bottom-4 duration-1000 outline-none">
             <PhysicalMockups />
@@ -134,7 +147,7 @@ export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
           {/* Experiments - Full Bleed (Flushed) */}
           <TabsContent value="experiments" className="w-full animate-in fade-in-30 slide-in-from-bottom-4 duration-1000 outline-none">
              {/* Intro Header - Constrained */}
-             <div className="max-w-[1400px] mx-auto px-8 py-20">
+             <MotionSection curved className="py-20">
                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 border-b border-white/[0.05] pb-12">
                 <div className="md:col-span-4">
                   <h2 className="text-3xl font-serif text-white">Experimental Type</h2>
@@ -146,7 +159,7 @@ export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
                   </p>
                 </div>
               </div>
-             </div>
+             </MotionSection>
              
              {/* Full Bleed Components */}
              <ScrollTypography />

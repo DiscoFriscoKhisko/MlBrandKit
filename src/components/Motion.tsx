@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { toast } from "sonner@2.0.3";
 import { motion } from "motion/react";
+import { MotionCard } from "./MotionSystem";
 
 // GSAP-like easing curves
 const easeOutExpo = [0.19, 1, 0.22, 1];
@@ -36,7 +37,7 @@ export function Motion() {
             
           {/* Interaction 1: Magnetic Hover */}
           <div className="group relative">
-             <div className="aspect-[4/3] bg-[#050505] border border-white/[0.1] flex items-center justify-center overflow-hidden mb-6 relative depth-card">
+             <MotionCard className="aspect-[4/3] bg-[#050505] border border-white/[0.1] flex items-center justify-center overflow-hidden mb-6 relative depth-card border-none">
                 <motion.button 
                   className="relative px-8 py-3 rounded-full border border-white/10 text-white font-mono text-xs tracking-widest uppercase overflow-hidden"
                   whileHover={{ scale: 1.05, borderColor: "rgba(23, 247, 247, 0.5)" }}
@@ -61,7 +62,7 @@ export function Motion() {
                 </motion.button>
                 {/* Grid background for context */}
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
-             </div>
+             </MotionCard>
              <div className="flex justify-between items-baseline border-t border-white/[0.1] pt-4">
                 <div>
                     <p className="text-sm font-serif text-white">Magnetic Spring</p>
@@ -72,8 +73,8 @@ export function Motion() {
 
           {/* Interaction 2: Electric Lift */}
           <div className="group relative cursor-pointer">
-             <motion.div 
-               className="aspect-[4/3] bg-[#050505] border border-white/[0.1] flex items-center justify-center mb-6 depth-card"
+             <MotionCard 
+               className="aspect-[4/3] bg-[#050505] border border-white/[0.1] flex items-center justify-center mb-6 depth-card border-none"
                whileHover={{ y: -8, boxShadow: "0 10px 30px rgba(23, 247, 247, 0.1)" }}
                transition={{ duration: 0.5, ease: easeOutExpo }}
              >
@@ -84,7 +85,7 @@ export function Motion() {
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
                 </motion.div>
-             </motion.div>
+             </MotionCard>
              <div className="flex justify-between items-baseline border-t border-white/[0.1] pt-4">
                 <div>
                     <p className="text-sm font-serif text-white">Levitation</p>
@@ -95,7 +96,7 @@ export function Motion() {
 
           {/* Interaction 3: Text Stagger */}
           <div className="group relative">
-             <div className="aspect-[4/3] bg-[#050505] border border-white/[0.1] flex flex-col items-center justify-center mb-6 relative depth-card overflow-hidden" onClick={handleReplay}>
+             <MotionCard className="aspect-[4/3] bg-[#050505] border border-white/[0.1] flex flex-col items-center justify-center mb-6 relative depth-card overflow-hidden border-none" onClick={handleReplay}>
                 <div className="absolute top-4 right-4 z-20">
                    <Button variant="ghost" size="icon" className="h-6 w-6 text-white/20 hover:text-[#17f7f7]" onClick={(e) => { e.stopPropagation(); handleReplay(); }}>
                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
@@ -132,7 +133,7 @@ export function Motion() {
                     </motion.span>
                   ))}
                 </motion.h3>
-             </div>
+             </MotionCard>
              <div className="flex justify-between items-baseline border-t border-white/[0.1] pt-4">
                 <div>
                     <p className="text-sm font-serif text-white">Cascade</p>
@@ -149,7 +150,7 @@ export function Motion() {
         <div className="grid md:grid-cols-2 gap-8">
            {/* Marquee */}
            <div className="group">
-              <div className="h-40 bg-[#050505] border border-white/[0.1] flex items-center overflow-hidden mb-6 relative depth-card">
+              <MotionCard className="h-40 bg-[#050505] border border-white/[0.1] flex items-center overflow-hidden mb-6 relative depth-card border-none">
                  <div className="flex whitespace-nowrap animate-marquee opacity-30 group-hover:opacity-60 transition-opacity duration-700">
                     {[1,2,3,4].map(i => (
                       <span key={i} className="text-4xl font-serif text-white mx-8 font-light italic">
@@ -158,7 +159,7 @@ export function Motion() {
                     ))}
                  </div>
                  <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-transparent to-[#050505] pointer-events-none"></div>
-              </div>
+              </MotionCard>
               <div className="flex justify-between items-baseline border-t border-white/[0.1] pt-4">
                 <div>
                     <p className="text-sm font-serif text-white">Infinite Loop</p>
@@ -169,7 +170,7 @@ export function Motion() {
 
            {/* Grain/Noise */}
            <div className="group">
-              <div className="h-40 bg-[#050505] border border-white/[0.1] relative overflow-hidden mb-6 isolate depth-card">
+              <MotionCard className="h-40 bg-[#050505] border border-white/[0.1] relative overflow-hidden mb-6 isolate depth-card border-none">
                  {/* Noise Layer */}
                  <div className="absolute inset-0 opacity-20 mix-blend-overlay" style={{ 
                     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
@@ -180,7 +181,7 @@ export function Motion() {
                        <span className="text-[#17f7f7] font-mono text-xs tracking-widest uppercase">Sensor Active</span>
                     </div>
                  </div>
-              </div>
+              </MotionCard>
               <div className="flex justify-between items-baseline border-t border-white/[0.1] pt-4">
                 <div>
                     <p className="text-sm font-serif text-white">Film Grain</p>

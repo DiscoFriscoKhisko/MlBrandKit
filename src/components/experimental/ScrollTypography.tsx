@@ -1,102 +1,134 @@
 import { useRef } from "react";
-import { motion, useScroll, useTransform, useSpring } from "motion/react";
+import {
+  motion,
+  useScroll,
+  useSpring,
+  useTransform,
+  useMotionValue,
+  useVelocity,
+  useAnimationFrame
+} from "motion/react";
+
+// Utility to wrap a number between min and max
+const wrap = (min: number, max: number, v: number) => {
+  const rangeSize = max - min;
+  return ((((v - min) % rangeSize) + rangeSize) % rangeSize) + min;
+};
+
+interface ParallaxProps {
+  children: string;
+  baseVelocity: number;
+  className?: string;
+}
+
+function ParallaxText({ children, baseVelocity = 100, className }: ParallaxProps) {
+  const baseX = useMotionValue(0);
+  const { scrollY } = useScroll();
+  const scrollVelocity = useVelocity(scrollY);
+  const smoothVelocity = useSpring(scrollVelocity, {
+    damping: 50,
+    stiffness: 400
+  });
+  const velocityFactor = useTransform(smoothVelocity, [0, 1000], [0, 5], {
+    clamp: false
+  });
+
+  const x = useTransform(baseX, (v) => `${wrap(-20, -45, v)}%`);
+
+  const directionFactor = useRef<number>(1);
+  useAnimationFrame((t, delta) => {
+    let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
+
+    if (velocityFactor.get() < 0) {
+      directionFactor.current = -1;
+    } else if (velocityFactor.get() > 0) {
+      directionFactor.current = 1;
+    }
+
+    moveBy += directionFactor.current * moveBy * velocityFactor.get();
+
+    baseX.set(baseX.get() + moveBy);
+  });
+
+  return (
+    <div className="parallax overflow-hidden m-0 whitespace-nowrap flex flex-nowrap">
+      <motion.div className={`scroller font-bold uppercase whitespace-nowrap flex flex-nowrap ${className}`} style={{ x }}>
+        <span className="block mr-[30px]">{children} </span>
+        <span className="block mr-[30px]">{children} </span>
+        <span className="block mr-[30px]">{children} </span>
+        <span className="block mr-[30px]">{children} </span>
+      </motion.div>
+    </div>
+  );
+}
 
 export function ScrollTypography() {
   const containerRef = useRef<HTMLDivElement>(null);
-  
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start start", "end end"]
+    offset: ["start end", "end start"]
   });
 
-  // Smooth out the scroll progress
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
-
-  // 1. Font Weight: 100 -> 900
-  const weight = useTransform(smoothProgress, [0, 1], [100, 900]);
+  // Variable Font Animations - Keeping the mechanics, reverting the style
+  const weight = useTransform(scrollYProgress, [0, 0.5, 1], [100, 900, 100]);
+  const slant = useTransform(scrollYProgress, [0, 0.5, 1], [0, -10, 0]);
+  const tracking = useTransform(scrollYProgress, [0, 0.5, 1], ["-0.05em", "0.05em", "-0.05em"]);
   
-  // 2. Slant: 0 -> -10
-  const slant = useTransform(smoothProgress, [0, 1], [0, -10]);
-  
-  // 3. Color: White -> Cyan
-  const color = useTransform(smoothProgress, [0, 0.5], ["#ffffff", "#17f7f7"]);
-  
-  // 4. Tracking: normal -> wide
-  const letterSpacing = useTransform(smoothProgress, [0, 1], ["0em", "0.1em"]);
-  
-  // 5. Line Width: 0 -> 200px
-  const lineWidth = useTransform(smoothProgress, [0, 0.5], ["0px", "200px"]);
-  
-  // 6. Meta Opacity
-  const metaOpacity = useTransform(smoothProgress, [0.6, 1], [0, 1]);
-  const metaY = useTransform(smoothProgress, [0.6, 1], [20, 0]);
-
-  const text = "FLUX CORE";
+  // Reverted to System Cyan (#17f7f7) and Monochrome
+  const color = useTransform(scrollYProgress, [0, 0.5, 1], ["#333333", "#17f7f7", "#333333"]);
 
   return (
-    <div ref={containerRef} className="h-[400vh] relative bg-[#050505]">
-      <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden border-l border-white/[0.05]">
-        
-        {/* Inject Inter Variable Font */}
-        <style>{`
+    <section ref={containerRef} className="relative min-h-[200vh] py-20 bg-[#050505] overflow-hidden flex flex-col justify-center gap-10">
+       {/* Inject Inter Variable Font for the experiment mechanics only */}
+       <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Inter:slnt,wght@-10..0,100..900&display=swap');
         `}</style>
 
-        <div className="relative z-10 text-center">
-          <motion.h1 
-            className="text-[12vw] leading-[0.85] mix-blend-difference font-sans transition-colors duration-0"
-            style={{ 
-              fontFamily: "'Inter', sans-serif",
-              color: color,
-              letterSpacing: letterSpacing,
-              fontVariationSettings: "'wght' 100, 'slnt' 0" // Fallback/Base
-            }}
-          >
-            {text.split("").map((char, i) => (
-              <motion.span 
-                key={i} 
-                style={{
-                   // We apply variation settings to each char for potentially different effects later
-                   // For now, global sync is fine.
-                   // Note: Motion handles CSS variables well, but font-variation-settings string interpolation needs care.
-                   // We use a custom value for this.
-                   fontVariationSettings: useTransform(
-                     [weight, slant], 
-                     ([w, s]) => `'wght' ${Math.round(w as number)}, 'slnt' ${s}`
-                   )
-                }}
-              >
-                {char === " " ? "\u00A0" : char}
-              </motion.span>
-            ))}
-          </motion.h1>
-          
-          <motion.div 
-            style={{ width: lineWidth, backgroundColor: color }}
-            className="h-px mx-auto my-8"
-          ></motion.div>
-          
-          <motion.div style={{ opacity: metaOpacity, y: metaY }}>
-             <p className="text-xs font-mono text-[#17f7f7] uppercase tracking-[0.3em]">Inter Variable</p>
-             <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest mt-2">Weight & Slant Interpolation</p>
-          </motion.div>
-        </div>
+      <div className="relative z-10 flex flex-col gap-8">
+        {/* Row 1: Right to Left */}
+        <ParallaxText baseVelocity={-5} className="text-6xl md:text-9xl text-white/20 font-sans">
+          Material Lab • System V2.0 • Optical • Flux •
+        </ParallaxText>
 
-        {/* Background Gradient Mesh */}
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
-           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-gradient-to-tr from-[#17f7f7]/20 to-transparent rounded-full blur-[100px]"></div>
-        </div>
-        
-        {/* Scroll Indicators */}
-        <div className="absolute bottom-12 left-12 text-left">
-          <p className="text-[10px] font-mono text-white/30 uppercase tracking-widest">Scroll Trigger</p>
-          <p className="text-xs font-serif text-white mt-1">Scrub: 1.5s</p>
-        </div>
+        {/* Row 2: Left to Right with Variable Font Effects */}
+        <motion.div style={{ 
+            fontVariationSettings: "'wght' 900, 'slnt' -10",
+            color: color,
+            letterSpacing: tracking,
+            fontFamily: "'Inter', sans-serif"
+        }}>
+             <ParallaxText baseVelocity={5} className="text-7xl md:text-[10rem] leading-[0.85]">
+              Variable Motion • Kinetic Type • Velocity •
+            </ParallaxText>
+        </motion.div>
+
+        {/* Row 3: Right to Left fast */}
+        <ParallaxText baseVelocity={-3} className="text-5xl md:text-8xl text-white/10 font-serif italic">
+          Refraction • Prismatic • Spectrum • Light •
+        </ParallaxText>
       </div>
-    </div>
+
+      {/* System Indicator - Cyan */}
+      <div className="fixed bottom-8 left-8 z-50 pointer-events-none mix-blend-difference">
+          <motion.div 
+            style={{ scaleX: scrollYProgress }} 
+            className="h-1 bg-[#17f7f7] w-24 origin-left mb-2"
+          />
+          <p className="font-mono text-[10px] text-[#17f7f7] uppercase tracking-widest">
+            Velocity Scroll
+          </p>
+      </div>
+      
+      {/* Background Elements - Cyan/System */}
+      <div className="absolute inset-0 pointer-events-none">
+          <motion.div 
+            style={{ 
+                y: useTransform(scrollYProgress, [0, 1], [0, -200]),
+                opacity: useTransform(scrollYProgress, [0, 0.5, 1], [0.1, 0.2, 0.1])
+            }}
+            className="absolute top-1/4 right-0 w-[50vw] h-[50vw] bg-[#17f7f7] blur-[150px] rounded-full opacity-10" 
+          />
+      </div>
+    </section>
   );
 }

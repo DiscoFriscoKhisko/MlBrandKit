@@ -1,6 +1,7 @@
-import { Button } from "./ui/button";
+import { ArrowButton } from "./ui/ArrowButton";
 import { toast } from "sonner@2.0.3";
 import { copyToClipboard } from "./ui/utils";
+import { MotionFadeText, MotionSplitText, MotionSection } from "./MotionSystem";
 
 const typographySpecs = [
   {
@@ -86,13 +87,13 @@ export function Typography() {
       {/* Header */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
         <div className="md:col-span-4">
-          <h2 className="text-3xl font-serif text-white">Typographic Voice</h2>
+          <MotionSplitText className="text-3xl font-serif text-white">Typographic Voice</MotionSplitText>
         </div>
         <div className="md:col-span-8 md:pl-12 border-l border-white/[0.05]">
-          <p className="text-[#d5dada] text-lg font-light leading-relaxed max-w-lg">
+          <MotionFadeText className="text-[#d5dada] text-lg font-light leading-relaxed max-w-lg">
             Merriweather provides the authority of the printed word. Inter provides the utility of the machine.
             Together, they form a dialogue between tradition and technology.
-          </p>
+          </MotionFadeText>
         </div>
       </div>
 
@@ -140,7 +141,7 @@ export function Typography() {
       </div>
 
       {/* Editorial Layout Example */}
-      <div className="pt-24 border-t border-white/[0.05]">
+      <MotionSection curved className="bg-[#090909] border border-white/5 px-8 py-12">
         <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Editorial Applications</h3>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-24 gap-y-16">
@@ -159,9 +160,9 @@ export function Typography() {
                 By removing the noise, we allow the signal to be heard. 
                 Every pixel must justify its existence in the void.
               </p>
-              <Button variant="link" className="text-[#17f7f7] p-0 h-auto hover:text-white transition-colors uppercase tracking-[0.2em] text-[10px] font-bold decoration-0">
-                Read Manifesto &rarr;
-              </Button>
+              <ArrowButton variant="link" className="text-[#17f7f7] font-bold tracking-[0.2em] text-[10px]">
+                Read Manifesto
+              </ArrowButton>
             </div>
           </div>
 
@@ -185,7 +186,7 @@ export function Typography() {
             </div>
           </div>
         </div>
-      </div>
+      </MotionSection>
 
       {/* Digital Product: Data Visualization */}
       <div className="pt-24 border-t border-white/[0.05]">

@@ -1,6 +1,7 @@
 import { Card } from "./ui/card";
 import pineappleImg from "figma:asset/4a48ca548bd18aa919107b9d93ce3a1ec8f5690c.png";
 import { MASTER_LOGO_URL } from "./branding/constants";
+import { MotionCard } from "./MotionSystem";
 
 export function UsageGuidelines() {
   return (
@@ -29,32 +30,32 @@ export function UsageGuidelines() {
           <div className="space-y-16">
              {/* Do 1 */}
              <div className="group">
-               <div className="bg-[#f3f4f4] p-12 mb-6 flex items-center justify-center aspect-[2.5/1] depth-card">
+               <MotionCard className="bg-[#f3f4f4] p-12 mb-6 flex items-center justify-center aspect-[2.5/1] depth-card border-none">
                  <img src={MASTER_LOGO_URL} alt="Logo Black" className="h-10 w-auto object-contain opacity-95" />
-               </div>
+               </MotionCard>
                <p className="text-sm text-white font-serif mb-2">Paper Surfaces</p>
                <p className="text-xs text-[#d5dada]/60 leading-relaxed">Use the Void Black logo on "White Smoke" or physical paper stocks.</p>
              </div>
 
              {/* Do 2 */}
              <div className="group">
-               <div className="bg-[#050505] p-12 mb-6 flex items-center justify-center aspect-[2.5/1] border border-white/[0.1] depth-card">
+               <MotionCard className="bg-[#050505] p-12 mb-6 flex items-center justify-center aspect-[2.5/1] border border-white/[0.1] depth-card border-none">
                  <img src={MASTER_LOGO_URL} alt="Logo White" className="h-10 w-auto object-contain invert opacity-95" />
-               </div>
+               </MotionCard>
                <p className="text-sm text-white font-serif mb-2">Digital Void</p>
                <p className="text-xs text-[#d5dada]/60 leading-relaxed">Use the Ghost White logo on digital black backgrounds.</p>
              </div>
 
              {/* Do 3 */}
              <div className="group">
-               <div className="relative overflow-hidden mb-6 flex items-center justify-center aspect-[2.5/1] depth-card">
+               <MotionCard className="relative overflow-hidden mb-6 flex items-center justify-center aspect-[2.5/1] depth-card border-none">
                  <img 
                     src="https://images.unsplash.com/photo-1614728853913-1e2203d0108d?auto=format&fit=crop&w=800&q=80"
                     alt="Texture" className="absolute inset-0 w-full h-full object-cover grayscale opacity-40 mix-blend-overlay"
                  />
                  <div className="absolute inset-0 bg-[#050505]/80"></div>
                  <img src={MASTER_LOGO_URL} alt="Logo White" className="h-10 w-auto object-contain invert relative z-10 opacity-95" />
-               </div>
+               </MotionCard>
                <p className="text-sm text-white font-serif mb-2">Deep Overlay</p>
                <p className="text-xs text-[#d5dada]/60 leading-relaxed">Ensure 80% opacity on black overlays when placing logo over imagery.</p>
              </div>
@@ -71,33 +72,33 @@ export function UsageGuidelines() {
           <div className="space-y-16">
              {/* Don't 1 */}
              <div className="group">
-               <div className="bg-[#050505] p-12 mb-6 flex items-center justify-center aspect-[2.5/1] relative overflow-hidden border border-white/[0.05] opacity-60">
+               <MotionCard className="bg-[#050505] p-12 mb-6 flex items-center justify-center aspect-[2.5/1] relative overflow-hidden border border-white/[0.05] opacity-60 border-none">
                  <div className="absolute inset-0 border border-[#ff2a6d]/20 pointer-events-none"></div>
                  <div className="absolute top-4 right-4 text-[#ff2a6d] text-xs">✕</div>
                  <img src={MASTER_LOGO_URL} alt="Stretch" className="h-8 w-32 object-fill opacity-80 invert" />
-               </div>
+               </MotionCard>
                <p className="text-sm text-white font-serif mb-2">Distortion</p>
                <p className="text-xs text-[#d5dada]/60 leading-relaxed">Never stretch, squash, or skew the logo proportions.</p>
              </div>
 
              {/* Don't 2 */}
              <div className="group">
-               <div className="bg-[#050505] p-12 mb-6 flex items-center justify-center aspect-[2.5/1] relative overflow-hidden border border-white/[0.05] opacity-60">
+               <MotionCard className="bg-[#050505] p-12 mb-6 flex items-center justify-center aspect-[2.5/1] relative overflow-hidden border border-white/[0.05] opacity-60 border-none">
                   <div className="absolute inset-0 border border-[#ff2a6d]/20 pointer-events-none"></div>
                   <div className="absolute top-4 right-4 text-[#ff2a6d] text-xs">✕</div>
                  <img src={MASTER_LOGO_URL} alt="Color" className="h-10 w-auto object-contain sepia hue-rotate-90 opacity-80 invert" />
-               </div>
+               </MotionCard>
                <p className="text-sm text-white font-serif mb-2">Recoloring</p>
                <p className="text-xs text-[#d5dada]/60 leading-relaxed">Do not apply unauthorized colors or gradients to the logo mark.</p>
              </div>
 
              {/* Don't 3 */}
              <div className="group">
-               <div className="bg-[#17f7f7] p-12 mb-6 flex items-center justify-center aspect-[2.5/1] relative overflow-hidden opacity-60">
+               <MotionCard className="bg-[#17f7f7] p-12 mb-6 flex items-center justify-center aspect-[2.5/1] relative overflow-hidden opacity-60 border-none">
                   <div className="absolute inset-0 border border-[#ff2a6d]/20 pointer-events-none"></div>
                   <div className="absolute top-4 right-4 text-[#ff2a6d] text-xs">✕</div>
                  <img src={MASTER_LOGO_URL} alt="Low Contrast" className="h-10 w-auto object-contain invert opacity-50" />
-               </div>
+               </MotionCard>
                <p className="text-sm text-white font-serif mb-2">Low Contrast</p>
                <p className="text-xs text-[#d5dada]/60 leading-relaxed">Avoid placing white logos on high-brightness spectral backgrounds.</p>
              </div>
@@ -116,7 +117,7 @@ export function UsageGuidelines() {
                 { name: "Thermal", id: "meqnevisbo", filter: "grayscale(100%) invert(100%) contrast(120%) brightness(80%) sepia(100%) hue-rotate(-50deg) saturate(300%)" }
               ].map((filter) => (
                 <div key={filter.id} className="group cursor-pointer">
-                  <div className="aspect-[3/4] relative bg-[#050505] mb-6 overflow-hidden border border-white/[0.05] depth-card">
+                  <MotionCard className="aspect-[3/4] relative bg-[#050505] mb-6 overflow-hidden border border-white/[0.05] depth-card border-none">
                     <img 
                       src={pineappleImg} 
                       alt={filter.name}
@@ -124,7 +125,7 @@ export function UsageGuidelines() {
                       style={{ filter: filter.filter }}
                     />
                     <div className="absolute inset-0 ring-1 ring-inset ring-white/10 group-hover:ring-white/30 transition-all duration-500"></div>
-                  </div>
+                  </MotionCard>
                   <div className="flex flex-col space-y-1 border-t border-white/[0.1] pt-4">
                     <span className="text-sm font-serif text-white">{filter.name}</span>
                     <code className="text-[9px] font-mono text-[#d5dada]/40 uppercase tracking-widest">CSS Matrix</code>

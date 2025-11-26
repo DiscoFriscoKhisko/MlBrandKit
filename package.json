@@ -10,6 +10,8 @@
           "@radix-ui/react-tabs": "*",
           "class-variance-authority": "*",
           "clsx": "*",
+          "gsap": "*",
+          "lenis": "*",
           "lucide-react": "*",
           "motion": "*",
           "react": "^18.3.1",

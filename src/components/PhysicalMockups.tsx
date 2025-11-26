@@ -1,6 +1,7 @@
 import { Button } from "./ui/button";
 import { MASTER_LOGO_URL } from "./branding/constants";
 import { toast } from "sonner@2.0.3";
+import { MotionCard, MotionFadeText, MotionSplitText, MotionSection } from "./MotionSystem";
 
 export function PhysicalMockups() {
   return (
@@ -8,12 +9,12 @@ export function PhysicalMockups() {
       {/* Header */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
         <div className="md:col-span-4">
-          <h2 className="text-3xl font-serif text-white">Tangible Artifacts</h2>
+          <MotionSplitText className="text-3xl font-serif text-white">Tangible Artifacts</MotionSplitText>
         </div>
         <div className="md:col-span-8 md:pl-12 border-l border-white/[0.05]">
-          <p className="text-[#d5dada] text-lg font-light leading-relaxed max-w-lg">
+          <MotionFadeText className="text-[#d5dada] text-lg font-light leading-relaxed max-w-lg">
             Physical manifestations of the Void. Strictly functional, ruthlessly minimal.
-          </p>
+          </MotionFadeText>
         </div>
       </div>
 
@@ -31,8 +32,8 @@ export function PhysicalMockups() {
         </div>
 
         {/* Google Doc Preview */}
-        <div className="relative w-full max-w-3xl mx-auto bg-[#050505] aspect-[1/1.414] shadow-2xl p-[5%] overflow-hidden group">
-             <div className="h-full flex flex-col bg-white shadow-[0_0_50px_rgba(0,0,0,0.5)] relative z-10">
+        <MotionCard className="w-full max-w-3xl mx-auto bg-[#050505] aspect-[1/1.414] shadow-2xl p-[5%] group border-none">
+             <div className="h-full flex flex-col bg-white shadow-[0_0_50px_rgba(0,0,0,0.5)] relative z-10 rounded-sm overflow-hidden">
                {/* Watermark */}
                <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-0">
                   <span className="text-[300px] font-serif text-black/[0.03] -rotate-12 select-none leading-none">ml</span>
@@ -78,13 +79,13 @@ export function PhysicalMockups() {
                   </div>
                </div>
              </div>
-        </div>
+        </MotionCard>
       </div>
 
       {/* Email Signature */}
       <div className="pt-24 border-t border-white/[0.05]">
           <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Digital Signature</h3>
-          <div className="max-w-2xl mx-auto bg-[#0a0a0a] border border-white/10 p-8 rounded-lg relative overflow-hidden group">
+          <MotionCard className="max-w-2xl mx-auto bg-[#0a0a0a] border border-white/10 p-8 relative overflow-hidden group rounded-lg">
              <div className="absolute top-0 left-0 w-1 h-full bg-[#17f7f7]"></div>
 
              {/* Watermark - Consistent */}
@@ -127,14 +128,14 @@ export function PhysicalMockups() {
                    CONFIDENTIALITY NOTICE: The contents of this email message and any attachments are intended solely for the addressee(s) and may contain confidential and/or privileged information and may be legally protected from disclosure.
                 </p>
              </div>
-          </div>
+          </MotionCard>
       </div>
 
       {/* Company Board / Environmental Graphics */}
       <div className="pt-24 border-t border-white/[0.05]">
           <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Environmental Graphics</h3>
           
-          <div className="relative w-full aspect-[21/9] bg-[#080808] overflow-hidden flex items-center justify-center shadow-2xl group">
+          <MotionCard className="w-full aspect-[21/9] bg-[#080808] overflow-hidden flex items-center justify-center shadow-2xl group border-none">
              {/* Wall Texture */}
              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/concrete-wall.png')] opacity-20"></div>
              
@@ -163,7 +164,7 @@ export function PhysicalMockups() {
 
              {/* Floor Reflection */}
              <div className="absolute bottom-0 left-0 right-0 h-[150px] bg-gradient-to-t from-black to-transparent z-20"></div>
-          </div>
+          </MotionCard>
       </div>
     </div>
   );
