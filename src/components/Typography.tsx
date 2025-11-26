@@ -1,7 +1,10 @@
+import { useState, useRef, useEffect } from "react";
 import { ArrowButton } from "./ui/ArrowButton";
 import { toast } from "sonner@2.0.3";
 import { copyToClipboard } from "./ui/utils";
-import { MotionFadeText, MotionSplitText, MotionSection } from "./MotionSystem";
+import { MotionFadeText, MotionSplitText, MotionSection, MotionCard } from "./MotionSystem";
+import { Slider } from "./ui/slider";
+import { motion } from "motion/react";
 
 const typographySpecs = [
   {
@@ -73,6 +76,10 @@ const typographySpecs = [
 ];
 
 export function Typography() {
+  const [previewText, setPreviewText] = useState("Material Lab");
+  const [weight, setWeight] = useState([400]);
+  const [slant, setSlant] = useState([0]);
+  
   const handleCopy = async (text: string) => {
     const success = await copyToClipboard(text);
     if (success) {
@@ -84,6 +91,11 @@ export function Typography() {
 
   return (
     <div className="space-y-32">
+       {/* Inject Inter Variable Font for this section */}
+       <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Inter:slnt,wght@-10..0,100..900&display=swap');
+        `}</style>
+
       {/* Header */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
         <div className="md:col-span-4">
@@ -96,6 +108,89 @@ export function Typography() {
           </MotionFadeText>
         </div>
       </div>
+      
+      {/* Variable Font Playground */}
+      <MotionSection curved className="bg-[#090909] border border-white/10 p-8 md:p-12">
+         <div className="grid md:grid-cols-12 gap-12">
+            <div className="md:col-span-4 space-y-8">
+               <div>
+                 <h3 className="text-[10px] font-mono text-[#17f7f7] uppercase tracking-[0.3em] mb-6">Variable Axis Control</h3>
+                 <p className="text-sm text-[#d5dada]/60 mb-8">Manipulate the Inter Variable axes to fine-tune typographic voice for specific interaction states.</p>
+               </div>
+               
+               <div className="space-y-6">
+                  <div className="space-y-3">
+                     <div className="flex justify-between text-[10px] font-mono text-[#d5dada] uppercase tracking-wider">
+                        <span>Weight (wght)</span>
+                        <span>{weight[0]}</span>
+                     </div>
+                     <Slider 
+                        defaultValue={[400]} 
+                        max={900} 
+                        min={100} 
+                        step={1} 
+                        value={weight}
+                        onValueChange={setWeight}
+                        className="py-2"
+                     />
+                  </div>
+
+                  <div className="space-y-3">
+                     <div className="flex justify-between text-[10px] font-mono text-[#d5dada] uppercase tracking-wider">
+                        <span>Slant (slnt)</span>
+                        <span>{slant[0]}deg</span>
+                     </div>
+                     <Slider 
+                        defaultValue={[0]} 
+                        max={0} 
+                        min={-10} 
+                        step={0.1} 
+                        value={slant}
+                        onValueChange={setSlant}
+                        className="py-2"
+                     />
+                  </div>
+
+                  <div className="pt-4">
+                     <input 
+                       type="text" 
+                       value={previewText}
+                       onChange={(e) => setPreviewText(e.target.value)}
+                       className="w-full bg-black/20 border border-white/10 text-white px-4 py-2 text-sm font-sans focus:outline-none focus:border-[#17f7f7]/50 transition-colors rounded"
+                       placeholder="Type to test..."
+                     />
+                  </div>
+               </div>
+            </div>
+
+            <div className="md:col-span-8 flex items-center justify-center min-h-[300px] border-l border-white/5 pl-8 overflow-hidden relative">
+               <div className="absolute inset-0 grid grid-cols-[repeat(20,1fr)] grid-rows-[repeat(10,1fr)] opacity-10 pointer-events-none">
+                  {Array.from({ length: 200 }).map((_, i) => (
+                     <div key={i} className="border-[0.5px] border-[#17f7f7]/20" />
+                  ))}
+               </div>
+               
+               <motion.div 
+                 className="text-center z-10 break-words max-w-full p-4"
+                 animate={{
+                    fontVariationSettings: `'wght' ${weight[0]}, 'slnt' ${slant[0]}`
+                 }}
+                 style={{
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: 'clamp(3rem, 8vw, 6rem)',
+                    color: '#ffffff',
+                    lineHeight: 1,
+                 }}
+               >
+                 {previewText}
+               </motion.div>
+               
+               <div className="absolute bottom-4 right-4 text-[9px] font-mono text-[#17f7f7]/50">
+                  font-variation-settings: 'wght' {weight[0]}, 'slnt' {slant[0]};
+               </div>
+            </div>
+         </div>
+      </MotionSection>
 
       {/* Type Specimen List */}
       <div className="w-full border-t border-white/[0.05]">

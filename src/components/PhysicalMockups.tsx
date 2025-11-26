@@ -1,4 +1,4 @@
-import { Button } from "./ui/button";
+import { ArrowButton } from "./ui/ArrowButton";
 import { MASTER_LOGO_URL } from "./branding/constants";
 import { toast } from "sonner@2.0.3";
 import { MotionCard, MotionFadeText, MotionSplitText, MotionSection } from "./MotionSystem";
@@ -22,13 +22,13 @@ export function PhysicalMockups() {
       <div className="pt-24 border-t border-white/[0.05]">
         <div className="flex items-center justify-between mb-12">
           <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em]">Digital Stationery</h3>
-          <Button 
+          <ArrowButton 
             variant="link" 
-            className="text-[#17f7f7] p-0 h-auto text-[10px] uppercase tracking-[0.2em] hover:text-white transition-colors decoration-0"
+            className="text-[#17f7f7] text-[10px] uppercase tracking-[0.2em] hover:text-white transition-colors"
             onClick={() => toast.info("Download started...")}
           >
             Google Doc Template
-          </Button>
+          </ArrowButton>
         </div>
 
         {/* Google Doc Preview */}

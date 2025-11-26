@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Button } from "./ui/button";
 import { ArrowButton } from "./ui/ArrowButton";
 import { toast } from "sonner@2.0.3";
 import { copyToClipboard } from "./ui/utils";
@@ -106,6 +105,47 @@ export function ColorPalette() {
         ))}
       </div>
 
+      {/* Spectral Interaction Lab */}
+      <div className="pt-24 border-t border-white/[0.05]">
+         <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Spectral Blending</h3>
+         
+         <div className="grid md:grid-cols-2 gap-12">
+            <div className="relative aspect-video bg-[#050505] overflow-hidden border border-white/10 rounded-2xl group">
+                {/* Background Noise */}
+                <div className="absolute inset-0 opacity-20" style={{ 
+                   backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+                }}></div>
+                
+                {/* Moving Orbs */}
+                <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-[#17f7f7] rounded-full blur-3xl mix-blend-screen animate-pulse opacity-60"></div>
+                <div className="absolute top-1/3 right-1/3 w-40 h-40 bg-[#ff2a6d] rounded-full blur-3xl mix-blend-screen animate-pulse opacity-60 delay-700"></div>
+                
+                <div className="absolute inset-0 flex items-center justify-center">
+                   <h4 className="text-4xl font-serif text-white z-10 mix-blend-overlay font-bold">INTERFERENCE</h4>
+                </div>
+                
+                <div className="absolute bottom-4 left-4">
+                   <span className="text-[9px] font-mono text-[#17f7f7] uppercase tracking-widest">mix-blend-mode: screen</span>
+                </div>
+            </div>
+
+            <div className="flex flex-col justify-center space-y-6">
+               <div>
+                   <h4 className="text-white font-serif text-xl mb-2">Photon Additive Mixing</h4>
+                   <p className="text-[#d5dada]/60 text-sm leading-relaxed">
+                      Our color system is designed to behave like light. When "Laser Cyan" and "Neon Red" overlap, they should additively mix, creating white hotspots rather than muddy browns. 
+                   </p>
+               </div>
+               <div className="p-4 border border-white/10 bg-white/5 rounded">
+                  <code className="text-[10px] font-mono text-[#17f7f7] block mb-2">.spectral-blend &#123;</code>
+                  <code className="text-[10px] font-mono text-[#d5dada] block pl-4">mix-blend-mode: screen;</code>
+                  <code className="text-[10px] font-mono text-[#d5dada] block pl-4">filter: blur(40px);</code>
+                  <code className="text-[10px] font-mono text-[#17f7f7] block">&#125;</code>
+               </div>
+            </div>
+         </div>
+      </div>
+
       {/* Interaction Study */}
       <div className="pt-12 border-t border-white/[0.05]">
          <div className="grid md:grid-cols-2 gap-24">
@@ -115,17 +155,23 @@ export function ColorPalette() {
               <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Interactive States</h3>
               <div className="flex flex-col gap-6 max-w-xs">
                   {/* Primary: Outline with Glow */}
-                  <Button className="w-full bg-transparent hover:bg-[#17f7f7]/5 text-[#17f7f7] border border-[#17f7f7]/50 hover:border-[#17f7f7] rounded-full h-14 tracking-[0.1em] text-xs uppercase transition-all duration-300 shadow-[0_0_0_1px_transparent] hover:shadow-[0_0_15px_rgba(23,247,247,0.3)]">
+                  <ArrowButton 
+                    variant="outline"
+                    className="w-full text-[#17f7f7] border-[#17f7f7]/50 hover:bg-[#17f7f7]/5 hover:border-[#17f7f7] hover:text-[#17f7f7] shadow-[0_0_0_1px_transparent] hover:shadow-[0_0_15px_rgba(23,247,247,0.3)]"
+                  >
                     Primary System
-                  </Button>
+                  </ArrowButton>
                   
                   {/* Destructive: Neon Red */}
-                  <Button className="w-full bg-transparent hover:bg-[#ff2a6d]/5 text-[#ff2a6d] border border-[#ff2a6d]/50 hover:border-[#ff2a6d] rounded-full h-14 tracking-[0.1em] text-xs uppercase transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,42,109,0.3)]">
+                  <ArrowButton 
+                    variant="outline"
+                    className="w-full text-[#ff2a6d] border-[#ff2a6d]/50 hover:bg-[#ff2a6d]/5 hover:border-[#ff2a6d] hover:text-[#ff2a6d] hover:shadow-[0_0_15px_rgba(255,42,109,0.3)]"
+                  >
                     Critical Action
-                  </Button>
+                  </ArrowButton>
 
                   {/* Tertiary: Link */}
-                  <ArrowButton variant="link" className="w-full justify-start text-[#d5dada] hover:text-white text-xs uppercase tracking-[0.2em]">
+                  <ArrowButton variant="link" className="justify-start text-[#d5dada] hover:text-white text-xs uppercase tracking-[0.2em]">
                     Documentation
                   </ArrowButton>
               </div>

@@ -6,19 +6,48 @@ import { DigitalAssets } from "./DigitalAssets";
 import { Motion } from "./Motion";
 import { UsageGuidelines } from "./UsageGuidelines";
 import { ScrollTypography } from "./experimental/ScrollTypography";
+import { MotionPinnedSection } from "./MotionPinnedSection";
 import { LayoutSystem } from "./LayoutSystem";
 import { MASTER_LOGO_URL } from "./branding/constants";
-import { Button } from "./ui/button";
 import { ArrowButton } from "./ui/ArrowButton";
 import { MotionSection, MotionSplitText, MotionFadeText } from "./MotionSystem";
+import { FloatingShape } from "./ui/FloatingShape";
 
 export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
   return (
-    <div className="min-h-screen bg-[#050505] text-foreground font-sans selection:bg-[#17f7f7]/30 selection:text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#050505] text-foreground font-sans selection:bg-[#17f7f7]/30 selection:text-white overflow-x-hidden relative">
       {/* Ultra-Subtle Grain - Barely Perceptible */}
       <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.03] mix-blend-overlay" style={{ 
         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
       }}></div>
+
+      {/* Ambient Floating Elements - Global Depth */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+         {/* Top Right Cyan Glow */}
+         <FloatingShape depth={0.5} className="top-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-[#17f7f7] opacity-[0.03] blur-[120px]" />
+         
+         {/* Middle Left Dark Void */}
+         <FloatingShape depth={0.2} className="top-[40%] left-[-20%] w-[60vw] h-[60vw] rounded-full bg-black opacity-80 blur-[100px]" />
+         
+         {/* Bottom Right Subtle Accent */}
+         <FloatingShape depth={0.8} className="bottom-[-10%] right-[10%] w-[30vw] h-[30vw] rounded-full bg-[#d5dada] opacity-[0.02] blur-[80px]" />
+         
+         {/* Geometric Artifacts */}
+         <FloatingShape depth={1.2} className="top-[20%] left-[10%]">
+            <svg width="100" height="100" viewBox="0 0 100 100" fill="none" className="opacity-10">
+               <path d="M0 0 L20 20 M100 0 L80 20 M100 100 L80 80 M0 100 L20 80" stroke="#17f7f7" strokeWidth="2" />
+               <rect x="40" y="40" width="20" height="20" stroke="white" strokeWidth="1" />
+            </svg>
+         </FloatingShape>
+
+         <FloatingShape depth={-0.5} className="bottom-[30%] left-[5%]">
+            <div className="flex gap-2 opacity-5">
+              <div className="w-2 h-2 bg-white rounded-full" />
+              <div className="w-2 h-2 bg-white rounded-full" />
+              <div className="w-2 h-2 bg-white rounded-full" />
+            </div>
+         </FloatingShape>
+      </div>
 
       <Tabs defaultValue="experiments" className="w-full relative z-10">
         
@@ -52,7 +81,7 @@ export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
 
               <ArrowButton 
                 variant="outline" 
-                className="font-mono text-[10px] uppercase tracking-[0.2em] px-5 py-2.5"
+                className="font-mono text-[10px] uppercase tracking-[0.2em]"
                 href="mailto:damini@materiallab.io"
               >
                 Contact
@@ -145,7 +174,7 @@ export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
           </TabsContent>
 
           {/* Experiments - Full Bleed (Flushed) */}
-          <TabsContent value="experiments" className="w-full animate-in fade-in-30 slide-in-from-bottom-4 duration-1000 outline-none">
+          <TabsContent value="experiments" className="w-full animate-in fade-in-30 duration-1000 outline-none">
              {/* Intro Header - Constrained */}
              <MotionSection curved className="py-20">
                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 border-b border-white/[0.05] pb-12">
@@ -163,6 +192,8 @@ export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
              
              {/* Full Bleed Components */}
              <ScrollTypography />
+             
+             <MotionPinnedSection />
              
              {/* Placeholder for more scrolly telling sections */}
              <div className="h-[50vh] w-full flex items-center justify-center border-t border-white/[0.05]">
