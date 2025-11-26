@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MotionSection, MotionCard, MotionSplitText, MotionFadeText } from "./MotionSystem";
+import { MotionSection, MotionCard, MotionCardMedia, MotionSplitText, MotionFadeText } from "./MotionSystem";
 import { ArrowButton } from "./ui/ArrowButton";
 
 export function LayoutSystem() {
@@ -108,17 +108,19 @@ export function LayoutSystem() {
          <div className="grid md:grid-cols-2 gap-12">
              {/* Card Example */}
              <MotionCard className="aspect-[4/3] bg-[#090909] border border-white/10 relative flex flex-col overflow-hidden group border-none">
-                 <div className="flex-1 bg-white/5 relative flex items-center justify-center border-b border-white/5">
-                    <span className="text-white/20 font-mono text-[10px] uppercase tracking-widest">Media Area</span>
+                 <div className="flex-1 relative overflow-hidden border-b border-white/5">
+                    <MotionCardMedia 
+                      src="https://images.unsplash.com/photo-1600607686527-6fb886090705?auto=format&fit=crop&w=800&q=80" 
+                      alt="Card Media" 
+                    />
+                     {/* Overlay Specs */}
+                    <div className="absolute top-0 left-0 w-6 h-6 border-t border-l border-[#17f7f7] rounded-tl-[24px] z-20 pointer-events-none"></div>
+                    <div className="absolute top-4 left-4 text-[#17f7f7] font-mono text-[9px] opacity-0 group-hover:opacity-100 transition-opacity z-20 pointer-events-none">R24</div>
                  </div>
-                 <div className="p-6">
+                 <div className="p-6 relative z-10 bg-[#090909]">
                     <div className="w-1/2 h-2 bg-white/10 rounded mb-3"></div>
                     <div className="w-3/4 h-2 bg-white/10 rounded"></div>
                  </div>
-                 
-                 {/* Overlay Specs */}
-                 <div className="absolute top-0 left-0 w-6 h-6 border-t border-l border-[#17f7f7] rounded-tl-[24px]"></div>
-                 <div className="absolute top-4 left-4 text-[#17f7f7] font-mono text-[9px] opacity-0 group-hover:opacity-100 transition-opacity">R24</div>
              </MotionCard>
 
              <div className="flex flex-col justify-center">

@@ -7,15 +7,20 @@ import { Motion } from "./Motion";
 import { UsageGuidelines } from "./UsageGuidelines";
 import { ScrollTypography } from "./experimental/ScrollTypography";
 import { MotionPinnedSection } from "./MotionPinnedSection";
+import { FloatingShape } from "./ui/FloatingShape";
 import { LayoutSystem } from "./LayoutSystem";
 import { MASTER_LOGO_URL } from "./branding/constants";
 import { ArrowButton } from "./ui/ArrowButton";
 import { MotionSection, MotionSplitText, MotionFadeText } from "./MotionSystem";
-import { FloatingShape } from "./ui/FloatingShape";
+import { AgencyWebsite } from "./website/AgencyWebsite";
+import { SystemV2 } from "./SystemV2";
+import { CustomCursor } from "./website/CustomCursor";
 
 export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
   return (
-    <div className="min-h-screen bg-[#050505] text-foreground font-sans selection:bg-[#17f7f7]/30 selection:text-white overflow-x-hidden relative">
+    <div className="min-h-screen bg-[#050505] text-foreground font-sans selection:bg-[#17f7f7]/30 selection:text-white overflow-x-hidden relative cursor-none">
+      <CustomCursor />
+      
       {/* Ultra-Subtle Grain - Barely Perceptible */}
       <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.03] mix-blend-overlay" style={{ 
         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
@@ -49,13 +54,13 @@ export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
          </FloatingShape>
       </div>
 
-      <Tabs defaultValue="experiments" className="w-full relative z-10">
+      <Tabs defaultValue="system" className="w-full relative z-10">
         
         {/* Header Section - Constrained */}
         <MotionSection className="pt-20 pb-12" curved>
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
             <div className="space-y-8">
-               <div className="h-20 w-20 flex items-center justify-center relative group">
+               <div className="h-20 w-20 flex items-center justify-center relative group interactive">
                  <img src={MASTER_LOGO_URL} alt="Material Lab" className="h-16 w-16 object-contain opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
                </div>
                <div>
@@ -94,7 +99,7 @@ export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
         <div className="sticky top-0 z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-white/[0.03] mb-0">
           <div className="max-w-[1400px] mx-auto px-8">
             <TabsList className="w-full flex flex-wrap md:flex-nowrap justify-start h-auto py-4 p-0 bg-transparent border-b-0 gap-6 md:gap-12">
-              {['colors', 'typography', 'layout', 'physical', 'digital', 'motion', 'experiments', 'usage'].map((tab) => (
+              {['system', 'colors', 'typography', 'physical', 'digital', 'motion', 'experiments', 'usage', 'website'].map((tab) => (
                 <TabsTrigger 
                   key={tab}
                   value={tab} 
@@ -131,6 +136,7 @@ export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
                     after:bg-[#17f7f7]
                     after:transition-all
                     after:duration-500
+                    interactive
                   "
                 >
                   {tab}
@@ -143,6 +149,11 @@ export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
         {/* Content Area - Full Width Container */}
         <div className="min-h-[600px] w-full">
           
+          {/* System V2 - The New Documentation */}
+          <TabsContent value="system" className="max-w-[1600px] mx-auto px-8 py-20 animate-in fade-in-30 slide-in-from-bottom-4 duration-1000 outline-none">
+            <SystemV2 />
+          </TabsContent>
+
           {/* Colors - Constrained */}
           <TabsContent value="colors" className="max-w-5xl mx-auto px-8 py-20 animate-in fade-in-30 slide-in-from-bottom-4 duration-1000 outline-none">
             <ColorPalette />
@@ -153,7 +164,7 @@ export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
             <Typography />
           </TabsContent>
 
-          {/* Layout - Constrained */}
+          {/* Layout - Constrained (Legacy) */}
           <TabsContent value="layout" className="max-w-5xl mx-auto px-8 py-20 animate-in fade-in-30 slide-in-from-bottom-4 duration-1000 outline-none">
             <LayoutSystem />
           </TabsContent>
@@ -204,6 +215,11 @@ export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
           {/* Usage - Constrained */}
           <TabsContent value="usage" className="max-w-5xl mx-auto px-8 py-20 animate-in fade-in-30 slide-in-from-bottom-4 duration-1000 outline-none">
             <UsageGuidelines />
+          </TabsContent>
+
+          {/* Agency Website - Full Width */}
+          <TabsContent value="website" className="w-full animate-in fade-in-30 duration-1000 outline-none">
+            <AgencyWebsite />
           </TabsContent>
 
         </div>

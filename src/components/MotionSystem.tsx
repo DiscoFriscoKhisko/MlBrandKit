@@ -39,8 +39,9 @@ export function MotionCard({ className, children, delay = 0, ...props }: MotionC
     <motion.article
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay }} // Power3.out feel
+      viewport={{ once: true, amount: 0.15 }} // ~ top 85%
+      whileHover="hover"
+      transition={{ duration: 0.8, ease: [0.215, 0.61, 0.355, 1], delay }} // Power3.out
       className={cn(
         "card group bg-[#090909] border border-white/10",
         className
@@ -58,13 +59,17 @@ export function MotionCardMedia({
   className 
 }: { src?: string, alt?: string, className?: string }) {
   return (
-    <div className="card-media relative">
+    <div className="card-media relative overflow-hidden h-full w-full">
       <motion.img 
         src={src} 
         alt={alt}
-        className={cn("object-cover", className)}
-        whileHover={{ scale: 1.03 }} // Subtle scale instead of parallax for simplicity
-        transition={{ duration: 0.4, ease: "easeOut" }}
+        className={cn("object-cover w-full h-full block", className)}
+        variants={{
+          hover: { 
+            y: "-3%", 
+            transition: { duration: 0.4, ease: "easeOut" } // Power2.out
+          }
+        }}
       />
     </div>
   )
