@@ -2,11 +2,10 @@ import React, { useEffect, useRef } from 'react';
 
 // --- Constants & Configuration ---
 
-// Visual Styling
 const OBJECT_SCALE = 135;
-const MAX_BOUNCES = 6; 
-const STAR_COUNT = 120;
-const DUST_COUNT = 60;
+const MAX_BOUNCES = 4; // Reduced for clarity with wider beams
+const STAR_COUNT = 150; // More background stars for depth
+const DUST_COUNT = 80;
 
 // Spectrum
 interface SpectralBand {
@@ -17,13 +16,13 @@ interface SpectralBand {
 }
 
 const SPECTRUM: SpectralBand[] = [
-  { name: 'red',    color: '#ff2a6d', opacity: 0.6, n: 1.42 }, // Neon Red
-  { name: 'orange', color: '#ff9f0a', opacity: 0.6, n: 1.52 },
-  { name: 'yellow', color: '#ffd60a', opacity: 0.7, n: 1.62 },
-  { name: 'green',  color: '#05f7a5', opacity: 0.7, n: 1.72 }, // Neon Green
-  { name: 'blue',   color: '#0a84ff', opacity: 0.8, n: 1.82 },
-  { name: 'indigo', color: '#5e5ce6', opacity: 0.8, n: 1.92 },
-  { name: 'violet', color: '#bf5af2', opacity: 0.9, n: 2.02 }  
+  { name: 'red',    color: '#ff2a6d', opacity: 0.8, n: 1.42 }, 
+  { name: 'orange', color: '#ff9f0a', opacity: 0.8, n: 1.52 },
+  { name: 'yellow', color: '#ffd60a', opacity: 0.8, n: 1.62 },
+  { name: 'green',  color: '#05f7a5', opacity: 0.8, n: 1.72 }, 
+  { name: 'blue',   color: '#0a84ff', opacity: 0.9, n: 1.82 },
+  { name: 'indigo', color: '#5e5ce6', opacity: 0.9, n: 1.92 },
+  { name: 'violet', color: '#bf5af2', opacity: 1.0, n: 2.02 }  
 ];
 
 const N_AIR = 1.0;
@@ -339,8 +338,8 @@ class Particle {
             alpha = 0.05; 
             for (const beam of beams) {
                 const d = distToSegment({x:sx, y:sy}, beam.p1, beam.p2);
-                if (d < 25) {
-                    alpha += (1.0 - d/25) * 0.6; 
+                if (d < 35) {
+                    alpha += (1.0 - d/35) * 0.8; 
                 }
             }
         }
@@ -351,6 +350,32 @@ class Particle {
         ctx.fill();
     }
 }
+
+// Noise Generation for Smoky Fog
+const createNoiseTexture = () => {
+    if (typeof document === 'undefined') return null;
+    const cvs = document.createElement('canvas');
+    cvs.width = 256; 
+    cvs.height = 256;
+    const cx = cvs.getContext('2d');
+    if (!cx) return null;
+    
+    cx.fillStyle = '#000000';
+    cx.fillRect(0,0,256,256);
+    
+    // Create cloud-like noise
+    for (let i = 0; i < 60; i++) {
+        const x = Math.random() * 256;
+        const y = Math.random() * 256;
+        const r = 20 + Math.random() * 60;
+        const g = cx.createRadialGradient(x,y,0, x,y,r);
+        g.addColorStop(0, `rgba(255,255,255, ${0.05 + Math.random()*0.05})`);
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        cx.fillStyle = g;
+        cx.beginPath(); cx.arc(x,y,r,0,Math.PI*2); cx.fill();
+    }
+    return cvs;
+};
 
 export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = true }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -363,8 +388,13 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
   const starsRef = useRef<Particle[]>([]);
   const dustRef = useRef<Particle[]>([]);
   const timeRef = useRef(0);
+  const noisePatternRef = useRef<CanvasImageSource | null>(null);
 
   useEffect(() => {
+    // Init Noise
+    const noise = createNoiseTexture();
+    if (noise) noisePatternRef.current = noise;
+
     const handleResize = () => {
         if (containerRef.current && canvasRef.current) {
             const { clientWidth, clientHeight } = containerRef.current;
@@ -412,9 +442,8 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
           const height = canvas.height;
           const dpr = window.devicePixelRatio || 1;
           
-          timeRef.current += 0.01;
+          timeRef.current += 0.005;
           
-          // HEAVY SMOOTHING: Lowered factor from 0.1 to 0.04 for weighty, smooth feel
           smoothMouseRef.current.x = lerp(smoothMouseRef.current.x, mouseRef.current.x, 0.04);
           smoothMouseRef.current.y = lerp(smoothMouseRef.current.y, mouseRef.current.y, 0.04);
 
@@ -422,16 +451,15 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
           const my = smoothMouseRef.current.y * dpr;
           const center = vec2(width / 2, height / 2);
           
-          // REDUCED ROTATION: Reduced base speed and mouse influence significantly for stability
           rotationRef.current.x += 0.0005 + (smoothMouseRef.current.y - height/2) * 0.000001;
           rotationRef.current.y += 0.0010 + (smoothMouseRef.current.x - width/2) * 0.000001;
 
-          // 1. Background
-          const grad = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width * 0.9);
-          grad.addColorStop(0, '#0d1117'); 
-          grad.addColorStop(0.6, '#050505');
-          grad.addColorStop(1, '#000000');
-          ctx.fillStyle = grad;
+          // 1. Deep Atmospheric Background
+          const bgGrad = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width * 1.2);
+          bgGrad.addColorStop(0, '#0a0a0a'); 
+          bgGrad.addColorStop(0.4, '#050505');
+          bgGrad.addColorStop(1, '#000000');
+          ctx.fillStyle = bgGrad;
           ctx.fillRect(0, 0, width, height);
 
           // Prepare Geometries
@@ -452,7 +480,7 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
           const lightDir = norm3({ x: -rayDir.x, y: -rayDir.y, z: 0.8 });
 
           // 2. Stars (Back Layer)
-          const parallaxX = smoothMouseRef.current.x - width/2; // Use smooth mouse for parallax too
+          const parallaxX = smoothMouseRef.current.x - width/2; 
           const parallaxY = smoothMouseRef.current.y - height/2;
           starsRef.current.forEach(star => {
               star.update(parallaxX, parallaxY);
@@ -524,7 +552,6 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
               ctx.moveTo(hull[0].x, hull[0].y);
               for (let i = 1; i < hull.length; i++) { ctx.lineTo(hull[i].x, hull[i].y); }
               ctx.closePath();
-              ctx.lineJoin = 'round';
               ctx.lineWidth = 2.0 * dpr;
               ctx.strokeStyle = '#17f7f7'; 
               ctx.shadowBlur = 15; 
@@ -533,17 +560,69 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
               ctx.shadowBlur = 0;
           }
 
-          // 4. Light Tracing
+          // 4. Volumetric Light Systems
           const activeBeams: {p1:Vec2, p2:Vec2}[] = [];
-          const pulse = 0.85 + Math.sin(timeRef.current * 4) * 0.15;
+          const pulse = 0.9 + Math.sin(timeRef.current * 3) * 0.1;
 
-          const drawFlare = (pos: Vec2, color: string, scale: number) => {
-               const rad = 15 * scale * dpr;
+          // Helper for Volumetric Beams ("Ribbons")
+          const drawVolumetricBeam = (
+              start: Vec2, 
+              end: Vec2, 
+              color: string, 
+              widthPx: number, 
+              alpha: number,
+              hasSmoke: boolean
+          ) => {
+              const dx = end.x - start.x;
+              const dy = end.y - start.y;
+              const length = Math.sqrt(dx*dx + dy*dy);
+              const angle = Math.atan2(dy, dx);
+
+              ctx.save();
+              ctx.translate(start.x, start.y);
+              ctx.rotate(angle);
+
+              // 1. Core Ribbon (Gradient across width)
+              // We draw a rect from (0, -w/2) to (len, w/2)
+              // Gradient is vertical (y-axis in local space)
+              const grad = ctx.createLinearGradient(0, -widthPx/2, 0, widthPx/2);
+              grad.addColorStop(0, 'rgba(0,0,0,0)');
+              grad.addColorStop(0.2, color.replace(')', ', 0.0)')); // Fade in
+              grad.addColorStop(0.5, color); // Bright Center
+              grad.addColorStop(0.8, color.replace(')', ', 0.0)')); // Fade out
+              grad.addColorStop(1, 'rgba(0,0,0,0)');
+              
+              ctx.fillStyle = grad;
+              ctx.globalAlpha = alpha;
+              // Composite lighter for additive blending
+              ctx.globalCompositeOperation = 'lighter';
+              ctx.fillRect(0, -widthPx/2, length, widthPx);
+
+              // 2. Smoky Texture (Drifting)
+              if (hasSmoke && noisePatternRef.current) {
+                   ctx.globalAlpha = alpha * 0.4;
+                   ctx.globalCompositeOperation = 'overlay'; 
+                   const pattern = ctx.createPattern(noisePatternRef.current as any, 'repeat');
+                   if (pattern) {
+                       // Scroll the texture
+                       const offset = (timeRef.current * 20) % 256;
+                       ctx.translate(-offset, 0);
+                       ctx.fillStyle = pattern;
+                       ctx.fillRect(offset, -widthPx/2, length, widthPx);
+                   }
+              }
+
+              ctx.restore();
+          };
+
+          const drawFlare = (pos: Vec2, color: string, scale: number, isExit: boolean = false) => {
+               const rad = (isExit ? 60 : 20) * scale * dpr;
                const g = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, rad);
-               g.addColorStop(0, 'rgba(255,255,255,0.9)');
-               g.addColorStop(0.4, color);
+               g.addColorStop(0, isExit ? '#ffffff' : 'rgba(255,255,255,0.9)');
+               g.addColorStop(isExit ? 0.2 : 0.4, color);
                g.addColorStop(1, 'rgba(0,0,0,0)');
                ctx.fillStyle = g;
+               ctx.globalCompositeOperation = 'lighter';
                ctx.beginPath();
                ctx.arc(pos.x, pos.y, rad, 0, Math.PI*2);
                ctx.fill();
@@ -573,31 +652,27 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
               if (!target) return;
 
               const modAlpha = currentAlpha * pulse;
-              activeBeams.push({ p1: startPoint, p2: target.point }); // Capture for dust
+              activeBeams.push({ p1: startPoint, p2: target.point });
 
-              // Draw Beam
-              ctx.beginPath();
-              ctx.moveTo(startPoint.x, startPoint.y);
-              ctx.lineTo(target.point.x, target.point.y);
-              ctx.strokeStyle = band.color;
-              ctx.lineWidth = 4.0 * dpr; 
-              ctx.globalAlpha = modAlpha * 0.3;
-              ctx.stroke();
-              ctx.beginPath();
-              ctx.moveTo(startPoint.x, startPoint.y);
-              ctx.lineTo(target.point.x, target.point.y);
-              ctx.strokeStyle = '#ffffff'; 
-              ctx.lineWidth = 0.8 * dpr;
-              ctx.globalAlpha = modAlpha * 0.9;
-              ctx.stroke();
+              // Draw Wide Ribbon Beam
+              // Width increases with depth? Or constant? User said "broader diverging beams".
+              // Let's make them fairly wide (e.g. 40px) to look like sheets
+              drawVolumetricBeam(
+                  startPoint, 
+                  target.point, 
+                  band.color, 
+                  40 * dpr, 
+                  modAlpha * 0.4,
+                  true
+              );
 
               if (type === 'wall') {
-                  drawFlare(target.point, band.color, 0.6 * modAlpha); // Wall Flare
+                  drawFlare(target.point, band.color, 0.8 * modAlpha);
                   const dReflect = reflect(direction, target.normal);
                   traceSpectralRay(target.point, dReflect, band, depth - 1, currentAlpha * 0.8);
               } 
               else if (type === 'hull' && hullHit) {
-                  drawFlare(target.point, band.color, 0.8 * modAlpha); // Surface Flare
+                  drawFlare(target.point, band.color, 0.8 * modAlpha);
                   const dIn = refract2D(direction, hullHit.normal, N_AIR, band.n);
                   if (!dIn) {
                        const dReflect = reflect(direction, hullHit.normal);
@@ -607,12 +682,13 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
                   const exitHit = intersectRayHull(add(hullHit.point, mul(dIn, 0.1)), dIn, hull, hullHit.index);
                   if (!exitHit) return; 
 
+                  // Internal Beam (keep sharp/thin)
                   ctx.beginPath();
                   ctx.moveTo(hullHit.point.x, hullHit.point.y);
                   ctx.lineTo(exitHit.point.x, exitHit.point.y);
                   ctx.strokeStyle = band.color;
-                  ctx.lineWidth = 1.5 * dpr;
-                  ctx.globalAlpha = currentAlpha * 0.5 * pulse; 
+                  ctx.lineWidth = 2 * dpr;
+                  ctx.globalAlpha = currentAlpha * 0.8 * pulse; 
                   ctx.stroke();
 
                   const dOut = refract2D(dIn, exitHit.normal, band.n, N_AIR);
@@ -627,47 +703,53 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
           globalAlphaRef.current += (targetAlpha - globalAlphaRef.current) * 0.1;
 
           ctx.save();
-          ctx.globalAlpha = globalAlphaRef.current;
+          // Apply global 'lighter' for the beam system
           ctx.globalCompositeOperation = 'lighter'; 
           
           const beamEnd = entryHit ? entryHit.point : add(mouse, mul(rayDir, Math.max(width, height)));
           activeBeams.push({ p1: mouse, p2: beamEnd });
 
-          // Main Beam
-          ctx.beginPath();
-          ctx.moveTo(mouse.x, mouse.y);
-          ctx.lineTo(beamEnd.x, beamEnd.y);
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-          ctx.lineWidth = 5 * dpr;
-          ctx.shadowBlur = 25;
-          ctx.shadowColor = 'rgba(255,255,255,1)';
-          ctx.stroke();
-          ctx.shadowBlur = 0;
-          ctx.beginPath();
-          ctx.moveTo(mouse.x, mouse.y);
-          ctx.lineTo(beamEnd.x, beamEnd.y);
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 2.0 * dpr;
-          ctx.stroke();
+          // Main Beam: Sharp White -> Slightly Soft
+          if (globalAlphaRef.current > 0.001) {
+               // Draw Main Beam
+               drawVolumetricBeam(
+                   mouse,
+                   beamEnd,
+                   'rgba(255,255,255,1)',
+                   8 * dpr, // Sharper than spectrum
+                   0.8,
+                   true
+               );
+          }
 
           if (entryHit) {
-               drawFlare(entryHit.point, '#ffffff', 1.2); // Main Impact Flare
+               drawFlare(entryHit.point, '#ffffff', 1.5); // Impact Flare
           }
 
           if (entryHit && globalAlphaRef.current > 0.01) {
-              SPECTRUM.forEach(band => {
+              
+              // Find the "Exit Point" (Brightest Spot) logic
+              // We'll trace spectral rays. The first exit point of the prism is the "source" of the rainbow.
+              // We can add a massive flare there.
+              
+              SPECTRUM.forEach((band, i) => {
                   const dIn = refract2D(rayDir, entryHit.normal, N_AIR, band.n);
                   if (!dIn) return;
                   const exitHit = intersectRayHull(add(entryHit.point, mul(dIn, 0.1)), dIn, hull, entryHit.index);
                   if (!exitHit) return;
 
+                  // Draw Internal Beam
                   ctx.beginPath();
                   ctx.moveTo(entryHit.point.x, entryHit.point.y);
                   ctx.lineTo(exitHit.point.x, exitHit.point.y);
                   ctx.strokeStyle = band.color;
-                  ctx.lineWidth = 1.5 * dpr;
-                  ctx.globalAlpha = band.opacity * 0.4 * globalAlphaRef.current * pulse;
+                  ctx.lineWidth = 2 * dpr;
+                  ctx.globalAlpha = band.opacity * 0.6 * globalAlphaRef.current * pulse;
                   ctx.stroke();
+
+                  // Massive Exit Flare (Only draw once effectively or per band with add)
+                  // We'll draw it per band but smaller, stacking up to white/bright
+                  drawFlare(exitHit.point, band.color, 1.0, true);
 
                   const dOut = refract2D(dIn, exitHit.normal, band.n, N_AIR);
                   if (dOut) {
@@ -677,16 +759,14 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
           }
 
           // 5. Dust (Volumetric)
-          // Draw on top of beams but inside the additive context
+          // Draw on top but subtle
+          ctx.globalCompositeOperation = 'source-over';
           dustRef.current.forEach(d => {
               d.update(0,0);
               d.draw(ctx, width, height, activeBeams);
           });
 
-          ctx.globalCompositeOperation = 'source-over';
-          ctx.globalAlpha = 1.0;
           ctx.restore();
-
           animationFrameRef.current = requestAnimationFrame(render);
       };
       render();

@@ -1,7 +1,7 @@
 
-  # Branding Kit Creation
+  # ML brand kit
 
-  This is a code bundle for Branding Kit Creation. The original project is available at https://www.figma.com/design/KUrZeOSkNXBPxvhU5VBA1p/Branding-Kit-Creation.
+  This is a code bundle for ML brand kit. The original project is available at https://www.figma.com/design/KUrZeOSkNXBPxvhU5VBA1p/ML-brand-kit.
 
   ## Running the code
 

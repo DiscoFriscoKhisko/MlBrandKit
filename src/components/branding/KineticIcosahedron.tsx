@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { icosahedronGeometry } from './geometry-utils';
 
 interface KineticIcosahedronProps {
   size?: number;
@@ -15,11 +16,8 @@ export const KineticIcosahedron: React.FC<KineticIcosahedronProps> = ({
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      // Normalize mouse position from -1 to 1 based on window center
-      // This gives a global feel to the movement
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = (e.clientY / window.innerHeight) * 2 - 1;
-      
       mouseRef.current = { x, y };
     };
 
@@ -31,46 +29,14 @@ export const KineticIcosahedron: React.FC<KineticIcosahedronProps> = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
-    // Golden ratio
-    const phi = (1 + Math.sqrt(5)) / 2;
-    
-    // Vertices of an icosahedron
-    // (0, ±1, ±phi), (±1, ±phi, 0), (±phi, 0, ±1)
-    let vertices = [
-      [0, 1, phi], [0, 1, -phi], [0, -1, phi], [0, -1, -phi],
-      [1, phi, 0], [1, -phi, 0], [-1, phi, 0], [-1, -phi, 0],
-      [phi, 0, 1], [phi, 0, -1], [-phi, 0, 1], [-phi, 0, -1]
-    ];
+    // Use pre-calculated geometry
+    const { vertices, edges } = icosahedronGeometry;
 
-    // Normalize vertices to radius 1
-    vertices = vertices.map(v => {
-      const mag = Math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-      return [v[0]/mag, v[1]/mag, v[2]/mag];
-    });
-
-    // Edges calculation
-    const edges: [number, number][] = [];
-    for (let i = 0; i < vertices.length; i++) {
-      for (let j = i + 1; j < vertices.length; j++) {
-        const dist = Math.sqrt(
-          Math.pow(vertices[i][0] - vertices[j][0], 2) +
-          Math.pow(vertices[i][1] - vertices[j][1], 2) +
-          Math.pow(vertices[i][2] - vertices[j][2], 2)
-        );
-        if (dist < 1.1 && dist > 0.9) {
-          edges.push([i, j]);
-        }
-      }
-    }
-
-    // Animation state
     let baseAngleX = 0;
     let baseAngleY = 0;
-    let targetMouseX = 0;
-    let targetMouseY = 0;
     let currentMouseX = 0;
     let currentMouseY = 0;
 
@@ -79,66 +45,64 @@ export const KineticIcosahedron: React.FC<KineticIcosahedronProps> = ({
       
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Constant slow rotation
       baseAngleX += 0.002;
       baseAngleY += 0.003;
 
-      // Mouse interaction
-      // Target follows mouse
-      targetMouseX = mouseRef.current.y * 1.5; // Tilt strength
-      targetMouseY = mouseRef.current.x * 1.5;
+      const targetMouseX = mouseRef.current.y * 1.5;
+      const targetMouseY = mouseRef.current.x * 1.5;
 
-      // Smooth lerp
       currentMouseX += (targetMouseX - currentMouseX) * 0.05;
       currentMouseY += (targetMouseY - currentMouseY) * 0.05;
 
-      // Combine
       const angleX = baseAngleX + currentMouseX;
       const angleY = baseAngleY + currentMouseY;
 
       const cx = size / 2;
       const cy = size / 2;
       const scale = (size / 2) * 0.7; 
+      
+      const sinY = Math.sin(angleY);
+      const cosY = Math.cos(angleY);
+      const sinX = Math.sin(angleX);
+      const cosX = Math.cos(angleX);
 
-      // Rotate and project
+      // Project vertices
+      // Optimization: We could use a Float32Array for projected coords if vertex count was high,
+      // but for < 20 vertices, mapping is fine.
       const projected = vertices.map(v => {
-        // Rotate Y
-        let x = v[0] * Math.cos(angleY) - v[2] * Math.sin(angleY);
-        let z = v[0] * Math.sin(angleY) + v[2] * Math.cos(angleY);
-        let y = v[1];
+        const x = v[0] * cosY - v[2] * sinY;
+        const z = v[0] * sinY + v[2] * cosY;
+        const y = v[1];
 
-        // Rotate X
-        let yNew = y * Math.cos(angleX) - z * Math.sin(angleX);
-        let zNew = y * Math.sin(angleX) + z * Math.cos(angleX);
-        y = yNew;
-        z = zNew;
+        const yNew = y * cosX - z * sinX;
+        // const zNew = y * sinX + z * cosX; // zNew not needed for 2D projection without perspective
 
-        // Orthographic projection
         return {
           x: cx + x * scale,
-          y: cy + y * scale
+          y: cy + yNew * scale
         };
       });
 
-      // Draw edges
       ctx.strokeStyle = color;
       ctx.lineWidth = 1.5;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
       ctx.beginPath();
-      edges.forEach(([i, j]) => {
-        ctx.moveTo(projected[i].x, projected[i].y);
-        ctx.lineTo(projected[j].x, projected[j].y);
-      });
+      // Batch drawing could be faster but for lines moveTo/lineTo is standard
+      for (let i = 0; i < edges.length; i++) {
+        const [v1, v2] = edges[i];
+        const p1 = projected[v1];
+        const p2 = projected[v2];
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+      }
       ctx.stroke();
 
       requestRef.current = requestAnimationFrame(render);
     };
 
-    // Handle high DPI
     const dpr = window.devicePixelRatio || 1;
-    // Reset transform to identity before scaling to avoid accumulation if effect re-runs
     ctx.setTransform(1, 0, 0, 1, 0, 0); 
     canvas.width = size * dpr;
     canvas.height = size * dpr;

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { rhombicGeometry } from '../geometry-utils';
 
 interface KineticPolyhedronProps {
   size?: number;
@@ -26,67 +27,10 @@ export const KineticRhombic: React.FC<KineticPolyhedronProps> = ({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
-    // Rhombic Triacontahedron logic (or similar complex faceted form)
-    // Vertices are the union of:
-    // 1. Dodecahedron vertices
-    // 2. Icosahedron vertices (scaled to matching radius)
-    
-    const phi = (1 + Math.sqrt(5)) / 2;
-    
-    // Icosahedron (normalized)
-    const icoVerts = [
-      [0, 1, phi], [0, 1, -phi], [0, -1, phi], [0, -1, -phi],
-      [1, phi, 0], [1, -phi, 0], [-1, phi, 0], [-1, -phi, 0],
-      [phi, 0, 1], [phi, 0, -1], [-phi, 0, 1], [-phi, 0, -1]
-    ].map(v => {
-         const m = Math.sqrt(v[0]**2 + v[1]**2 + v[2]**2);
-         return [v[0]/m, v[1]/m, v[2]/m];
-    });
-
-    // Dodecahedron (normalized)
-    // (±1, ±1, ±1)
-    // (0, ±phi, ±1/phi)
-    // (±1/phi, 0, ±phi)
-    // (±phi, ±1/phi, 0)
-    let dodVerts: number[][] = [];
-    for(let x of [-1, 1]) for(let y of [-1, 1]) for(let z of [-1, 1]) dodVerts.push([x, y, z]);
-    for(let i of [-1, 1]) for(let j of [-1, 1]) dodVerts.push([0, i*phi, j/phi]);
-    for(let i of [-1, 1]) for(let j of [-1, 1]) dodVerts.push([i/phi, 0, j*phi]);
-    for(let i of [-1, 1]) for(let j of [-1, 1]) dodVerts.push([i*phi, j/phi, 0]);
-    
-    dodVerts = dodVerts.map(v => {
-        const m = Math.sqrt(v[0]**2 + v[1]**2 + v[2]**2);
-        return [v[0]/m, v[1]/m, v[2]/m];
-    });
-
-    // Combine
-    // Note: Icosahedron and Dodecahedron vertices in dual position might need scaling relative to each other
-    // to form the Rhombic Triacontahedron.
-    // In Rhombic Triacontahedron, all vertices are at same distance? No.
-    // There are 2 types of vertices: 12 (5-fold) and 20 (3-fold).
-    // But we normalized them all, so they are on a sphere (Geodesic-ish).
-    const vertices = [...icoVerts, ...dodVerts];
-    
-    // Edges: Connect nearest neighbors
-    // Since we projected everything to a sphere, just finding close points works for a cool mesh.
-    const edges: [number, number][] = [];
-    
-    for (let i = 0; i < vertices.length; i++) {
-        for (let j = i + 1; j < vertices.length; j++) {
-             const d = Math.sqrt(
-                (vertices[i][0]-vertices[j][0])**2 + 
-                (vertices[i][1]-vertices[j][1])**2 + 
-                (vertices[i][2]-vertices[j][2])**2
-            );
-            // Experimentally found distance for this density
-            if (d > 0.5 && d < 0.7) { 
-                edges.push([i, j]);
-            }
-        }
-    }
+    const { vertices, edges } = rhombicGeometry;
 
     let baseAngleX = 0;
     let baseAngleY = 0;
@@ -109,12 +53,16 @@ export const KineticRhombic: React.FC<KineticPolyhedronProps> = ({
       const cy = size / 2;
       const scale = (size / 2) * 0.55; 
 
+      const sinY = Math.sin(angleY);
+      const cosY = Math.cos(angleY);
+      const sinX = Math.sin(angleX);
+      const cosX = Math.cos(angleX);
+
       const projected = vertices.map(v => {
-        let x = v[0] * Math.cos(angleY) - v[2] * Math.sin(angleY);
-        let z = v[0] * Math.sin(angleY) + v[2] * Math.cos(angleY);
-        let y = v[1];
-        let yNew = y * Math.cos(angleX) - z * Math.sin(angleX);
-        let zNew = y * Math.sin(angleX) + z * Math.cos(angleX);
+        const x = v[0] * cosY - v[2] * sinY;
+        const z = v[0] * sinY + v[2] * cosY;
+        const y = v[1];
+        const yNew = y * cosX - z * sinX;
         return { x: cx + x * scale, y: cy + yNew * scale };
       });
 
@@ -122,10 +70,13 @@ export const KineticRhombic: React.FC<KineticPolyhedronProps> = ({
       ctx.lineWidth = 0.8;
       ctx.lineCap = 'round';
       ctx.beginPath();
-      edges.forEach(([i, j]) => {
-        ctx.moveTo(projected[i].x, projected[i].y);
-        ctx.lineTo(projected[j].x, projected[j].y);
-      });
+      for (let i = 0; i < edges.length; i++) {
+        const [v1, v2] = edges[i];
+        const p1 = projected[v1];
+        const p2 = projected[v2];
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+      }
       ctx.stroke();
 
       requestRef.current = requestAnimationFrame(render);

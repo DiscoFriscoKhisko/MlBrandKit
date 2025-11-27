@@ -148,17 +148,70 @@ const featuredWork = [
         year: '[2025]',
         color: '#d2b59d',
         image: 'https://images.unsplash.com/photo-1452570053594-1b985d6ea890?w=1200&q=80',
+    },
+    {
+        id: 4,
+        name: 'Perhitsiksha',
+        headline: 'Tailor-made CRM automation',
+        tags: ['EdTech', 'CRM'],
+        year: '[2024]',
+        color: '#39b0bd',
+        image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200&q=80',
+    },
+    {
+        id: 5,
+        name: 'CargoSphere',
+        headline: 'Global GTM technical strategy',
+        tags: ['Logistics', 'Strategy'],
+        year: '[2023]',
+        color: '#d29dd0',
+        image: 'https://images.unsplash.com/photo-1494412574643-35d324698420?w=1200&q=80',
+    },
+    {
+        id: 6,
+        name: 'Numbers',
+        headline: 'Gamified mental math app',
+        tags: ['EdTech', 'Mobile'],
+        year: '[2024]',
+        color: '#fecacc',
+        image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=1200&q=80',
+    },
+    {
+        id: 7,
+        name: 'Alamirap',
+        headline: 'End-to-end funnel automation',
+        tags: ['Health', 'Automation'],
+        year: '[2023]',
+        color: '#60dcfb',
+        image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&q=80',
+    },
+    {
+        id: 8,
+        name: 'JB Singh',
+        headline: 'Corporate AI workflows',
+        tags: ['Corporate', 'AI'],
+        year: '[2024]',
+        color: '#cb7b3a',
+        image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80',
+    },
+    {
+        id: 9,
+        name: 'TMEN',
+        headline: 'Sales enablement architecture',
+        tags: ['Sales', 'Systems'],
+        year: '[2023]',
+        color: '#3a8ccb',
+        image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80',
+    },
+    {
+        id: 10,
+        name: 'Troupex',
+        headline: 'Social network for entertainment',
+        tags: ['Social', 'Coming Soon'],
+        year: '[2025]',
+        color: '#d2b59d',
+        image: 'https://images.unsplash.com/photo-1514525253440-b393452e3383?w=1200&q=80',
     }
-];
-
-const shipLog = [
-    { name: 'Perhitsiksha', desc: 'Tailor-made CRM automation and sales systems for education scaling.' },
-    { name: 'CargoSphere', desc: 'Global Go-to-Market technical strategy for cargo-tech expansion.' },
-    { name: 'Numbers', desc: 'Custom mental math learning app with gamified practice loops.' },
-    { name: 'Alamirap Nutrition', desc: 'End-to-end automation for lead funnels and customer workflows.' },
-    { name: 'JB Singh & Sons', desc: 'Corporate website coupled with internal AI automation workflows.' },
-    { name: 'TMEN Systems', desc: 'Sales enablement tools and GTM system architecture.' },
-    { name: 'Troupex', desc: 'A dedicated social network for entertainment professionals.', tag: 'Coming Soon' },
 ];
 
 const coreValues = [
@@ -187,8 +240,6 @@ const navLinks = [
   { href: '#contact', label: 'Contact' }
 ];
 
-// --- Components ---
-
 function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -203,12 +254,10 @@ function Nav() {
     <>
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${scrolled ? 'bg-[#050505]/80 backdrop-blur-md border-white/5 py-4' : 'bg-transparent border-transparent py-6 md:py-8'}`}>
         <div className={`w-full ${TOKENS.padding.container} flex justify-between items-center`}>
-          {/* Logo */}
           <a href="#" className="relative z-50 mix-blend-difference text-white group interactive">
             <span className="font-serif text-xl md:text-2xl font-bold tracking-tighter">Material Lab</span>
           </a>
 
-          {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-8 mix-blend-difference text-white">
             {navLinks.map((item) => (
                <a key={item.href} href={item.href} className="text-xs font-mono uppercase tracking-[0.2em] hover:text-[#17f7f7] transition-colors interactive">
@@ -217,21 +266,18 @@ function Nav() {
             ))}
           </div>
 
-          {/* CTA */}
           <div className="hidden md:block">
             <SystemButton href="mailto:damini@materiallab.io" variant="outline" className="py-2 px-4 text-[10px]">
                Contact
             </SystemButton>
           </div>
 
-          {/* Mobile Toggle */}
           <button className="md:hidden text-white relative z-50 interactive" onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <X /> : <Menu />}
           </button>
         </div>
       </nav>
 
-      {/* Mobile Menu */}
       {mobileOpen && (
         <div className="fixed inset-0 z-40 bg-[#050505] flex items-center justify-center">
           <div className="flex flex-col items-center gap-8">
@@ -259,9 +305,9 @@ export function AgencyWebsite() {
   const [view, setView] = useState<'home' | 'capabilities'>('home');
   const mainRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
+  const workSectionRef = useRef<HTMLElement>(null);
   const [footerHeight, setFooterHeight] = useState(0);
 
-  // Hooks must run unconditionally
   useEffect(() => {
     if (footerRef.current) {
       let timeoutId: any;
@@ -289,8 +335,6 @@ export function AgencyWebsite() {
       
       // --- Hero ---
       const heroTl = gsap.timeline({ delay: 0.2 });
-      
-      // The .hero-badge class is gone in the new design, so we remove this block to fix the GSAP target error.
       
       heroTl.from(".hero-title", {
         y: 100,
@@ -330,6 +374,34 @@ export function AgencyWebsite() {
             start: "top 90%"
           }
         });
+      });
+
+      // --- Work Section Animation ---
+      const projects = gsap.utils.toArray('.project-text');
+      const images = gsap.utils.toArray('.project-image');
+      
+      // Set initial state
+      if (images.length > 0) {
+        gsap.set(images[0], { opacity: 1, scale: 1 });
+        gsap.set(projects[0], { opacity: 1 });
+      }
+
+      projects.forEach((project, i) => {
+         ScrollTrigger.create({
+            trigger: project,
+            start: "top center",
+            end: "bottom center",
+            onToggle: (self) => {
+              if (self.isActive) {
+                 // Active state
+                 gsap.to(images, { opacity: 0, scale: 1.1, duration: 0.6, overwrite: true });
+                 gsap.to(images[i], { opacity: 1, scale: 1, duration: 0.8, ease: "power3.out", overwrite: true });
+                 
+                 gsap.to(projects, { opacity: 0.2, x: 0, duration: 0.4, overwrite: true });
+                 gsap.to(project, { opacity: 1, x: 20, duration: 0.4, ease: "power2.out", overwrite: true });
+              }
+            }
+         });
       });
 
     }, mainRef);
@@ -423,7 +495,6 @@ export function AgencyWebsite() {
                        <div className="relative z-20 h-full flex flex-col justify-between p-8 md:p-12 transition-colors duration-500 group-hover:text-white">
                           <div className="flex justify-between items-start">
                              <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl overflow-hidden bg-white/5">
-                                {/* Placeholder or Icon for each service could go here if we had one in data, using a generic one or index based */}
                                 <div className="w-full h-full flex items-center justify-center text-white/20 font-mono text-xs">
                                    0{i + 1}
                                 </div>
@@ -522,124 +593,72 @@ export function AgencyWebsite() {
             <VerticalParallaxScroll items={methodology} />
         </section>
 
-        {/* --- SECTION 6: SELECTED WORK (Redesigned) --- */}
-        <section className="relative w-full pb-12 xl:pb-24 bg-[#050505]" id="work">
+        {/* --- SECTION 6: FEATURED WORK (Pinned Gallery) --- */}
+        <section ref={workSectionRef} className="relative z-10 bg-[#050505] py-20 lg:py-32" id="work">
            <div className={LAYOUT.container}>
-              <div className="w-full relative flex flex-col lg:flex-row gap-8">
+              <div className="flex flex-col lg:flex-row gap-8 lg:gap-0">
                  
-                 {/* Left Sticky Column (Desktop) */}
-                 <div className="hidden lg:flex flex-col w-full lg:w-5/12 xl:w-5/12 h-screen sticky top-0 justify-center z-10 pointer-events-none">
-                    <div className="relative pointer-events-auto py-20">
-                       <h2 className="text-white text-lg font-medium mb-12">Featured Work</h2>
-                       
-                       <div className="flex flex-col gap-4">
-                          {featuredWork.map((work) => (
-                             <div key={work.id} className="group relative transition-transform duration-300 hover:translate-x-4">
-                                <a href="#" className="block">
-                                   <h3 className="text-6xl xl:text-7xl font-medium tracking-tight text-white transition-colors duration-300 group-hover:text-[#17f7f7]">
-                                      {work.name}
-                                   </h3>
-                                   <div className="text-white/50 text-sm font-medium mt-2 font-mono">
-                                      {work.year}
-                                   </div>
-                                </a>
-                             </div>
-                          ))}
-                       </div>
-                    </div>
-                 </div>
-
-                 {/* Right Column (Scrollable Cards) */}
-                 <div className="w-full lg:w-7/12 xl:w-7/12 pt-0 lg:pt-32 flex flex-col gap-8 lg:gap-24">
-                    
-                    {/* Mobile Heading */}
-                    <div className="lg:hidden mb-8">
-                       <h2 className="text-white text-2xl font-medium">Featured Work</h2>
+                 {/* Left Column: Scrolling Text */}
+                 <div className="w-full lg:w-1/2 flex flex-col gap-[10vh] lg:py-[20vh] z-20">
+                    <div className="mb-20">
+                      <h2 className={`${TYPOGRAPHY.h1} text-white mb-6`}>Featured Work</h2>
+                      <p className={`${TYPOGRAPHY.bodyLarge} text-white/50 max-w-md`}>
+                        A selection of recent shipments, from enterprise ERPs to consumer apps.
+                      </p>
                     </div>
 
                     {featuredWork.map((work) => (
-                       <div key={work.id} className="group relative w-full rounded-3xl overflow-hidden cursor-pointer">
-                          <div className="aspect-[4/3] w-full relative overflow-hidden bg-gray-900">
-                             {/* Image */}
-                             <img 
-                                src={work.image} 
-                                alt={work.name}
-                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                             />
-                             
-                             {/* Mobile Info Overlay (Always Visible) */}
-                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent lg:hidden flex flex-col justify-end p-6">
-                                <div className="text-white/70 text-xs font-mono mb-2">{work.year}</div>
-                                <h3 className="text-white text-3xl font-medium">{work.name}</h3>
-                             </div>
-
-                             {/* Desktop Hover Overlay (Circle Mask Effect) */}
-                             <div 
-                                className="hidden lg:flex absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 items-end p-8"
-                                style={{ backgroundColor: work.color }}
-                             >
-                                <div className="w-full flex flex-col justify-between h-full relative z-10 text-[#111212]">
-                                   <div className="text-3xl xl:text-4xl font-medium tracking-tight leading-tight max-w-md">
-                                      {work.headline}
-                                   </div>
-                                   
-                                   <div className="flex justify-between items-end w-full mt-auto pt-12">
-                                      <div className="hidden xl:block w-24" /> {/* Spacer */}
-                                      
-                                      <div className="inline-flex items-center rounded-full bg-white/20 backdrop-blur-md text-[#111212] px-4 py-2 gap-3 text-sm font-medium">
-                                         <ArrowUpRight className="w-4 h-4" />
-                                         <span>{work.tags[0]}</span>
-                                      </div>
-                                   </div>
-                                </div>
-                             </div>
+                       <div key={work.id} className="project-text group flex flex-col justify-center min-h-[30vh] opacity-20 transition-all border-l-2 border-white/5 pl-8 hover:border-[#17f7f7]/50">
+                          <div className="flex items-center gap-4 mb-4">
+                             <span className="font-mono text-[#17f7f7] text-xs tracking-widest">{work.year}</span>
+                             <div className="h-[1px] w-8 bg-white/10"></div>
+                             <span className="font-mono text-white/40 text-xs tracking-widest uppercase">{work.tags[0]}</span>
+                          </div>
+                          <h3 className="text-4xl md:text-6xl font-serif text-white mb-4 group-hover:text-[#17f7f7] transition-colors w-fit cursor-pointer">
+                             {work.name}
+                          </h3>
+                          <p className="text-xl text-[#d5dada]/80 max-w-md font-light leading-relaxed">
+                             {work.headline}
+                          </p>
+                          <div className="mt-6 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 text-[#17f7f7] text-sm font-medium uppercase tracking-wider">
+                             View Case Study <ArrowRight className="w-4 h-4" />
                           </div>
                        </div>
                     ))}
+                 </div>
 
-                    {/* Bottom CTA */}
-                    <div className="flex justify-center mt-12">
-                       <div className="group relative overflow-hidden rounded-full bg-white text-black px-8 py-3 cursor-pointer transition-all hover:px-10">
-                           <span className="relative z-10 flex items-center gap-2 font-medium">
-                              Explore Our Work <ArrowUpRight className="w-4 h-4" />
-                           </span>
+                 {/* Right Column: Sticky Image Stage */}
+                 <div className="hidden lg:block lg:w-1/2 relative">
+                    <div className="sticky top-0 h-screen flex items-center justify-center py-20">
+                       <div className="relative w-full aspect-[4/5] md:aspect-square lg:aspect-[4/3] rounded-3xl overflow-hidden border border-white/10 bg-[#090909]">
+                          {/* Dynamic Images */}
+                          {featuredWork.map((work, i) => (
+                             <div key={work.id} className="project-image absolute inset-0 w-full h-full opacity-0">
+                                <img 
+                                   src={work.image} 
+                                   alt={work.name}
+                                   className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#050505]/80 via-transparent to-transparent opacity-60"></div>
+                             </div>
+                          ))}
+                          
+                          {/* Static Overlay Elements */}
+                          <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end z-10 pointer-events-none">
+                             <div className="flex gap-2">
+                                <div className="w-2 h-2 rounded-full bg-[#17f7f7] animate-pulse"></div>
+                                <span className="text-[10px] uppercase tracking-widest text-white/60">Live Preview</span>
+                             </div>
+                          </div>
                        </div>
                     </div>
-
                  </div>
+
               </div>
            </div>
         </section>
 
-              {/* The Ship Log */}
-              <div className="fade-up border-t border-white/10 pt-24">
-                 <div className={`${TOKENS.grid.main} items-start`}>
-                    <div className="lg:col-span-6 mb-10 lg:mb-0">
-                        <h3 className={`${TYPOGRAPHY.h2} text-white mb-2`}>The Ship Log</h3>
-                        <p className={`${TYPOGRAPHY.body} text-white/50`}>Other recent shipments.</p>
-                    </div>
-                    <div className="lg:col-span-14 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                        {shipLog.map((item, i) => (
-                            <div key={i} className="group flex flex-col gap-1 interactive">
-                                <div className="flex items-center justify-between">
-                                    <h4 className="text-xl text-white font-medium group-hover:text-[#17f7f7] transition-colors">
-                                        {item.name}
-                                    </h4>
-                                    {item.tag && (
-                                        <span className="text-[9px] font-mono uppercase tracking-wider text-[#17f7f7] bg-[#17f7f7]/10 px-2 py-0.5 rounded">
-                                            {item.tag}
-                                        </span>
-                                    )}
-                                </div>
-                                <p className="text-sm text-[#d5dada]/60 leading-relaxed">
-                                    {item.desc}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                 </div>
-              </div>
-      
+
         {/* --- BOOK A SESSION (Horizontal Scroll) --- */}
         <section className="relative z-20 bg-[#050505]" id="contact">
            <HorizontalScrollText text="Book a Whiteboard Session — Let's Build" />
