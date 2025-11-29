@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "motion/react";
 import { MotionSplitText, MotionFadeText } from "./MotionSystem";
-import { ArrowButton } from "./ui/ArrowButton";
+import { Button } from "./ui/button";
 import { FloatingShape } from "./ui/FloatingShape";
 import { cn } from "./ui/utils";
 
@@ -112,9 +112,9 @@ export function MotionPinnedSection() {
                             </span>
                           ))}
                        </div>
-                       <ArrowButton className="mt-8 text-xs tracking-[0.2em] text-[#17f7f7]">
+                       <Button variant="outline" size="sm" className="mt-8">
                          View Case Study
-                       </ArrowButton>
+                       </Button>
                     </div>
                   </div>
                </motion.div>

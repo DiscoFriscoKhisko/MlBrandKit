@@ -1,11 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import React, { useLayoutEffect, useRef } from 'react';
+import { gsap, ScrollTrigger } from '../../../lib/gsap';
 import { ArrowLeft } from 'lucide-react';
 import { TYPOGRAPHY } from '../design-system';
 import { ImageContainer } from '../../ui/CardSystem';
-
-gsap.registerPlugin(ScrollTrigger);
+import { Button } from '../../ui/button';
 
 const CAPABILITIES_DATA = [
   {
@@ -49,7 +47,7 @@ export function CapabilitiesPage({ onBack }: { onBack: () => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<HTMLAnchorElement[]>([]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     // Ensure ScrollTrigger is refreshed
     ScrollTrigger.refresh();
     
@@ -100,13 +98,17 @@ export function CapabilitiesPage({ onBack }: { onBack: () => void }) {
       {/* Header / Nav Area */}
       <div className="fixed top-0 left-0 right-0 z-50 p-8 flex justify-between items-center pointer-events-none">
         <div className="pointer-events-auto">
-           <button 
-             onClick={onBack} 
-             className="flex items-center gap-2 text-sm font-mono uppercase tracking-widest text-white/50 hover:text-[#17f7f7] transition-colors group"
+           <Button
+             variant="ghost"
+             size="sm"
+             withArrow={false}
+             withAnimation={false}
+             onClick={onBack}
+             className="gap-2"
            >
              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
              Back
-           </button>
+           </Button>
         </div>
       </div>
 

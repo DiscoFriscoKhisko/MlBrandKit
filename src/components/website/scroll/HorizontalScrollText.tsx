@@ -1,8 +1,5 @@
 import React, { useLayoutEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { gsap, ScrollTrigger } from '../../../lib/gsap';
 
 interface HorizontalScrollTextProps {
   text: string;
@@ -106,7 +103,7 @@ export function HorizontalScrollText({ text, className = '' }: HorizontalScrollT
   }, [text]);
 
   return (
-    <div ref={triggerRef} className={`w-full py-32 overflow-hidden flex items-center bg-[#050505] ${className}`}>
+    <div ref={triggerRef} className={`w-full py-32 overflow-hidden flex items-center bg-background ${className}`}>
       <h2 ref={headingRef} className="font-serif text-[20vw] lg:text-[16vw] leading-none font-bold text-white whitespace-nowrap flex px-4">
         {text.split('').map((char, i) => (
           <span key={i} className="char inline-block origin-center will-change-transform">

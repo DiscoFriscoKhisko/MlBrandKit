@@ -1,6 +1,5 @@
 import { useLayoutEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap, ScrollTrigger } from "../../lib/gsap";
 import { cn } from "./utils";
 
 interface FloatingShapeProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -13,9 +12,6 @@ export function FloatingShape({ className, depth = 0.2, style, children, ...prop
   useLayoutEffect(() => {
     const el = elRef.current;
     if (!el) return;
-
-    // Ensure ScrollTrigger is registered
-    gsap.registerPlugin(ScrollTrigger);
 
     const ctx = gsap.context(() => {
       // The exact GSAP logic requested by the user

@@ -1,31 +1,35 @@
-
-  {
+{
       "name": "ML brand kit",
       "version": "0.1.0",
       "private": true,
       "dependencies": {
-          "@radix-ui/react-slider": "*",
-          "@radix-ui/react-slot": "*",
-          "@radix-ui/react-switch": "*",
-          "@radix-ui/react-tabs": "*",
-          "class-variance-authority": "*",
-          "clsx": "*",
-          "gsap": "*",
-          "lenis": "*",
-          "lucide-react": "*",
-          "motion": "*",
-          "react": "^18.3.1",
-          "react-dom": "^18.3.1",
-          "sonner": "^2.0.3",
-          "tailwind-merge": "*"
+            "@radix-ui/react-slider": "*",
+            "@radix-ui/react-slot": "*",
+            "@radix-ui/react-switch": "*",
+            "@radix-ui/react-tabs": "*",
+            "class-variance-authority": "*",
+            "clsx": "*",
+            "gsap": "*",
+            "lenis": "*",
+            "lucide-react": "*",
+            "motion": "*",
+            "react": "^18.3.1",
+            "react-dom": "^18.3.1",
+            "sonner": "^2.0.3",
+            "tailwind-merge": "*"
       },
       "devDependencies": {
-          "@types/node": "^20.10.0",
-          "@vitejs/plugin-react-swc": "^3.10.2",
-          "vite": "6.3.5"
+            "@playwright/test": "^1.57.0",
+            "@types/node": "^20.10.0",
+            "@vitejs/plugin-react-swc": "^3.10.2",
+            "puppeteer": "^24.31.0",
+            "vite": "6.3.5"
       },
       "scripts": {
-          "dev": "vite",
-          "build": "vite build"
+            "dev": "vite",
+            "build": "vite build",
+            "test:visual": "playwright test",
+            "test:visual:update": "playwright test --update-snapshots",
+            "test:visual:report": "playwright show-report"
       }
-  }
+}

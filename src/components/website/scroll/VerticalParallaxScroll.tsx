@@ -1,9 +1,6 @@
 import React, { useLayoutEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { gsap, ScrollTrigger } from '../../../lib/gsap';
 import { ImageContainer } from '../../ui/CardSystem';
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface ParallaxItem {
   image: string;
@@ -101,7 +98,7 @@ export function VerticalParallaxScroll({ items, className = '' }: VerticalParall
   }, [items]);
 
   return (
-    <div ref={triggerRef} className={`relative w-full h-screen bg-[#050505] overflow-hidden pointer-events-none ${className}`}>
+    <div ref={triggerRef} className={`relative w-full h-screen bg-background overflow-hidden pointer-events-none ${className}`}>
       <div className="grid grid-cols-1 lg:grid-cols-2 h-full pointer-events-none">
         
         {/* Text Column */}
@@ -109,7 +106,7 @@ export function VerticalParallaxScroll({ items, className = '' }: VerticalParall
            <div ref={headingsContainerRef} className="w-full space-y-[30vh] lg:space-y-[45vh] py-[15vh]">
               {items.map((item, i) => (
                  <div key={i} className="js-heading max-w-lg">
-                    <span className="text-[#17f7f7] font-mono text-xs uppercase tracking-widest mb-4 block">0{i + 1} — {item.title}</span>
+                    <span className="text-primary font-mono text-xs uppercase tracking-widest mb-4 block">0{i + 1} — {item.title}</span>
                     <h3 className="font-serif text-2xl md:text-4xl text-white mb-6">{item.description}</h3>
                  </div>
               ))}

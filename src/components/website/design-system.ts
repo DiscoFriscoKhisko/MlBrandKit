@@ -5,31 +5,33 @@ export const COLORS = {
   void: '#050505',      // Main Background
   oled: '#090909',      // Card/Section Background
   white: '#fefefe',     // Primary Text
-  warmWhite: '#faf9f7', 
+  warmWhite: '#faf9f7',
   laser: '#17f7f7',     // Accent (Cyan)
   alabaster: '#d5dada', // Secondary Text
-  nickel: '#737373'
+  nickel: '#737373',
+  ink: '#111212',       // Used in WorkCard overlays
+  black: '#000000',     // Pure black
 };
 
 // --- Design Tokens ---
 export const TOKENS = {
   padding: {
-    section: "py-20 lg:py-32",
-    container: "px-7 md:px-14", // p-7 (~28px) / px-14 (~56px)
-    card: "p-7 md:p-12",
+    section: "py-24 lg:py-40", // Increased for more breathing room
+    container: "px-6 md:px-12 lg:px-20", // More generous horizontal padding
+    card: "p-8 md:p-14",
   },
   grid: {
-    main: "grid grid-cols-1 lg:grid-cols-20 gap-y-10 lg:gap-x-10", // The 20-column grid
-    thirds: "grid grid-cols-1 md:grid-cols-3 gap-10",
-    halves: "grid grid-cols-1 md:grid-cols-2 gap-10",
+    main: "grid grid-cols-1 lg:grid-cols-20 gap-y-12 lg:gap-x-12", // The 20-column grid with more gap
+    thirds: "grid grid-cols-1 md:grid-cols-3 gap-12",
+    halves: "grid grid-cols-1 md:grid-cols-2 gap-12",
   },
   geometry: {
-    rounded: "rounded-3xl", 
+    rounded: "rounded-3xl",
     roundedSection: "rounded-[2.5rem]",
   },
   heights: {
     hero: "min-h-screen",
-    cardMobile: "h-[50vh]", 
+    cardMobile: "h-[50vh]",
     cardDesktop: "lg:h-[90vh]",
   }
 };
@@ -37,8 +39,8 @@ export const TOKENS = {
 export const LAYOUT = {
   container: `w-full mx-auto relative z-10 ${TOKENS.padding.container}`,
   section: `${TOKENS.padding.section} relative overflow-hidden`,
-  sectionCurved: `${TOKENS.padding.section} relative overflow-hidden ${TOKENS.geometry.roundedSection} my-4 mx-2 md:mx-4 bg-[#090909] border border-white/5`,
-  card: `bg-[#090909] border border-white/10 ${TOKENS.geometry.rounded} ${TOKENS.padding.card}`,
+  sectionCurved: `${TOKENS.padding.section} relative overflow-hidden ${TOKENS.geometry.roundedSection} my-4 mx-2 md:mx-4 bg-card border border-white/5`,
+  card: `bg-card border border-white/10 ${TOKENS.geometry.rounded} ${TOKENS.padding.card}`,
 };
 
 // Applied from BrandKit (Typography.tsx)

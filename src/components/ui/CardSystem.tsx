@@ -8,14 +8,15 @@ interface CardProps {
 
 export function Card({ children, className = '', padding = 'p-7 lg:p-12' }: CardProps) {
   return (
-    <div 
+    <div
       className={`
-        w-full flex flex-col 
-        bg-[#090909] border border-white/10 
-        rounded-2xl lg:rounded-3xl 
+        w-full flex flex-col
+        bg-card border border-white/10
+        rounded-2xl lg:rounded-3xl
         ${padding}
-        transition-all duration-500
+        transition-slow
         hover:border-white/20
+        hover-lift
         ${className}
       `}
     >
@@ -54,7 +55,7 @@ export function ImageContainer({ src, alt, className = '', active = false }: Ima
       />
       
       {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#090909] via-transparent to-transparent opacity-60" />
+      <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-60" />
     </div>
   );
 }

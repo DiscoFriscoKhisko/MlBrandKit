@@ -1,5 +1,6 @@
 import React from 'react';
 import { SlackNotification, FigmaCanvas, GithubCommits } from './visuals/ProofOfWork';
+import { Button } from './ui/button';
 
 export function SystemV2() {
   return (
@@ -200,9 +201,9 @@ export function SystemV2() {
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
                  <div className="w-8 h-8 rounded-full border border-white"></div>
               </div>
-              <button className="px-8 py-4 rounded-full bg-[#17f7f7] text-black font-medium uppercase tracking-wider interactive">
+              <Button variant="primary" withArrow={false}>
                 Hover Me
-              </button>
+              </Button>
               <p className="text-sm text-[#d5dada]/50">
                  Cursor expands to <code>scale-3</code> and blends with content.
               </p>
@@ -362,20 +363,20 @@ export function SystemV2() {
            {/* Interactive Elements */}
            <div className="space-y-4">
               <div className="bg-[#090909] border border-white/10 rounded-3xl p-8 h-64 flex flex-col items-center justify-center gap-6">
-                 <button className="rounded-full px-6 py-3 text-xs font-medium bg-[#17f7f7] text-black hover:bg-white hover:scale-105 transition-all duration-300">
+                 <Button variant="primary" size="sm" withArrow={false}>
                     Primary Pill
-                 </button>
-                 <a href="#" className="text-sm text-white border-b border-white/30 pb-1 hover:text-[#17f7f7] hover:border-[#17f7f7] transition-all">
+                 </Button>
+                 <Button variant="secondary" withArrow={false}>
                     Text Link
-                 </a>
+                 </Button>
               </div>
               <div>
                  <h4 className="text-white font-medium mb-2">Interaction</h4>
                  <ul className="text-sm text-[#d5dada]/60 list-disc pl-4 space-y-1">
-                    <li>Pill shapes for main actions</li>
-                    <li>Underlined text for secondary</li>
-                    <li>Scale/Opacity shifts, no heavy transforms</li>
-                    <li>Whole card clickable where possible</li>
+                    <li>Pill shapes with slide-up animation</li>
+                    <li>Border-radius: 3xl → xl on hover</li>
+                    <li>Underlined text for secondary actions</li>
+                    <li>Icon buttons rotate 90° on hover</li>
                  </ul>
               </div>
            </div>

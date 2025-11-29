@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { MotionSection, MotionCard, MotionCardMedia, MotionSplitText, MotionFadeText } from "./MotionSystem";
-import { ArrowButton } from "./ui/ArrowButton";
+import { Button } from "./ui/button";
 
 export function LayoutSystem() {
   const [showGrid, setShowGrid] = useState(false);
@@ -45,12 +45,15 @@ export function LayoutSystem() {
           </MotionFadeText>
           
           <div className="mt-8 flex items-center gap-6">
-             <button 
+             <Button
+               variant={showGrid ? "primary" : "outline"}
+               size="sm"
+               withArrow={false}
+               withAnimation={false}
                onClick={() => setShowGrid(!showGrid)}
-               className={`px-4 py-2 rounded text-[10px] font-mono uppercase tracking-widest border transition-all ${showGrid ? 'bg-[#17f7f7] text-black border-[#17f7f7]' : 'bg-transparent text-white border-white/20 hover:border-[#17f7f7]'}`}
              >
                {showGrid ? 'Hide Grid' : 'Show Grid'}
-             </button>
+             </Button>
              
              <div className="text-[10px] font-mono text-[#d5dada]/60">
                 Current Viewport: <span className="text-white">{windowWidth}px</span> — <span className="text-[#17f7f7]">{getBreakpoint(windowWidth)}</span>
@@ -170,47 +173,45 @@ export function LayoutSystem() {
           <div className="space-y-6">
             <div className="p-12 bg-[#090909] border border-white/10 rounded-[24px] flex items-center justify-center gap-4">
               <div className="relative">
-                 {/* The Actual Button */}
-                 <ArrowButton className="bg-[#17f7f7] text-black hover:bg-white border-transparent">
+                 {/* The Actual Button - Rise at Seven style with slide animation */}
+                 <Button variant="primary">
                     Book a call
-                 </ArrowButton>
+                 </Button>
 
                  {/* Spec Lines */}
                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-[9px] font-mono text-[#17f7f7] whitespace-nowrap">
-                   px-5 (20px)
+                   rounded-3xl → rounded-xl
                  </div>
-                 <div className="absolute top-1/2 -right-12 -translate-y-1/2 text-[9px] font-mono text-[#17f7f7] whitespace-nowrap">
-                   py-2.5 (10px)
+                 <div className="absolute top-1/2 -right-16 -translate-y-1/2 text-[9px] font-mono text-[#17f7f7] whitespace-nowrap">
+                   text slide-up
                  </div>
               </div>
             </div>
             <div>
                <h4 className="text-white font-serif text-lg mb-2">Primary Action</h4>
                <div className="grid grid-cols-2 gap-y-2 text-[10px] font-mono text-[#d5dada]/60 border-t border-white/10 pt-2">
-                 <span className="text-white">Shape</span> <span>Pill (999px)</span>
-                 <span className="text-white">Padding</span> <span>10px / 20px</span>
-                 <span className="text-white">Hover</span> <span>y: -2px</span>
-                 <span className="text-white">Icon</span> <span>Slide Left</span>
+                 <span className="text-white">Shape</span> <span>Pill (rounded-3xl)</span>
+                 <span className="text-white">Hover</span> <span>rounded-xl + text slide</span>
+                 <span className="text-white">Arrow</span> <span>ArrowUpRight icon</span>
                </div>
             </div>
           </div>
 
-          {/* Secondary Line Spec */}
+          {/* Outline Button Spec */}
            <div className="space-y-6">
             <div className="p-12 bg-[#090909] border border-white/10 rounded-[24px] flex items-center justify-center gap-4">
               <div className="relative">
-                 {/* The Actual Button */}
-                 <ArrowButton variant="link" className="text-white pb-0.5 hover:opacity-80 px-0">
-                    View details
-                 </ArrowButton>
+                 {/* Outline Button with slide animation */}
+                 <Button variant="outline">
+                    Our Services
+                 </Button>
               </div>
             </div>
             <div>
-               <h4 className="text-white font-serif text-lg mb-2">Secondary Line</h4>
+               <h4 className="text-white font-serif text-lg mb-2">Outline / Secondary</h4>
                <div className="grid grid-cols-2 gap-y-2 text-[10px] font-mono text-[#d5dada]/60 border-t border-white/10 pt-2">
-                 <span className="text-white">Style</span> <span>Border Bottom</span>
-                 <span className="text-white">Padding Bottom</span> <span>2px</span>
-                 <span className="text-white">Gap</span> <span>6px</span>
+                 <span className="text-white">Style</span> <span>Transparent + border</span>
+                 <span className="text-white">Hover</span> <span>Border highlight + slide</span>
                </div>
             </div>
           </div>

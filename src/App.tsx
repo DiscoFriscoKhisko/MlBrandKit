@@ -1,9 +1,7 @@
 import { BrandKit } from "./components/BrandKit";
 import { Toaster } from "sonner@2.0.3";
 import { useState, lazy, Suspense, useEffect } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Flip } from "gsap/Flip";
+import { ScrollTrigger } from "./lib/gsap";
 import Lenis from "lenis";
 
 // Lazy load PrismScene to isolate Three.js context and improve performance
@@ -15,9 +13,6 @@ export default function App() {
   const [view, setView] = useState<'kit' | 'prism'>('kit');
 
   useEffect(() => {
-    // Initialize GSAP
-    gsap.registerPlugin(ScrollTrigger, Flip);
-    
     // Initialize Lenis for smooth scrolling
     const lenis = new Lenis({
       lerp: 0.08,

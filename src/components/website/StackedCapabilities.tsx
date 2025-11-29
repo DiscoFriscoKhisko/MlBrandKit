@@ -1,12 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import { ArrowRight } from 'lucide-react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { gsap, ScrollTrigger } from '../../lib/gsap';
 import { TOKENS, TYPOGRAPHY, COLORS, LAYOUT } from './design-system';
-import { SystemButton } from './ui/SystemButton';
+import { Button } from '../ui/button';
 import { Card, ImageContainer } from '../ui/CardSystem';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const CAPABILITIES = [
   {
@@ -51,7 +48,7 @@ export function StackedCapabilities() {
   const containerRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<HTMLDivElement[]>([]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
@@ -137,7 +134,7 @@ export function StackedCapabilities() {
             <div 
               key={cap.id}
               ref={el => itemsRef.current[index] = el!}
-              className="w-full h-screen shrink-0 relative flex items-center bg-[#090909] border-b border-white/10 last:border-none"
+              className="w-full h-screen shrink-0 relative flex items-center bg-card border-b border-white/10 last:border-none"
             >
               {/* Background / Image Column (Right on Desktop, hidden on mobile?) */}
               {/* We'll do a split layout: Text Left, Image Right */}
@@ -145,10 +142,10 @@ export function StackedCapabilities() {
               <div className="absolute inset-0 flex flex-col lg:flex-row">
                 
                 {/* Content Column */}
-                <div className="w-full lg:w-1/2 h-full flex flex-col justify-center px-7 md:px-14 lg:pl-20 relative z-20 bg-[#090909]/90 lg:bg-[#090909]">
+                <div className="w-full lg:w-1/2 h-full flex flex-col justify-center px-7 md:px-14 lg:pl-20 relative z-20 bg-card/90 lg:bg-card">
                     <div className="max-w-xl space-y-8 js-heading">
                         <div className="flex items-center gap-4">
-                            <span className="font-mono text-[#17f7f7] text-sm">0{index + 1}</span>
+                            <span className="font-mono text-primary text-sm">0{index + 1}</span>
                             <div className="h-[1px] w-12 bg-white/20"></div>
                             <span className="font-mono text-white/60 text-xs uppercase tracking-widest">{cap.subtitle}</span>
                         </div>
@@ -157,7 +154,7 @@ export function StackedCapabilities() {
                             {cap.title}
                         </h2>
                         
-                        <p className={`${TYPOGRAPHY.bodyLarge} text-[#d5dada]/70`}>
+                        <p className={`${TYPOGRAPHY.bodyLarge} text-muted-foreground`}>
                             {cap.description}
                         </p>
 
@@ -170,9 +167,9 @@ export function StackedCapabilities() {
                         </div>
 
                         <div className="pt-8">
-                            <SystemButton href={cap.link} variant="outline">
+                            <Button href={cap.link} variant="outline">
                                 Explore {cap.title}
-                            </SystemButton>
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -180,7 +177,7 @@ export function StackedCapabilities() {
                 {/* Image Column */}
                 <div className="hidden lg:block w-1/2 h-full relative border-l border-white/10">
                     <ImageContainer src={cap.image} alt={cap.title} />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#090909] to-transparent opacity-50"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-card to-transparent opacity-50"></div>
                 </div>
 
               </div>

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ArrowButton } from "./ui/ArrowButton";
+import { Button } from "./ui/button";
 import { toast } from "sonner@2.0.3";
 import { copyToClipboard } from "./ui/utils";
 import { MotionFadeText, MotionSplitText, MotionSection, MotionCard } from "./MotionSystem";
@@ -255,9 +255,9 @@ export function Typography() {
                 By removing the noise, we allow the signal to be heard. 
                 Every pixel must justify its existence in the void.
               </p>
-              <ArrowButton variant="link" className="text-[#17f7f7] font-bold tracking-[0.2em] text-[10px]">
+              <Button variant="link" withArrow={false}>
                 Read Manifesto
-              </ArrowButton>
+              </Button>
             </div>
           </div>
 

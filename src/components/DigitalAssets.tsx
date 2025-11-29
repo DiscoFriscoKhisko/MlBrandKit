@@ -2,10 +2,10 @@ import { downloadSVG, downloadSVGAsPNG } from "./ui/utils";
 import { LazyRender } from "./ui/LazyRender";
 import { MotionCard, MotionFadeText, MotionSplitText } from "./MotionSystem";
 import { MASTER_LOGO_URL, BUSINESS_CARD_FRONT_IMAGE_URL, BUSINESS_CARD_BACK_IMAGE_URL } from "./branding/constants";
-import { 
+import {
   generateWordmarkSVG,
-  generateLinkedInPostSVG, 
-  generateInstagramPostSVG, 
+  generateLinkedInPostSVG,
+  generateInstagramPostSVG,
   generateTwitterHeaderSVG,
   generateBusinessCardSVG,
   generateBusinessCardBackSVG
@@ -18,6 +18,7 @@ import { KineticRhombic } from "./branding/primitives/KineticRhombic";
 import { KineticStellationCycle } from "./branding/primitives/KineticStellationCycle";
 import { StellatedIcosidodecahedron } from "./branding/primitives/StellatedIcosidodecahedron";
 import { KineticGrid } from "./branding/interactive/KineticGrid";
+import { Button } from "./ui/button";
 import { MagneticBadge } from "./branding/interactive/MagneticBadge";
 import { GrainyCursor } from "./branding/interactive/GrainyCursor";
 import { DymaxionMap } from "./branding/primitives/DymaxionMap";
@@ -120,18 +121,24 @@ export function DigitalAssets() {
     height?: number
   }) => (
     <div className={`absolute inset-x-0 bottom-0 p-6 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500 z-20 ${className}`}>
-       <button 
+       <Button
+         variant="light"
+         size="sm"
+         withArrow={false}
+         withAnimation={false}
          onClick={(e) => { e.stopPropagation(); onDownload('svg', width, height); }}
-         className="bg-white text-black text-[10px] font-mono uppercase tracking-widest px-4 py-2 hover:bg-[#17f7f7] transition-colors"
        >
          SVG
-       </button>
-       <button 
+       </Button>
+       <Button
+         variant="outline"
+         size="sm"
+         withArrow={false}
+         withAnimation={false}
          onClick={(e) => { e.stopPropagation(); onDownload('png', width, height); }}
-         className="bg-black text-white border border-white/20 text-[10px] font-mono uppercase tracking-widest px-4 py-2 hover:bg-white hover:text-black transition-colors"
        >
          PNG
-       </button>
+       </Button>
     </div>
   );
 

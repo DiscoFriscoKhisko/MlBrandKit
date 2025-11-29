@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "../../ui/button";
 
 export function IcebergDiagram() {
   return (
@@ -19,9 +20,9 @@ export function IcebergDiagram() {
                <div className="w-3/4 h-2 rounded bg-white/10"></div>
                <div className="w-1/2 h-2 rounded bg-white/10"></div>
             </div>
-            <button className="w-full py-2 rounded bg-[#17f7f7] text-black text-xs font-bold uppercase tracking-wider">
+            <Button variant="primary" size="sm" withArrow={false} className="w-full">
                Action
-            </button>
+            </Button>
 
             {/* Label */}
             <div className="absolute -right-12 top-1/2 -translate-y-1/2 flex items-center gap-2">

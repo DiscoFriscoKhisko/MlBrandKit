@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowButton } from "./ui/ArrowButton";
+import { Button } from "./ui/button";
 import { toast } from "sonner@2.0.3";
 import { copyToClipboard } from "./ui/utils";
 import { MotionCard, MotionFadeText, MotionSplitText } from "./MotionSystem";
@@ -154,26 +154,20 @@ export function ColorPalette() {
             <div>
               <h3 className="text-[10px] font-mono text-[#d5dada]/40 uppercase tracking-[0.3em] mb-12">Interactive States</h3>
               <div className="flex flex-col gap-6 max-w-xs">
-                  {/* Primary: Outline with Glow */}
-                  <ArrowButton 
-                    variant="outline"
-                    className="w-full text-[#17f7f7] border-[#17f7f7]/50 hover:bg-[#17f7f7]/5 hover:border-[#17f7f7] hover:text-[#17f7f7] shadow-[0_0_0_1px_transparent] hover:shadow-[0_0_15px_rgba(23,247,247,0.3)]"
-                  >
+                  {/* Primary: Outline with slide animation */}
+                  <Button variant="outline" className="w-full">
                     Primary System
-                  </ArrowButton>
-                  
-                  {/* Destructive: Neon Red */}
-                  <ArrowButton 
-                    variant="outline"
-                    className="w-full text-[#ff2a6d] border-[#ff2a6d]/50 hover:bg-[#ff2a6d]/5 hover:border-[#ff2a6d] hover:text-[#ff2a6d] hover:shadow-[0_0_15px_rgba(255,42,109,0.3)]"
-                  >
-                    Critical Action
-                  </ArrowButton>
+                  </Button>
 
-                  {/* Tertiary: Link */}
-                  <ArrowButton variant="link" className="justify-start text-[#d5dada] hover:text-white text-xs uppercase tracking-[0.2em]">
+                  {/* Destructive: Red pill with slide animation */}
+                  <Button variant="destructive" className="w-full">
+                    Critical Action
+                  </Button>
+
+                  {/* Link: Text only */}
+                  <Button variant="link" className="justify-start text-muted-foreground hover:text-white">
                     Documentation
-                  </ArrowButton>
+                  </Button>
               </div>
             </div>
 

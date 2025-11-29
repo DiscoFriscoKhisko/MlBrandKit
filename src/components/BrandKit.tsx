@@ -10,16 +10,16 @@ import { MotionPinnedSection } from "./MotionPinnedSection";
 import { FloatingShape } from "./ui/FloatingShape";
 import { LayoutSystem } from "./LayoutSystem";
 import { MASTER_LOGO_URL } from "./branding/constants";
-import { ArrowButton } from "./ui/ArrowButton";
+import { Button } from "./ui/button";
 import { MotionSection, MotionSplitText, MotionFadeText } from "./MotionSystem";
 import { AgencyWebsite } from "./website/AgencyWebsite";
 import { SystemV2 } from "./SystemV2";
-import { CustomCursor } from "./website/CustomCursor";
+import { Cursor } from "./ui/Cursor";
 
 export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
   return (
-    <div className="min-h-screen bg-[#050505] text-foreground font-sans selection:bg-[#17f7f7]/30 selection:text-white overflow-x-hidden relative cursor-none">
-      <CustomCursor />
+    <div className="min-h-screen bg-[#050505] text-foreground font-sans selection:bg-[#17f7f7]/30 selection:text-white relative cursor-none">
+      <Cursor />
       
       {/* Ultra-Subtle Grain - Barely Perceptible */}
       <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.03] mix-blend-overlay" style={{ 
@@ -75,22 +75,22 @@ export function BrandKit({ onLaunchLab }: { onLaunchLab?: () => void }) {
             </div>
             
             <div className="flex gap-4 pb-2 items-center">
-              <ArrowButton 
+              <Button
                 onClick={onLaunchLab}
                 className="font-mono text-[10px] uppercase tracking-[0.2em]"
               >
                 Enter Refraction Lab
-              </ArrowButton>
-              
+              </Button>
+
               <div className="h-8 w-[1px] bg-white/10 mx-2"></div>
 
-              <ArrowButton 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="font-mono text-[10px] uppercase tracking-[0.2em]"
                 href="mailto:damini@materiallab.io"
               >
                 Contact
-              </ArrowButton>
+              </Button>
             </div>
           </div>
         </MotionSection>

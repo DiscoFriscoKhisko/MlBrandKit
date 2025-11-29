@@ -4,6 +4,41 @@
   /* "Void" Theme - Strict Dark Mode Luxury */
   --font-size: 16px;
 
+  /* ===== Animation Tokens ===== */
+  /* Duration Scale */
+  --duration-instant: 100ms;   /* Microinteractions, hover states */
+  --duration-fast: 200ms;      /* Button transitions, small reveals */
+  --duration-normal: 300ms;    /* Standard transitions */
+  --duration-slow: 500ms;      /* Section reveals, image fades */
+  --duration-slower: 700ms;    /* Text cascades, complex transitions */
+  --duration-slowest: 1000ms;  /* Page transitions, large reveals */
+
+  /* Easing Functions */
+  --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);           /* Standard exit (Power3.out) */
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);           /* Dramatic exit (Expo.out) */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);               /* Smooth both ways */
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);    /* Bouncy/elastic */
+
+  /* ===== Opacity Scale ===== */
+  --opacity-full: 1;
+  --opacity-muted: 0.6;        /* Secondary text, inactive items */
+  --opacity-subtle: 0.4;       /* Tertiary text, hints */
+  --opacity-faint: 0.2;        /* Borders, dividers */
+  --opacity-ghost: 0.1;        /* Hover backgrounds, subtle fills */
+  --opacity-whisper: 0.05;     /* Grain overlays, ambient effects */
+
+  /* ===== Glow Effects ===== */
+  --glow-primary: 0 0 60px rgba(23, 247, 247, 0.1);
+  --glow-subtle: 0 0 30px rgba(23, 247, 247, 0.05);
+  --glow-intense: 0 0 80px rgba(23, 247, 247, 0.15);
+
+  /* ===== Shadow Scale ===== */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.8);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.8);
+  --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.8);
+
+  /* ===== Color Tokens ===== */
   --background: #050505; /* Deepest Void */
   --foreground: #fefefe; /* Pure White */
   
@@ -167,23 +202,62 @@
 
 .depth-card {
   position: relative;
-  background: #090909;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, var(--opacity-ghost));
+  box-shadow:
     0 0 0 1px rgba(0, 0, 0, 1),
-    0 4px 12px rgba(0, 0, 0, 0.8),
-    0 12px 24px rgba(0, 0, 0, 0.8);
-  transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    var(--shadow-md),
+    var(--shadow-lg);
+  transition: all var(--duration-slow) var(--ease-out);
 }
 
 .depth-card:hover {
   transform: translateY(-2px);
-  box-shadow: 
-    0 0 0 1px rgba(23, 247, 247, 0.2), /* Cyan rim light */
-    0 8px 24px rgba(0, 0, 0, 0.8),
-    0 24px 48px rgba(0, 0, 0, 0.8),
-    0 0 60px rgba(23, 247, 247, 0.05); /* Ambient glow */
+  box-shadow:
+    0 0 0 1px rgba(23, 247, 247, var(--opacity-faint)),
+    var(--shadow-lg),
+    var(--shadow-xl),
+    var(--glow-subtle);
   border-color: rgba(23, 247, 247, 0.3);
+}
+
+/* ===== Transition Utility Classes ===== */
+.transition-fast {
+  transition-property: all;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--ease-out);
+}
+
+.transition-normal {
+  transition-property: all;
+  transition-duration: var(--duration-normal);
+  transition-timing-function: var(--ease-out);
+}
+
+.transition-slow {
+  transition-property: all;
+  transition-duration: var(--duration-slow);
+  transition-timing-function: var(--ease-out);
+}
+
+/* Hover lift effect for cards */
+.hover-lift {
+  transition: transform var(--duration-normal) var(--ease-out),
+              box-shadow var(--duration-normal) var(--ease-out);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), var(--glow-subtle);
+}
+
+/* Hover glow effect */
+.hover-glow {
+  transition: box-shadow var(--duration-normal) var(--ease-out);
+}
+
+.hover-glow:hover {
+  box-shadow: var(--glow-primary);
 }
 
 @theme inline {
@@ -291,4 +365,68 @@
 
 html {
   font-size: var(--font-size);
+}
+
+/* Circle Mask Hover Effect for Featured Work cards */
+.circle-mask-container .circle-mask {
+  clip-path: circle(0% at 50% 50%);
+  transition: clip-path 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.circle-mask-container:hover .circle-mask {
+  clip-path: circle(150% at 50% 50%);
+}
+
+/* Pointer fine ensures this only works on desktop devices with mouse */
+@media (pointer: fine) {
+  .circle-mask-container .circle-mask {
+    clip-path: circle(0% at 50% 50%);
+  }
+
+  .circle-mask-container:hover .circle-mask {
+    clip-path: circle(150% at 50% 50%);
+  }
+}
+
+/* Featured Work Cards - Rise at Seven proportions */
+@media (min-width: 1024px) {
+  .featured-work-cards {
+    max-width: 652px;
+    flex-basis: 652px;
+    flex-shrink: 0;
+    flex-grow: 0;
+  }
+}
+
+/* Button transition utilities - Rise at Seven style */
+.transition-rounded {
+  transition-property: border-radius, background-color, color, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Pointer-fine hover for desktop only - ensures animations don't trigger on touch */
+@media (pointer: fine) {
+  .pointer-fine\:hover\:rounded-xl:hover {
+    border-radius: 0.75rem;
+  }
+  .pointer-fine\:hover\:rotate-90:hover {
+    transform: rotate(90deg);
+  }
+
+  /* Footer text-slide animation (Rise at Seven style) */
+  .pointer-fine\:group-hover\:-translate-y-7:is(:where(.group):hover *) {
+    transform: translateY(-1.75rem);
+  }
+  .pointer-fine\:group-hover\:translate-y-0:is(:where(.group):hover *) {
+    transform: translateY(0);
+  }
+  .pointer-fine\:group-hover\:rotate-45:is(:where(.group):hover *) {
+    transform: rotate(45deg);
+  }
+
+  /* SocialPill rounded transition */
+  .pointer-fine\:hover\:rounded-sm:hover {
+    border-radius: 0.125rem;
+  }
 }
