@@ -1,31 +1,368 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+
+// --- Config Interface ---
+interface PrismConfig {
+  // === CRYSTAL SHAPE ===
+  crystalScale: number;           // 80-350 (size)
+  subdivisionLevel: number;       // 0-3 (smoothness)
+  facetDepth: number;             // 0-1 (outer spikes/craters)
+
+  // === INTERNAL STRUCTURE === (outer space crystal look)
+  internalFacets: number;         // 0-1 (phantom crystal layers inside)
+  needleDensity: number;          // 0-1 (rutile-like needle inclusions)
+  fractureDensity: number;        // 0-1 (rainbow-creating internal cracks)
+  veilOpacity: number;            // 0-1 (milky cloud wisps inside)
+
+  // === SURFACE ===
+  edgeBrightness: number;         // 0-1 (wireframe visibility)
+  surfaceGlow: number;            // 0-0.2 (ambient glow)
+  rainbowFire: number;            // 0-1 (prismatic edge colors)
+
+  // === LIGHT PHYSICS ===
+  iorBase: number;                // 1.0-2.5 (base refraction index)
+  abbeNumber: number;             // 15-70 (dispersion: lower = more rainbow)
+  dispersionStrength: number;     // 0.1-3.0 (how much colors spread apart)
+  absorption: number;             // 0-0.8 (light absorbed inside)
+  scattering: number;             // 0-1 (internal light scatter)
+
+  // === LIGHT BEAM ===
+  beamWidth: number;              // 5-60
+  beamIntensity: number;          // 0-1
+  exitRaySpread: number;          // 0-1 (how much colors fan out)
+  flareIntensity: number;         // 0-1 (bloom at exit points)
+
+  // === MOTION (Spring Physics) ===
+  motionMass: number;             // 0.5-3 (inertia/weight)
+  motionStiffness: number;        // 50-300 (snap response)
+  motionDamping: number;          // 10-40 (settling speed)
+  rotationSpeed: number;          // 0-0.01 (auto-rotate)
+
+  // === ENVIRONMENT ===
+  atmosphereHaze: number;         // 0-1 (scene fog)
+  vignette: number;               // 0-1 (edge darkening)
+}
+
+const DEFAULT_CONFIG: PrismConfig = {
+  // === CRYSTAL SHAPE ===
+  crystalScale: 150,
+  subdivisionLevel: 3,
+  facetDepth: 0.1,
+
+  // === INTERNAL STRUCTURE ===
+  internalFacets: 0.2,
+  needleDensity: 0.0,
+  fractureDensity: 0.2,
+  veilOpacity: 0.25,
+
+  // === SURFACE ===
+  edgeBrightness: 0.3,
+  surfaceGlow: 0.0,
+  rainbowFire: 0.3,
+
+  // === LIGHT PHYSICS ===
+  iorBase: 1.52,
+  abbeNumber: 25,
+  dispersionStrength: 3.0,
+  absorption: 0.8,
+  scattering: 0.6,
+
+  // === LIGHT BEAM ===
+  beamWidth: 59,
+  beamIntensity: 0.35,
+  exitRaySpread: 0.4,
+  flareIntensity: 0.01,
+
+  // === MOTION (SPRING PHYSICS) ===
+  motionMass: 2.0,
+  motionStiffness: 80,
+  motionDamping: 18,
+  rotationSpeed: 0.001,
+
+  // === ENVIRONMENT ===
+  atmosphereHaze: 1.0,
+  vignette: 0.5,
+};
+
+// --- Control Panel Components ---
+const Slider: React.FC<{
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  unit?: string;
+  onChange: (value: number) => void;
+}> = ({ label, value, min, max, step, unit = '', onChange }) => (
+  <div className="mb-3">
+    <div className="flex justify-between text-xs mb-1">
+      <span className="text-white/60">{label}</span>
+      <span className="text-[#17f7f7] font-mono">{value.toFixed(step < 0.01 ? 4 : step < 0.1 ? 2 : 0)}{unit}</span>
+    </div>
+    <input
+      type="range"
+      min={min}
+      max={max}
+      step={step}
+      value={value}
+      onChange={e => onChange(parseFloat(e.target.value))}
+      className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer
+                 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3
+                 [&::-webkit-slider-thumb]:bg-[#17f7f7] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
+    />
+  </div>
+);
+
+const Select: React.FC<{
+  label: string;
+  value: string;
+  options: string[];
+  onChange: (value: string) => void;
+}> = ({ label, value, options, onChange }) => (
+  <div className="mb-3">
+    <label className="text-white/60 text-xs mb-1 block">{label}</label>
+    <select
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      className="w-full bg-white/5 border border-white/10 rounded px-2 py-1 text-white text-xs focus:border-[#17f7f7] outline-none"
+    >
+      {options.map(opt => (
+        <option key={opt} value={opt} className="bg-black">{opt}</option>
+      ))}
+    </select>
+  </div>
+);
+
+const ColorPicker: React.FC<{
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}> = ({ label, value, onChange }) => (
+  <div className="mb-3 flex items-center justify-between">
+    <span className="text-white/60 text-xs">{label}</span>
+    <div className="flex items-center gap-2">
+      <input
+        type="color"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        className="w-6 h-6 rounded cursor-pointer bg-transparent border border-white/10"
+      />
+      <span className="text-[#17f7f7] font-mono text-xs">{value}</span>
+    </div>
+  </div>
+);
+
+const Section: React.FC<{
+  title: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}> = ({ title, isOpen, onToggle, children }) => (
+  <div className="border-b border-white/5">
+    <button
+      onClick={onToggle}
+      className="w-full px-3 py-2 flex items-center justify-between text-white/80 hover:text-white text-xs uppercase tracking-wider"
+    >
+      {title}
+      <svg className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+    {isOpen && <div className="px-3 pb-3">{children}</div>}
+  </div>
+);
+
+interface ControlPanelProps {
+  config: PrismConfig;
+  onChange: (key: keyof PrismConfig, value: PrismConfig[keyof PrismConfig]) => void;
+  onReset: () => void;
+  isOpen: boolean;
+  onToggle: () => void;
+}
+
+const ControlPanel: React.FC<ControlPanelProps> = ({ config, onChange, onReset, isOpen, onToggle }) => {
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    crystal: true,
+    internal: false,
+    surface: false,
+    physics: false,
+    beam: false,
+    motion: false,
+    environment: false,
+  });
+
+  const toggleSection = (section: string) => {
+    setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  return (
+    <div className={`fixed top-4 right-4 z-50 transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-[calc(100%+1rem)]'}`}>
+      {/* Toggle Button */}
+      <button
+        onClick={onToggle}
+        className="absolute -left-12 top-0 w-10 h-10 bg-black/80 border border-white/10 rounded-l-md flex items-center justify-center text-[#17f7f7] hover:bg-black/90 transition-colors"
+      >
+        <svg className={`w-5 h-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      {/* Panel */}
+      <div className="w-80 max-h-[85vh] overflow-y-auto bg-black/95 backdrop-blur-md border border-white/10 rounded-md scrollbar-thin scrollbar-thumb-white/10">
+        <div className="p-3 border-b border-white/10 flex items-center justify-between gap-4">
+          <h2 className="text-[#17f7f7] font-mono text-xs uppercase tracking-widest truncate flex-1">Controls</h2>
+          <button
+            onClick={onReset}
+            className="text-white/40 hover:text-[#17f7f7] text-xs uppercase tracking-wider transition-colors flex-shrink-0"
+          >
+            Reset
+          </button>
+        </div>
+
+        {/* Crystal Shape */}
+        <Section title="Crystal Shape" isOpen={openSections.crystal} onToggle={() => toggleSection('crystal')}>
+          <Slider label="Crystal Size" value={config.crystalScale} min={80} max={350} step={10} onChange={v => onChange('crystalScale', v)} />
+          <Slider label="Subdivision Level" value={config.subdivisionLevel} min={0} max={3} step={1} onChange={v => onChange('subdivisionLevel', v)} />
+          <Slider label="Facet Depth" value={config.facetDepth} min={0} max={1} step={0.05} onChange={v => onChange('facetDepth', v)} />
+        </Section>
+
+        {/* Internal Structure */}
+        <Section title="Internal Structure" isOpen={openSections.internal} onToggle={() => toggleSection('internal')}>
+          <Slider label="Phantom Crystals" value={config.internalFacets} min={0} max={1} step={0.05} onChange={v => onChange('internalFacets', v)} />
+          <Slider label="Needle Inclusions" value={config.needleDensity} min={0} max={1} step={0.05} onChange={v => onChange('needleDensity', v)} />
+          <Slider label="Fracture Density" value={config.fractureDensity} min={0} max={1} step={0.05} onChange={v => onChange('fractureDensity', v)} />
+          <Slider label="Cloud Veils" value={config.veilOpacity} min={0} max={1} step={0.05} onChange={v => onChange('veilOpacity', v)} />
+        </Section>
+
+        {/* Surface */}
+        <Section title="Surface" isOpen={openSections.surface} onToggle={() => toggleSection('surface')}>
+          <Slider label="Edge Brightness" value={config.edgeBrightness} min={0} max={1} step={0.05} onChange={v => onChange('edgeBrightness', v)} />
+          <Slider label="Surface Glow" value={config.surfaceGlow} min={0} max={0.2} step={0.01} onChange={v => onChange('surfaceGlow', v)} />
+          <Slider label="Rainbow Fire" value={config.rainbowFire} min={0} max={1} step={0.05} onChange={v => onChange('rainbowFire', v)} />
+        </Section>
+
+        {/* Light Physics */}
+        <Section title="Light Physics" isOpen={openSections.physics} onToggle={() => toggleSection('physics')}>
+          <Slider label="IOR Base" value={config.iorBase} min={1.0} max={2.5} step={0.05} onChange={v => onChange('iorBase', v)} />
+          <Slider label="Abbe Number" value={config.abbeNumber} min={15} max={70} step={1} unit="" onChange={v => onChange('abbeNumber', v)} />
+          <Slider label="Dispersion Strength" value={config.dispersionStrength} min={0.1} max={3.0} step={0.1} onChange={v => onChange('dispersionStrength', v)} />
+          <Slider label="Absorption" value={config.absorption} min={0} max={0.8} step={0.05} onChange={v => onChange('absorption', v)} />
+          <Slider label="Scattering" value={config.scattering} min={0} max={1} step={0.05} onChange={v => onChange('scattering', v)} />
+        </Section>
+
+        {/* Light Beam */}
+        <Section title="Light Beam" isOpen={openSections.beam} onToggle={() => toggleSection('beam')}>
+          <Slider label="Beam Width" value={config.beamWidth} min={5} max={60} step={2} onChange={v => onChange('beamWidth', v)} />
+          <Slider label="Beam Intensity" value={config.beamIntensity} min={0} max={1} step={0.05} onChange={v => onChange('beamIntensity', v)} />
+          <Slider label="Exit Ray Spread" value={config.exitRaySpread} min={0} max={1} step={0.05} onChange={v => onChange('exitRaySpread', v)} />
+          <Slider label="Flare Intensity" value={config.flareIntensity} min={0} max={1} step={0.05} onChange={v => onChange('flareIntensity', v)} />
+        </Section>
+
+        {/* Motion (Spring Physics) */}
+        <Section title="Motion (Spring Physics)" isOpen={openSections.motion} onToggle={() => toggleSection('motion')}>
+          <Slider label="Mass (Weight)" value={config.motionMass} min={0.5} max={3} step={0.1} onChange={v => onChange('motionMass', v)} />
+          <Slider label="Stiffness (Snap)" value={config.motionStiffness} min={50} max={300} step={10} onChange={v => onChange('motionStiffness', v)} />
+          <Slider label="Damping (Settle)" value={config.motionDamping} min={10} max={40} step={1} onChange={v => onChange('motionDamping', v)} />
+          <Slider label="Rotation Speed" value={config.rotationSpeed * 1000} min={0} max={10} step={0.1} onChange={v => onChange('rotationSpeed', v / 1000)} />
+        </Section>
+
+        {/* Environment */}
+        <Section title="Environment" isOpen={openSections.environment} onToggle={() => toggleSection('environment')}>
+          <Slider label="Atmosphere Haze" value={config.atmosphereHaze} min={0} max={1} step={0.05} onChange={v => onChange('atmosphereHaze', v)} />
+          <Slider label="Vignette" value={config.vignette} min={0} max={1} step={0.05} onChange={v => onChange('vignette', v)} />
+        </Section>
+      </div>
+    </div>
+  );
+};
+
+// --- Wavelength to RGB Conversion ---
+// Based on CIE 1931 color matching approximation
+const wavelengthToRGB = (wavelength: number): string => {
+  let r = 0, g = 0, b = 0;
+
+  if (wavelength >= 380 && wavelength < 440) {
+    r = -(wavelength - 440) / (440 - 380);
+    g = 0;
+    b = 1;
+  } else if (wavelength >= 440 && wavelength < 490) {
+    r = 0;
+    g = (wavelength - 440) / (490 - 440);
+    b = 1;
+  } else if (wavelength >= 490 && wavelength < 510) {
+    r = 0;
+    g = 1;
+    b = -(wavelength - 510) / (510 - 490);
+  } else if (wavelength >= 510 && wavelength < 580) {
+    r = (wavelength - 510) / (580 - 510);
+    g = 1;
+    b = 0;
+  } else if (wavelength >= 580 && wavelength < 645) {
+    r = 1;
+    g = -(wavelength - 645) / (645 - 580);
+    b = 0;
+  } else if (wavelength >= 645 && wavelength <= 700) {
+    r = 1;
+    g = 0;
+    b = 0;
+  }
+
+  // Intensity adjustment for edges of visible spectrum
+  let factor = 1.0;
+  if (wavelength >= 380 && wavelength < 420) {
+    factor = 0.3 + 0.7 * (wavelength - 380) / (420 - 380);
+  } else if (wavelength >= 645 && wavelength <= 700) {
+    factor = 0.3 + 0.7 * (700 - wavelength) / (700 - 645);
+  }
+
+  // Apply gamma correction and intensity
+  const gamma = 0.8;
+  r = Math.round(255 * Math.pow(r * factor, gamma));
+  g = Math.round(255 * Math.pow(g * factor, gamma));
+  b = Math.round(255 * Math.pow(b * factor, gamma));
+
+  return `rgb(${r}, ${g}, ${b})`;
+};
+
+// --- Dynamic Spectrum Generation with Cauchy Dispersion ---
+// 15 samples for smooth ribbon-like rainbow colors
+const generateSpectrum = (iorBase: number, abbeNumber: number, dispersionStrength: number): SpectralBand[] => {
+  const samples = 15;
+
+  // Calculate IOR spread based on Abbe number and dispersion strength
+  // Lower Abbe = more dispersion. dispersionStrength controls the multiplier
+  const iorSpread = (70 - abbeNumber) / 70 * dispersionStrength;
+
+  return Array.from({ length: samples }, (_, i) => {
+    const t = i / (samples - 1);
+    const wavelength = 700 - t * 320; // Red (700nm) → Violet (380nm)
+
+    // Linear interpolation: red gets base IOR, violet gets base + spread
+    const ior = iorBase + t * iorSpread;
+
+    return {
+      name: `λ${Math.round(wavelength)}`,
+      color: wavelengthToRGB(wavelength),
+      opacity: 0.7, // Higher opacity - colors will blend additively
+      n: ior
+    };
+  });
+};
 
 // --- Constants & Configuration ---
 
-// Visual Styling
-const OBJECT_SCALE = 200;
-const MAX_BOUNCES = 6; 
-const STAR_COUNT = 120;
-const DUST_COUNT = 60;
+// Visual Styling (defaults, overridden by config where applicable)
+const OBJECT_SCALE = 200; // Default scale for helper functions
+const MAX_BOUNCES = 5; // More bounces for richer reflections
+const STAR_COUNT = 120; // Default star count
+const DUST_COUNT = 60; // Default dust count
 
 // Spectrum
 interface SpectralBand {
   name: string;
   color: string;
-  opacity: number; 
-  n: number; 
+  opacity: number;
+  n: number;
 }
-
-// Exaggerated IOR spread (1.40-1.80) for dramatic rainbow separation
-const SPECTRUM: SpectralBand[] = [
-  { name: 'red',    color: '#ff2a6d', opacity: 0.85, n: 1.40 },  // Low IOR = less bend
-  { name: 'orange', color: '#ff9f0a', opacity: 0.85, n: 1.47 },
-  { name: 'yellow', color: '#ffd60a', opacity: 0.85, n: 1.54 },
-  { name: 'green',  color: '#05f7a5', opacity: 0.85, n: 1.61 },
-  { name: 'blue',   color: '#0a84ff', opacity: 0.90, n: 1.68 },
-  { name: 'indigo', color: '#5e5ce6', opacity: 0.90, n: 1.74 },
-  { name: 'violet', color: '#bf5af2', opacity: 0.95, n: 1.80 }   // High IOR = more bend
-];
 
 const N_AIR = 1.0;
 
@@ -50,6 +387,36 @@ const reflect = (dir: Vec2, normal: Vec2): Vec2 => {
     return sub(dir, mul(normal, 2 * dot(dir, normal)));
 };
 const lerp = (start: number, end: number, t: number) => start * (1 - t) + end * t;
+
+// --- Spring Physics for Buttery Smooth Motion ---
+interface SpringState {
+    pos: number;
+    vel: number;
+}
+
+const updateSpring = (
+    spring: SpringState,
+    target: number,
+    mass: number,
+    stiffness: number,
+    damping: number,
+    dt: number
+): SpringState => {
+    // Hooke's Law with damping: F = -kx - bv
+    const displacement = spring.pos - target;
+    const springForce = -stiffness * displacement;
+    const dampingForce = -damping * spring.vel;
+    const totalForce = springForce + dampingForce;
+
+    // F = ma -> a = F/m
+    const acceleration = totalForce / mass;
+
+    // Update velocity and position
+    const newVel = spring.vel + acceleration * dt;
+    const newPos = spring.pos + newVel * dt;
+
+    return { pos: newPos, vel: newVel };
+};
 const distToSegment = (p: Vec2, v: Vec2, w: Vec2) => {
     const l2 = (v.x - w.x)**2 + (v.y - w.y)**2;
     if (l2 === 0) return len(sub(p, v));
@@ -457,8 +824,64 @@ const parseColorToRGB = (color: string): { r: number; g: number; b: number } => 
             b: parseInt(hex.slice(4, 6), 16)
         };
     }
+    // Handle rgb(r, g, b) format from wavelengthToRGB
+    if (color.startsWith('rgb(')) {
+        const match = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+        if (match) {
+            return {
+                r: parseInt(match[1], 10),
+                g: parseInt(match[2], 10),
+                b: parseInt(match[3], 10)
+            };
+        }
+    }
     // Default white
     return { r: 255, g: 255, b: 255 };
+};
+
+// --- Soft Rainbow Band (Natural rainbow look - no bright core) ---
+const drawSoftRainbowBand = (
+    ctx: CanvasRenderingContext2D,
+    start: Vec2,
+    end: Vec2,
+    color: string,
+    baseWidth: number,
+    alpha: number,
+    dpr: number
+) => {
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const length = Math.sqrt(dx * dx + dy * dy);
+    if (length < 1) return;
+
+    const angle = Math.atan2(dy, dx);
+    const rgb = parseColorToRGB(color);
+
+    ctx.save();
+    ctx.translate(start.x, start.y);
+    ctx.rotate(angle);
+
+    // Single soft diffuse layer - no bright core
+    // Wide spread with very gradual falloff for natural rainbow look
+    const bandWidth = baseWidth * 3;
+    const bandGrad = ctx.createLinearGradient(0, -bandWidth / 2, 0, bandWidth / 2);
+
+    // Soft gradient - brighter, max opacity around 0.25 at center
+    bandGrad.addColorStop(0, 'rgba(0,0,0,0)');
+    bandGrad.addColorStop(0.1, `rgba(${rgb.r},${rgb.g},${rgb.b},0.03)`);
+    bandGrad.addColorStop(0.25, `rgba(${rgb.r},${rgb.g},${rgb.b},0.10)`);
+    bandGrad.addColorStop(0.4, `rgba(${rgb.r},${rgb.g},${rgb.b},0.18)`);
+    bandGrad.addColorStop(0.5, `rgba(${rgb.r},${rgb.g},${rgb.b},0.25)`);
+    bandGrad.addColorStop(0.6, `rgba(${rgb.r},${rgb.g},${rgb.b},0.18)`);
+    bandGrad.addColorStop(0.75, `rgba(${rgb.r},${rgb.g},${rgb.b},0.10)`);
+    bandGrad.addColorStop(0.9, `rgba(${rgb.r},${rgb.g},${rgb.b},0.03)`);
+    bandGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+    ctx.fillStyle = bandGrad;
+    ctx.globalAlpha = alpha;
+    ctx.fillRect(0, -bandWidth / 2, length, bandWidth);
+
+    ctx.restore();
 };
 
 // --- Volumetric Beam Drawing ---
@@ -619,41 +1042,41 @@ const drawColorDispersion = (
         const fadeAlpha = alpha * (1 - t * 0.6) * band.opacity;
 
         // Layer 1: Ultra-soft outer haze (larger radius, softer, keeps rainbow)
-        const outerRad = radius * 2.0; // Increased from 1.6 for softer spread
+        const outerRad = radius * 2.0;
         const outerGrad = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, outerRad);
-        outerGrad.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.03 * fadeAlpha})`);
-        outerGrad.addColorStop(0.2, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.02 * fadeAlpha})`);
-        outerGrad.addColorStop(0.45, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.01 * fadeAlpha})`);
-        outerGrad.addColorStop(0.7, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.004 * fadeAlpha})`);
+        outerGrad.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.015 * fadeAlpha})`);
+        outerGrad.addColorStop(0.2, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.01 * fadeAlpha})`);
+        outerGrad.addColorStop(0.45, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.005 * fadeAlpha})`);
+        outerGrad.addColorStop(0.7, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.002 * fadeAlpha})`);
         outerGrad.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = outerGrad;
-        ctx.globalAlpha = 0.8;
+        ctx.globalAlpha = 0.5;
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, outerRad, 0, Math.PI * 2);
         ctx.fill();
 
-        // Layer 2: Main color cloud (softer opacity, keeps rainbow)
+        // Layer 2: Main color cloud (reduced intensity)
         const mainGrad = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, radius);
-        mainGrad.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.07 * fadeAlpha})`);
-        mainGrad.addColorStop(0.2, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.045 * fadeAlpha})`);
-        mainGrad.addColorStop(0.45, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.02 * fadeAlpha})`);
-        mainGrad.addColorStop(0.7, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.008 * fadeAlpha})`);
+        mainGrad.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.035 * fadeAlpha})`);
+        mainGrad.addColorStop(0.2, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.022 * fadeAlpha})`);
+        mainGrad.addColorStop(0.45, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.01 * fadeAlpha})`);
+        mainGrad.addColorStop(0.7, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.004 * fadeAlpha})`);
         mainGrad.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = mainGrad;
-        ctx.globalAlpha = 0.9;
+        ctx.globalAlpha = 0.6;
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
         ctx.fill();
 
-        // Layer 3: Soft core (softer opacity, keeps rainbow)
+        // Layer 3: Soft core (reduced intensity)
         const coreRad = radius * 0.4;
         const coreGrad = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, coreRad);
-        coreGrad.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.08 * fadeAlpha})`);
-        coreGrad.addColorStop(0.35, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.04 * fadeAlpha})`);
-        coreGrad.addColorStop(0.7, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.015 * fadeAlpha})`);
+        coreGrad.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.04 * fadeAlpha})`);
+        coreGrad.addColorStop(0.35, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.02 * fadeAlpha})`);
+        coreGrad.addColorStop(0.7, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.008 * fadeAlpha})`);
         coreGrad.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = coreGrad;
-        ctx.globalAlpha = 1.0;
+        ctx.globalAlpha = 0.7;
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, coreRad, 0, Math.PI * 2);
         ctx.fill();
@@ -704,6 +1127,100 @@ const drawAtmosphericFog = (
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.fill();
+    }
+    ctx.restore();
+};
+
+// --- Atmospheric Fog Layer WITH CONFIG ---
+const drawAtmosphericFogWithConfig = (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    center: Vec2,
+    time: number,
+    hazeIntensity: number,
+    vignetteStrength: number
+) => {
+    ctx.save();
+
+    // Dark vignette - intensity controlled by vignetteStrength
+    if (vignetteStrength > 0) {
+        const vignetteGrad = ctx.createRadialGradient(
+            center.x, center.y, 0,
+            center.x, center.y, Math.max(width, height) * 0.75
+        );
+        vignetteGrad.addColorStop(0, 'rgba(0,0,0,0)');
+        vignetteGrad.addColorStop(0.5, 'rgba(0,0,0,0)');
+        vignetteGrad.addColorStop(0.75, `rgba(0,0,0,${vignetteStrength * 0.2})`);
+        vignetteGrad.addColorStop(0.9, `rgba(0,0,0,${vignetteStrength * 0.5})`);
+        vignetteGrad.addColorStop(1, `rgba(0,0,0,${vignetteStrength * 0.8})`);
+
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = vignetteGrad;
+        ctx.fillRect(0, 0, width, height);
+    }
+
+    // Atmospheric haze - super soft misty effect with gentle blooms
+    if (hazeIntensity > 0) {
+        ctx.globalCompositeOperation = 'screen';
+
+        // Layer 1: Ultra-wide soft ambient mist
+        const mistGrad = ctx.createRadialGradient(
+            center.x, center.y, 0,
+            center.x, center.y, Math.max(width, height) * 0.9
+        );
+        mistGrad.addColorStop(0, `rgba(180,200,220,${hazeIntensity * 0.025})`);
+        mistGrad.addColorStop(0.3, `rgba(150,180,210,${hazeIntensity * 0.02})`);
+        mistGrad.addColorStop(0.6, `rgba(120,150,190,${hazeIntensity * 0.012})`);
+        mistGrad.addColorStop(0.85, `rgba(100,130,170,${hazeIntensity * 0.006})`);
+        mistGrad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = mistGrad;
+        ctx.fillRect(0, 0, width, height);
+
+        // Layer 2: Soft drifting mist clouds (many, very subtle)
+        const cloudCount = Math.floor(12 + hazeIntensity * 8);
+        for (let i = 0; i < cloudCount; i++) {
+            const seed = i * 89.123;
+            const driftX = Math.sin(time * 0.03 + seed) * width * 0.15;
+            const driftY = Math.cos(time * 0.025 + seed * 1.3) * height * 0.1;
+            const x = ((seed * 7.89) % 1) * width + driftX;
+            const y = ((seed * 3.21) % 1) * height + driftY;
+            const r = (150 + Math.sin(seed * 2.1) * 100) * (0.8 + hazeIntensity * 0.4);
+
+            const cloudGrad = ctx.createRadialGradient(x, y, 0, x, y, r);
+            const alpha = hazeIntensity * 0.012;
+            cloudGrad.addColorStop(0, `rgba(200,215,235,${alpha})`);
+            cloudGrad.addColorStop(0.4, `rgba(180,200,225,${alpha * 0.6})`);
+            cloudGrad.addColorStop(0.7, `rgba(160,185,215,${alpha * 0.25})`);
+            cloudGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+            ctx.fillStyle = cloudGrad;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Layer 3: Gentle bloom spots (like light catching mist particles)
+        const bloomCount = Math.floor(6 + hazeIntensity * 6);
+        for (let i = 0; i < bloomCount; i++) {
+            const seed = i * 234.567;
+            const pulse = 0.7 + Math.sin(time * 0.5 + seed) * 0.3;
+            const x = ((seed * 5.67) % 1) * width;
+            const y = ((seed * 2.34) % 1) * height;
+            const r = (80 + Math.sin(seed * 3.2) * 40) * (1 + hazeIntensity * 0.3);
+
+            const bloomGrad = ctx.createRadialGradient(x, y, 0, x, y, r);
+            const alpha = hazeIntensity * 0.015 * pulse;
+            bloomGrad.addColorStop(0, `rgba(220,235,255,${alpha})`);
+            bloomGrad.addColorStop(0.3, `rgba(200,220,245,${alpha * 0.5})`);
+            bloomGrad.addColorStop(0.6, `rgba(180,205,235,${alpha * 0.2})`);
+            bloomGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+            ctx.fillStyle = bloomGrad;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+        }
     }
     ctx.restore();
 };
@@ -768,6 +1285,94 @@ const drawQuartzInterior = (
         ctx.beginPath();
         ctx.arc(px + drift, py, pr, 0, Math.PI * 2);
         ctx.fill();
+    }
+
+    ctx.restore();
+};
+
+// --- Quartz Crystal Interior WITH CONFIG ---
+const drawQuartzInteriorWithConfig = (
+    ctx: CanvasRenderingContext2D,
+    hull: Vec2[],
+    time: number,
+    dpr: number,
+    cloudiness: number,
+    cx: number,
+    cy: number,
+    radius: number
+) => {
+    if (hull.length < 3 || cloudiness <= 0) return;
+
+    ctx.save();
+
+    // Create clipping path from hull
+    ctx.beginPath();
+    ctx.moveTo(hull[0].x, hull[0].y);
+    for (let i = 1; i < hull.length; i++) {
+        ctx.lineTo(hull[i].x, hull[i].y);
+    }
+    ctx.closePath();
+    ctx.clip();
+
+    // Layer 1: Base cloudy fill - intensity controlled by cloudiness
+    const baseAlpha = cloudiness * 0.06;
+    const baseGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+    baseGrad.addColorStop(0, `rgba(255,255,255,${baseAlpha})`);
+    baseGrad.addColorStop(0.4, `rgba(255,255,255,${baseAlpha * 0.6})`);
+    baseGrad.addColorStop(0.7, `rgba(255,255,255,${baseAlpha * 0.3})`);
+    baseGrad.addColorStop(1, `rgba(255,255,255,${baseAlpha * 0.1})`);
+    ctx.fillStyle = baseGrad;
+    ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
+
+    // Layer 2: Cloudy patches - more patches with higher cloudiness
+    const patchCount = Math.floor(10 + cloudiness * 25);
+    for (let i = 0; i < patchCount; i++) {
+        const seed = i * 73.419;
+        const px = cx + (seededRandom(seed) - 0.5) * radius * 1.2;
+        const py = cy + (seededRandom(seed + 100) - 0.5) * radius * 1.2;
+        const pr = (8 + seededRandom(seed + 200) * 35) * dpr * (0.5 + cloudiness * 0.8);
+
+        // Drift animation
+        const drift = Math.sin(time * 0.3 + seed) * 3 * dpr * cloudiness;
+
+        const patchAlpha = cloudiness * 0.12;
+        const patchGrad = ctx.createRadialGradient(
+            px + drift, py, 0,
+            px + drift, py, pr
+        );
+        patchGrad.addColorStop(0, `rgba(255,255,255,${patchAlpha})`);
+        patchGrad.addColorStop(0.3, `rgba(255,255,255,${patchAlpha * 0.6})`);
+        patchGrad.addColorStop(0.6, `rgba(255,255,255,${patchAlpha * 0.2})`);
+        patchGrad.addColorStop(1, 'rgba(255,255,255,0)');
+
+        ctx.fillStyle = patchGrad;
+        ctx.beginPath();
+        ctx.arc(px + drift, py, pr, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Layer 3: Subtle smoke wisps for high cloudiness
+    if (cloudiness > 0.5) {
+        const wispCount = Math.floor((cloudiness - 0.5) * 10);
+        for (let i = 0; i < wispCount; i++) {
+            const seed = i * 157.89;
+            const angle = seededRandom(seed) * Math.PI * 2;
+            const dist = seededRandom(seed + 50) * radius * 0.6;
+            const wx = cx + Math.cos(angle + time * 0.1) * dist;
+            const wy = cy + Math.sin(angle + time * 0.1) * dist;
+            const wr = (20 + seededRandom(seed + 100) * 40) * dpr;
+
+            const wispAlpha = (cloudiness - 0.5) * 0.08;
+            const wispGrad = ctx.createRadialGradient(wx, wy, 0, wx, wy, wr);
+            wispGrad.addColorStop(0, `rgba(200,220,255,${wispAlpha})`);
+            wispGrad.addColorStop(0.5, `rgba(180,200,240,${wispAlpha * 0.4})`);
+            wispGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+            ctx.fillStyle = wispGrad;
+            ctx.beginPath();
+            ctx.arc(wx, wy, wr, 0, Math.PI * 2);
+            ctx.fill();
+        }
     }
 
     ctx.restore();
@@ -844,7 +1449,7 @@ const drawInternalCaustics = (
     const focusRatio = 0.32 + (band.n - 1.40) * 0.25;
     const focusPoint = add(entryPoint, mul(pathVec, focusRatio));
 
-    // === Layer 1: Soft scattered glow along path (softer, larger) ===
+    // === Layer 1: Soft scattered glow along path (cooler tint) ===
     const scatterSteps = 8;
     for (let i = 0; i < scatterSteps; i++) {
         const t = (i + 0.5) / scatterSteps;
@@ -852,17 +1457,22 @@ const drawInternalCaustics = (
 
         // Width varies: wider at entry, narrow at focus, wider at exit
         const widthFactor = Math.abs(t - focusRatio) * 0.8 + 0.25;
-        const radius = (25 + widthFactor * 40) * dpr; // Larger for softer look
+        const radius = (25 + widthFactor * 40) * dpr;
+
+        // Blend band color with blue to reduce yellowness
+        const coolR = Math.round(rgb.r * 0.6 + 180 * 0.4);
+        const coolG = Math.round(rgb.g * 0.6 + 210 * 0.4);
+        const coolB = Math.round(rgb.b * 0.6 + 255 * 0.4);
 
         const scatterGrad = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, radius);
-        const baseAlpha = alpha * 0.08 * (1 - Math.abs(t - 0.5) * 0.3); // Slightly lower
-        scatterGrad.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},${baseAlpha * 0.7})`);
-        scatterGrad.addColorStop(0.3, `rgba(${rgb.r},${rgb.g},${rgb.b},${baseAlpha * 0.4})`);
-        scatterGrad.addColorStop(0.6, `rgba(${rgb.r},${rgb.g},${rgb.b},${baseAlpha * 0.15})`);
+        const baseAlpha = alpha * 0.03 * (1 - Math.abs(t - 0.5) * 0.3);
+        scatterGrad.addColorStop(0, `rgba(${coolR},${coolG},${coolB},${baseAlpha * 0.5})`);
+        scatterGrad.addColorStop(0.3, `rgba(${coolR},${coolG},${coolB},${baseAlpha * 0.25})`);
+        scatterGrad.addColorStop(0.6, `rgba(${coolR},${coolG},${coolB},${baseAlpha * 0.1})`);
         scatterGrad.addColorStop(1, 'rgba(0,0,0,0)');
 
         ctx.fillStyle = scatterGrad;
-        ctx.globalAlpha = 0.9;
+        ctx.globalAlpha = 0.8;
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
         ctx.fill();
@@ -872,43 +1482,52 @@ const drawInternalCaustics = (
     const subRayCount = 5;
     const beamHalfWidth = 10 * dpr;
 
-    ctx.globalAlpha = alpha * 0.2; // Reduced from 0.4 for softer look
+    // Extend points slightly beyond hull for natural fade
+    const extendAmount = 15 * dpr;
+    const extendedEntry = sub(entryPoint, mul(pathDir, extendAmount));
+    const extendedExit = add(exitPoint, mul(pathDir, extendAmount));
+
+    ctx.globalAlpha = alpha * 0.1;
+    ctx.lineCap = 'round'; // Soft line endings
     for (let i = 0; i < subRayCount; i++) {
         const offset = (i - (subRayCount - 1) / 2) * (beamHalfWidth * 2 / subRayCount);
-        const startOffset = add(entryPoint, mul(perp, offset));
-        const endOffset = add(exitPoint, mul(perp, offset * 0.3)); // Converge slightly
+        const startOffset = add(extendedEntry, mul(perp, offset));
+        const endOffset = add(extendedExit, mul(perp, offset * 0.3));
 
         // Bezier curve through focus point
         ctx.beginPath();
         ctx.moveTo(startOffset.x, startOffset.y);
         ctx.quadraticCurveTo(focusPoint.x, focusPoint.y, endOffset.x, endOffset.y);
 
-        // Gradient along path - softer intensity
+        // Gradient with fade at extended ends
         const lineGrad = ctx.createLinearGradient(
-            entryPoint.x, entryPoint.y,
-            exitPoint.x, exitPoint.y
+            extendedEntry.x, extendedEntry.y,
+            extendedExit.x, extendedExit.y
         );
-        lineGrad.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},0.05)`);
-        lineGrad.addColorStop(Math.max(0, focusRatio - 0.12), `rgba(${rgb.r},${rgb.g},${rgb.b},0.12)`);
-        lineGrad.addColorStop(focusRatio, `rgba(${rgb.r},${rgb.g},${rgb.b},0.2)`); // Reduced from 0.4
-        lineGrad.addColorStop(Math.min(1, focusRatio + 0.12), `rgba(${rgb.r},${rgb.g},${rgb.b},0.12)`);
-        lineGrad.addColorStop(1, `rgba(${rgb.r},${rgb.g},${rgb.b},0.06)`);
+        lineGrad.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},0)`); // Fade in
+        lineGrad.addColorStop(0.08, `rgba(${rgb.r},${rgb.g},${rgb.b},0.05)`);
+        lineGrad.addColorStop(Math.max(0.1, focusRatio - 0.12), `rgba(${rgb.r},${rgb.g},${rgb.b},0.12)`);
+        lineGrad.addColorStop(focusRatio, `rgba(${rgb.r},${rgb.g},${rgb.b},0.2)`);
+        lineGrad.addColorStop(Math.min(0.9, focusRatio + 0.12), `rgba(${rgb.r},${rgb.g},${rgb.b},0.12)`);
+        lineGrad.addColorStop(0.92, `rgba(${rgb.r},${rgb.g},${rgb.b},0.05)`);
+        lineGrad.addColorStop(1, `rgba(${rgb.r},${rgb.g},${rgb.b},0)`); // Fade out
 
         ctx.strokeStyle = lineGrad;
-        ctx.lineWidth = 2.5 * dpr; // Thicker but more transparent
+        ctx.lineWidth = 2.5 * dpr;
         ctx.stroke();
     }
 
-    // === Layer 3: Caustic focus point (bigger, softer glow with band color) ===
-    const causticRad = 18 * dpr; // Larger for softer appearance
+    // === Layer 3: Caustic focus point (cooler blue-white tint) ===
+    const causticRad = 18 * dpr;
     const causticGrad = ctx.createRadialGradient(
         focusPoint.x, focusPoint.y, 0,
         focusPoint.x, focusPoint.y, causticRad
     );
-    causticGrad.addColorStop(0, `rgba(255,255,255,${alpha * 0.3})`); // White core
-    causticGrad.addColorStop(0.15, `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha * 0.25})`); // Band color
-    causticGrad.addColorStop(0.4, `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha * 0.1})`); // Fading
-    causticGrad.addColorStop(0.7, `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha * 0.03})`);
+    // Blue-white core to reduce yellowness
+    causticGrad.addColorStop(0, `rgba(220,235,255,${alpha * 0.12})`);
+    causticGrad.addColorStop(0.15, `rgba(200,220,255,${alpha * 0.08})`);
+    causticGrad.addColorStop(0.4, `rgba(180,210,255,${alpha * 0.04})`);
+    causticGrad.addColorStop(0.7, `rgba(160,200,255,${alpha * 0.015})`);
     causticGrad.addColorStop(1, 'rgba(0,0,0,0)');
 
     ctx.fillStyle = causticGrad;
@@ -932,34 +1551,317 @@ const drawSurfaceHighlight = (
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
 
-    // Large soft round bloom - no elongation
-    const coreRadius = 8 * dpr;
-    const haloRadius = 45 * dpr;
+    // Soft blue-tinted flare like Daft Punk style
+    const coreRadius = 12 * dpr;
+    const haloRadius = 80 * dpr;
+    const outerGlowRadius = 120 * dpr;
 
-    // Outer halo: very soft falloff
-    const outerGrad = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, haloRadius);
-    outerGrad.addColorStop(0, `rgba(255,255,255,${intensity * 0.3})`);
-    outerGrad.addColorStop(0.08, `rgba(255,255,255,${intensity * 0.22})`);
-    outerGrad.addColorStop(0.2, `rgba(255,255,255,${intensity * 0.12})`);
-    outerGrad.addColorStop(0.4, `rgba(255,255,255,${intensity * 0.05})`);
-    outerGrad.addColorStop(0.65, `rgba(255,255,255,${intensity * 0.02})`);
-    outerGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    // Layer 1: Very large outer blue glow (super soft)
+    const outerGlow = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, outerGlowRadius);
+    outerGlow.addColorStop(0, `rgba(100,180,255,${intensity * 0.08})`);
+    outerGlow.addColorStop(0.2, `rgba(80,150,255,${intensity * 0.04})`);
+    outerGlow.addColorStop(0.5, `rgba(60,120,255,${intensity * 0.015})`);
+    outerGlow.addColorStop(1, 'rgba(0,0,0,0)');
 
-    ctx.fillStyle = outerGrad;
+    ctx.fillStyle = outerGlow;
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, outerGlowRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Layer 2: Mid blue halo
+    const haloGrad = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, haloRadius);
+    haloGrad.addColorStop(0, `rgba(150,200,255,${intensity * 0.12})`);
+    haloGrad.addColorStop(0.15, `rgba(120,180,255,${intensity * 0.08})`);
+    haloGrad.addColorStop(0.35, `rgba(100,160,255,${intensity * 0.04})`);
+    haloGrad.addColorStop(0.6, `rgba(80,140,255,${intensity * 0.015})`);
+    haloGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+    ctx.fillStyle = haloGrad;
     ctx.beginPath();
     ctx.arc(pos.x, pos.y, haloRadius, 0, Math.PI * 2);
     ctx.fill();
 
-    // Blown-out white core
+    // Layer 3: Soft white-blue core
     const coreGrad = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, coreRadius);
-    coreGrad.addColorStop(0, `rgba(255,255,255,${intensity * 0.6})`);
-    coreGrad.addColorStop(0.5, `rgba(255,255,255,${intensity * 0.3})`);
-    coreGrad.addColorStop(1, `rgba(255,255,255,0)`);
+    coreGrad.addColorStop(0, `rgba(220,240,255,${intensity * 0.25})`);
+    coreGrad.addColorStop(0.4, `rgba(180,220,255,${intensity * 0.12})`);
+    coreGrad.addColorStop(1, `rgba(150,200,255,0)`);
 
     ctx.fillStyle = coreGrad;
     ctx.beginPath();
     ctx.arc(pos.x, pos.y, coreRadius, 0, Math.PI * 2);
     ctx.fill();
+
+    ctx.restore();
+};
+
+// --- INTERNAL CRYSTAL STRUCTURE RENDERING ---
+// Based on crystal inclusion research (phantoms, needles, fractures, veils)
+
+// Internal Phantoms: Ghostly crystal layers inside the main crystal
+const drawInternalPhantoms = (
+    ctx: CanvasRenderingContext2D,
+    hull: Vec2[],
+    center: Vec2,
+    phantomIntensity: number,
+    time: number,
+    dpr: number
+) => {
+    if (phantomIntensity <= 0 || hull.length < 3) return;
+
+    ctx.save();
+
+    // Clip to hull
+    ctx.beginPath();
+    hull.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.closePath();
+    ctx.clip();
+
+    ctx.globalCompositeOperation = 'lighter';
+
+    const layers = Math.floor(2 + phantomIntensity * 4); // 2-6 phantom layers
+
+    for (let layer = 0; layer < layers; layer++) {
+        const scale = 0.3 + (layer / layers) * 0.5; // 30%-80% of outer size
+        const opacity = phantomIntensity * 0.4 * (1 - layer / layers); // Increased for visibility
+        const rotation = time * 0.1 + layer * 0.5; // Slow rotation offset per layer
+
+        // Draw scaled-down wireframe edges
+        ctx.strokeStyle = `rgba(23, 247, 247, ${opacity})`;
+        ctx.lineWidth = 0.5 * dpr;
+
+        ctx.beginPath();
+        hull.forEach((p, i) => {
+            // Scale point relative to center
+            const dx = (p.x - center.x) * scale;
+            const dy = (p.y - center.y) * scale;
+            // Apply slight rotation
+            const rx = dx * Math.cos(rotation) - dy * Math.sin(rotation);
+            const ry = dx * Math.sin(rotation) + dy * Math.cos(rotation);
+            const nx = center.x + rx;
+            const ny = center.y + ry;
+
+            if (i === 0) ctx.moveTo(nx, ny);
+            else ctx.lineTo(nx, ny);
+        });
+        ctx.closePath();
+        ctx.stroke();
+    }
+
+    ctx.restore();
+};
+
+// Needle Inclusions: Rutile-like needles that catch light
+const drawNeedleInclusions = (
+    ctx: CanvasRenderingContext2D,
+    hull: Vec2[],
+    center: Vec2,
+    needleDensity: number,
+    lightDir: Vec2,
+    time: number,
+    dpr: number
+) => {
+    if (needleDensity <= 0 || hull.length < 3) return;
+
+    ctx.save();
+
+    // Clip to hull
+    ctx.beginPath();
+    hull.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.closePath();
+    ctx.clip();
+
+    ctx.globalCompositeOperation = 'lighter';
+
+    // Calculate approximate radius from hull
+    let maxDist = 0;
+    hull.forEach(p => {
+        const d = Math.sqrt((p.x - center.x) ** 2 + (p.y - center.y) ** 2);
+        if (d > maxDist) maxDist = d;
+    });
+    const radius = maxDist * 0.8;
+
+    const count = Math.floor(needleDensity * 30);
+
+    // Seeded random for consistent needle positions
+    const seedRandom = (seed: number) => {
+        const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+        return x - Math.floor(x);
+    };
+
+    for (let i = 0; i < count; i++) {
+        // Random needle position and angle
+        const angle = seedRandom(i * 1.1) * Math.PI * 2;
+        const dist = seedRandom(i * 2.3) * radius * 0.6;
+        const needleLen = (15 + seedRandom(i * 3.7) * 25) * dpr;
+        const needleAngle = seedRandom(i * 4.9) * Math.PI;
+
+        const nx = center.x + Math.cos(angle) * dist;
+        const ny = center.y + Math.sin(angle) * dist;
+
+        // Calculate glow based on light direction alignment
+        const needleDir = { x: Math.cos(needleAngle), y: Math.sin(needleAngle) };
+        const lightAlignment = Math.abs(needleDir.x * lightDir.x + needleDir.y * lightDir.y);
+        const glow = 0.2 + lightAlignment * 0.6 * needleDensity; // Increased for visibility
+
+        // Shimmer effect
+        const shimmer = 0.5 + 0.5 * Math.sin(time * 2 + i * 0.7);
+
+        ctx.strokeStyle = `rgba(255, 255, 255, ${glow * shimmer})`;
+        ctx.lineWidth = (0.5 + seedRandom(i * 5.1) * 1) * dpr;
+
+        ctx.beginPath();
+        ctx.moveTo(
+            nx - Math.cos(needleAngle) * needleLen / 2,
+            ny - Math.sin(needleAngle) * needleLen / 2
+        );
+        ctx.lineTo(
+            nx + Math.cos(needleAngle) * needleLen / 2,
+            ny + Math.sin(needleAngle) * needleLen / 2
+        );
+        ctx.stroke();
+    }
+
+    ctx.restore();
+};
+
+// Internal Fractures: Rainbow-creating healed cracks
+const drawInternalFractures = (
+    ctx: CanvasRenderingContext2D,
+    hull: Vec2[],
+    center: Vec2,
+    fractureDensity: number,
+    lightDir: Vec2,
+    time: number,
+    dpr: number
+) => {
+    if (fractureDensity <= 0 || hull.length < 3) return;
+
+    ctx.save();
+
+    // Clip to hull
+    ctx.beginPath();
+    hull.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.closePath();
+    ctx.clip();
+
+    ctx.globalCompositeOperation = 'lighter';
+
+    // Calculate approximate radius
+    let maxDist = 0;
+    hull.forEach(p => {
+        const d = Math.sqrt((p.x - center.x) ** 2 + (p.y - center.y) ** 2);
+        if (d > maxDist) maxDist = d;
+    });
+    const radius = maxDist * 0.7;
+
+    const count = Math.floor(fractureDensity * 8);
+
+    const seedRandom = (seed: number) => {
+        const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+        return x - Math.floor(x);
+    };
+
+    for (let i = 0; i < count; i++) {
+        // Fracture center point
+        const fx = center.x + (seedRandom(i * 7.1) - 0.5) * radius;
+        const fy = center.y + (seedRandom(i * 8.3) - 0.5) * radius;
+
+        // Soft diffuse fracture glow - no hard lines
+        const fractureRadius = (30 + seedRandom(i * 9.5) * 50) * dpr;
+
+        // Soft rainbow gradient - very low opacity for natural look
+        const gradient = ctx.createRadialGradient(fx, fy, 0, fx, fy, fractureRadius);
+        const hueBase = (seedRandom(i * 11.9) * 360 + time * 20) % 360;
+
+        // Very soft opacity values for diffuse glow
+        gradient.addColorStop(0, `hsla(${hueBase}, 80%, 65%, ${fractureDensity * 0.08})`);
+        gradient.addColorStop(0.2, `hsla(${(hueBase + 40) % 360}, 75%, 60%, ${fractureDensity * 0.06})`);
+        gradient.addColorStop(0.4, `hsla(${(hueBase + 80) % 360}, 70%, 55%, ${fractureDensity * 0.04})`);
+        gradient.addColorStop(0.6, `hsla(${(hueBase + 120) % 360}, 65%, 50%, ${fractureDensity * 0.02})`);
+        gradient.addColorStop(1, 'rgba(0,0,0,0)');
+
+        // Fill soft glow instead of stroke lines
+        ctx.fillStyle = gradient;
+        ctx.fillRect(fx - fractureRadius, fy - fractureRadius, fractureRadius * 2, fractureRadius * 2);
+    }
+
+    ctx.restore();
+};
+
+// Cloud Veils: Milky wisps inside crystal
+const drawCloudVeils = (
+    ctx: CanvasRenderingContext2D,
+    hull: Vec2[],
+    center: Vec2,
+    veilOpacity: number,
+    time: number,
+    dpr: number
+) => {
+    if (veilOpacity <= 0 || hull.length < 3) return;
+
+    ctx.save();
+
+    // Clip to hull
+    ctx.beginPath();
+    hull.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.closePath();
+    ctx.clip();
+
+    ctx.globalCompositeOperation = 'lighter';
+
+    // Calculate approximate radius
+    let maxDist = 0;
+    hull.forEach(p => {
+        const d = Math.sqrt((p.x - center.x) ** 2 + (p.y - center.y) ** 2);
+        if (d > maxDist) maxDist = d;
+    });
+    const radius = maxDist;
+
+    // Animated drift
+    const driftX = Math.sin(time * 0.3) * 10 * dpr;
+    const driftY = Math.cos(time * 0.2) * 8 * dpr;
+
+    // Layer 1: Large soft cloud - increased opacity for visibility
+    const cloud1Grad = ctx.createRadialGradient(
+        center.x + driftX, center.y + driftY, 0,
+        center.x + driftX, center.y + driftY, radius * 0.8
+    );
+    cloud1Grad.addColorStop(0, `rgba(255, 255, 255, ${veilOpacity * 0.25})`);
+    cloud1Grad.addColorStop(0.3, `rgba(255, 255, 255, ${veilOpacity * 0.15})`);
+    cloud1Grad.addColorStop(0.6, `rgba(255, 255, 255, ${veilOpacity * 0.08})`);
+    cloud1Grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+    ctx.fillStyle = cloud1Grad;
+    ctx.fillRect(center.x - radius, center.y - radius, radius * 2, radius * 2);
+
+    // Layer 2: Smaller offset wisps - increased opacity
+    const wisp1X = center.x - driftX * 1.5 + Math.cos(time * 0.5) * radius * 0.3;
+    const wisp1Y = center.y - driftY * 1.2 + Math.sin(time * 0.4) * radius * 0.2;
+    const wisp1Grad = ctx.createRadialGradient(
+        wisp1X, wisp1Y, 0,
+        wisp1X, wisp1Y, radius * 0.4
+    );
+    wisp1Grad.addColorStop(0, `rgba(255, 255, 255, ${veilOpacity * 0.2})`);
+    wisp1Grad.addColorStop(0.5, `rgba(255, 255, 255, ${veilOpacity * 0.1})`);
+    wisp1Grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+    ctx.fillStyle = wisp1Grad;
+    ctx.fillRect(wisp1X - radius * 0.4, wisp1Y - radius * 0.4, radius * 0.8, radius * 0.8);
+
+    // Layer 3: Another offset wisp
+    const wisp2X = center.x + Math.sin(time * 0.35) * radius * 0.25;
+    const wisp2Y = center.y + driftY * 2 + Math.cos(time * 0.45) * radius * 0.15;
+    const wisp2Grad = ctx.createRadialGradient(
+        wisp2X, wisp2Y, 0,
+        wisp2X, wisp2Y, radius * 0.35
+    );
+    wisp2Grad.addColorStop(0, `rgba(200, 220, 255, ${veilOpacity * 0.05})`);
+    wisp2Grad.addColorStop(0.6, `rgba(200, 220, 255, ${veilOpacity * 0.02})`);
+    wisp2Grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+    ctx.fillStyle = wisp2Grad;
+    ctx.fillRect(wisp2X - radius * 0.35, wisp2Y - radius * 0.35, radius * 0.7, radius * 0.7);
 
     ctx.restore();
 };
@@ -983,15 +1885,15 @@ const drawExitCausticBloom = (
     // Use band color for rainbow effect
     const rgb = parseColorToRGB(band.color);
 
-    // Soft outer halo with band color
+    // Soft outer halo with band color - reduced intensity
     const haloGrad = ctx.createRadialGradient(
         exitPoint.x, exitPoint.y, 0,
         exitPoint.x, exitPoint.y, haloRadius
     );
-    haloGrad.addColorStop(0, `rgba(255,255,255,${alpha * 0.2})`);
-    haloGrad.addColorStop(0.1, `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha * 0.15})`);
-    haloGrad.addColorStop(0.3, `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha * 0.08})`);
-    haloGrad.addColorStop(0.55, `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha * 0.03})`);
+    haloGrad.addColorStop(0, `rgba(255,255,255,${alpha * 0.08})`);
+    haloGrad.addColorStop(0.1, `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha * 0.06})`);
+    haloGrad.addColorStop(0.3, `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha * 0.03})`);
+    haloGrad.addColorStop(0.55, `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha * 0.01})`);
     haloGrad.addColorStop(1, 'rgba(0,0,0,0)');
 
     ctx.fillStyle = haloGrad;
@@ -999,13 +1901,13 @@ const drawExitCausticBloom = (
     ctx.arc(exitPoint.x, exitPoint.y, haloRadius, 0, Math.PI * 2);
     ctx.fill();
 
-    // Blown-out white core
+    // Soft white core - reduced intensity
     const coreGrad = ctx.createRadialGradient(
         exitPoint.x, exitPoint.y, 0,
         exitPoint.x, exitPoint.y, coreRadius
     );
-    coreGrad.addColorStop(0, `rgba(255,255,255,${alpha * 0.4})`);
-    coreGrad.addColorStop(0.6, `rgba(255,255,255,${alpha * 0.18})`);
+    coreGrad.addColorStop(0, `rgba(255,255,255,${alpha * 0.15})`);
+    coreGrad.addColorStop(0.6, `rgba(255,255,255,${alpha * 0.06})`);
     coreGrad.addColorStop(1, 'rgba(0,0,0,0)');
 
     ctx.fillStyle = coreGrad;
@@ -1016,17 +1918,369 @@ const drawExitCausticBloom = (
     ctx.restore();
 };
 
+// --- CONFIG-AWARE DRAWING FUNCTIONS ---
+
+// Volumetric beam with config parameters for halo size and softness
+const drawVolumetricBeamWithConfig = (
+    ctx: CanvasRenderingContext2D,
+    start: Vec2,
+    end: Vec2,
+    color: string,
+    baseWidth: number,
+    alpha: number,
+    isIncoming: boolean,
+    time: number,
+    dpr: number,
+    haloSize: number,
+    softness: number
+) => {
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const length = Math.sqrt(dx * dx + dy * dy);
+    if (length < 1) return;
+
+    const angle = Math.atan2(dy, dx);
+    const rgb = parseColorToRGB(color);
+
+    ctx.save();
+    ctx.translate(start.x, start.y);
+    ctx.rotate(angle);
+
+    // Halo size multiplier (1-12 range maps to 4-8x width)
+    const haloMult = 4 + (haloSize / 12) * 4;
+    // Softness affects gradient falloff (0-1 range)
+    const softFalloff = 0.1 + softness * 0.4;
+
+    // Layer 1: Ultra-wide atmospheric haze
+    const hazeWidth = baseWidth * haloMult;
+    const hazeGrad = ctx.createLinearGradient(0, -hazeWidth / 2, 0, hazeWidth / 2);
+    hazeGrad.addColorStop(0, 'rgba(0,0,0,0)');
+    hazeGrad.addColorStop(softFalloff, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.02 * (1 + softness)})`);
+    hazeGrad.addColorStop(0.5, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.05 * (1 + softness)})`);
+    hazeGrad.addColorStop(1 - softFalloff, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.02 * (1 + softness)})`);
+    hazeGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = hazeGrad;
+    ctx.globalAlpha = alpha * 0.7;
+    ctx.fillRect(0, -hazeWidth / 2, length, hazeWidth);
+
+    // Layer 2: Wide outer glow
+    const outerWidth = baseWidth * (haloMult * 0.6);
+    const outerGrad = ctx.createLinearGradient(0, -outerWidth / 2, 0, outerWidth / 2);
+    outerGrad.addColorStop(0, 'rgba(0,0,0,0)');
+    outerGrad.addColorStop(0.2, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.04 * (1 + softness)})`);
+    outerGrad.addColorStop(0.5, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.1 * (1 + softness)})`);
+    outerGrad.addColorStop(0.8, `rgba(${rgb.r},${rgb.g},${rgb.b},${0.04 * (1 + softness)})`);
+    outerGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = outerGrad;
+    ctx.globalAlpha = alpha * 0.6;
+    ctx.fillRect(0, -outerWidth / 2, length, outerWidth);
+
+    // Layer 3: Soft core ribbon
+    const coreWidth = baseWidth * (1 - softness * 0.3);
+    const coreGrad = ctx.createLinearGradient(0, -coreWidth / 2, 0, coreWidth / 2);
+    coreGrad.addColorStop(0, 'rgba(0,0,0,0)');
+    coreGrad.addColorStop(0.25, `rgba(${rgb.r},${rgb.g},${rgb.b},0.3)`);
+    coreGrad.addColorStop(0.5, `rgba(${rgb.r},${rgb.g},${rgb.b},0.6)`);
+    coreGrad.addColorStop(0.75, `rgba(${rgb.r},${rgb.g},${rgb.b},0.3)`);
+    coreGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = coreGrad;
+    ctx.globalAlpha = alpha * (0.6 + (1 - softness) * 0.3);
+    ctx.fillRect(0, -coreWidth / 2, length, coreWidth);
+
+    // Layer 4: Hot center (only for low softness and incoming beam)
+    if (isIncoming && softness < 0.7) {
+        const hotWidth = baseWidth * 0.15 * (1 - softness);
+        const centerGrad = ctx.createLinearGradient(0, -hotWidth / 2, 0, hotWidth / 2);
+        centerGrad.addColorStop(0, 'rgba(255,255,255,0)');
+        centerGrad.addColorStop(0.4, `rgba(255,255,255,${0.4 * (1 - softness)})`);
+        centerGrad.addColorStop(0.6, `rgba(255,255,255,${0.4 * (1 - softness)})`);
+        centerGrad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = centerGrad;
+        ctx.globalAlpha = alpha * 0.5;
+        ctx.fillRect(0, -hotWidth / 2, length, hotWidth);
+    }
+
+    ctx.restore();
+};
+
+// Crystal haze with config
+const drawCrystalHazeWithConfig = (
+    ctx: CanvasRenderingContext2D,
+    hull: Vec2[],
+    entryPoint: Vec2,
+    dpr: number,
+    smokeDensity: number,
+    scattering: number
+) => {
+    if (hull.length < 3 || smokeDensity <= 0) return;
+
+    ctx.save();
+
+    // Clip to hull
+    ctx.beginPath();
+    hull.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.closePath();
+    ctx.clip();
+
+    // Calculate hull center
+    let cx = 0, cy = 0;
+    hull.forEach(p => { cx += p.x; cy += p.y; });
+    cx /= hull.length;
+    cy /= hull.length;
+
+    const radius = OBJECT_SCALE * dpr * 1.5;
+
+    ctx.globalCompositeOperation = 'lighter';
+
+    // Main haze - intensity controlled by smokeDensity
+    const hazeGrad = ctx.createRadialGradient(
+        entryPoint.x, entryPoint.y, 0,
+        entryPoint.x, entryPoint.y, radius
+    );
+    const baseAlpha = smokeDensity * 0.15;
+    hazeGrad.addColorStop(0, `rgba(255,255,255,${baseAlpha})`);
+    hazeGrad.addColorStop(0.2, `rgba(255,255,255,${baseAlpha * 0.6})`);
+    hazeGrad.addColorStop(0.5, `rgba(255,255,255,${baseAlpha * 0.3})`);
+    hazeGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+    ctx.fillStyle = hazeGrad;
+    ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
+
+    // Scattering adds additional diffuse glow
+    if (scattering > 0.3) {
+        const scatterGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius * 0.8);
+        const scatterAlpha = (scattering - 0.3) * 0.1;
+        scatterGrad.addColorStop(0, `rgba(200,220,255,${scatterAlpha})`);
+        scatterGrad.addColorStop(0.5, `rgba(180,200,240,${scatterAlpha * 0.5})`);
+        scatterGrad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = scatterGrad;
+        ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
+    }
+
+    ctx.restore();
+};
+
+// Internal caustics with config
+const drawInternalCausticsWithConfig = (
+    ctx: CanvasRenderingContext2D,
+    entryPoint: Vec2,
+    exitPoint: Vec2,
+    band: SpectralBand,
+    alpha: number,
+    time: number,
+    dpr: number,
+    scattering: number,
+    absorption: number
+) => {
+    const rgb = parseColorToRGB(band.color);
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+
+    const pathVec = sub(exitPoint, entryPoint);
+    const pathLen = len(pathVec);
+    if (pathLen < 1) { ctx.restore(); return; }
+
+    const pathDir = norm(pathVec);
+    const perp = vec2(-pathDir.y, pathDir.x);
+
+    // Focus point varies by IOR and scattering
+    const focusRatio = 0.3 + (band.n - 1.40) * 0.25 + scattering * 0.1;
+    const focusPoint = add(entryPoint, mul(pathVec, focusRatio));
+
+    // Scattering increases the number and spread of scatter points
+    const scatterSteps = Math.floor(6 + scattering * 8);
+    for (let i = 0; i < scatterSteps; i++) {
+        const t = (i + 0.5) / scatterSteps;
+        const pos = add(entryPoint, mul(pathVec, t));
+
+        // Width varies: wider at entry, narrow at focus, wider at exit
+        const widthFactor = Math.abs(t - focusRatio) * (0.6 + scattering * 0.6) + 0.2;
+        const radius = (20 + widthFactor * 50 + scattering * 30) * dpr;
+
+        // Absorption reduces intensity along path
+        const absorbFactor = 1 - absorption * t * 0.7;
+        const scatterGrad = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, radius);
+        const baseAlpha = alpha * 0.1 * absorbFactor * (1 + scattering * 0.5);
+        scatterGrad.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},${baseAlpha})`);
+        scatterGrad.addColorStop(0.4, `rgba(${rgb.r},${rgb.g},${rgb.b},${baseAlpha * 0.4})`);
+        scatterGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+        ctx.fillStyle = scatterGrad;
+        ctx.globalAlpha = 0.9;
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Caustic lines - fewer and softer with high scattering
+    const lineCount = Math.max(2, Math.floor(5 - scattering * 3));
+    const beamHalfWidth = (8 + scattering * 5) * dpr;
+
+    ctx.globalAlpha = alpha * 0.25 * (1 - scattering * 0.5);
+    for (let i = 0; i < lineCount; i++) {
+        const offset = (i - (lineCount - 1) / 2) * (beamHalfWidth * 2 / lineCount);
+        const startOffset = add(entryPoint, mul(perp, offset));
+        const endOffset = add(exitPoint, mul(perp, offset * (0.2 + scattering * 0.3)));
+
+        ctx.beginPath();
+        ctx.moveTo(startOffset.x, startOffset.y);
+        ctx.quadraticCurveTo(focusPoint.x, focusPoint.y, endOffset.x, endOffset.y);
+
+        const lineGrad = ctx.createLinearGradient(
+            entryPoint.x, entryPoint.y,
+            exitPoint.x, exitPoint.y
+        );
+        lineGrad.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},0.05)`);
+        lineGrad.addColorStop(focusRatio, `rgba(${rgb.r},${rgb.g},${rgb.b},0.25)`);
+        lineGrad.addColorStop(1, `rgba(${rgb.r},${rgb.g},${rgb.b},0.08)`);
+
+        ctx.strokeStyle = lineGrad;
+        ctx.lineWidth = (2 + scattering * 2) * dpr;
+        ctx.stroke();
+    }
+
+    // Focus point glow
+    const causticRad = (15 + scattering * 10) * dpr;
+    const causticGrad = ctx.createRadialGradient(
+        focusPoint.x, focusPoint.y, 0,
+        focusPoint.x, focusPoint.y, causticRad
+    );
+    causticGrad.addColorStop(0, `rgba(255,255,255,${alpha * 0.35})`);
+    causticGrad.addColorStop(0.2, `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha * 0.25})`);
+    causticGrad.addColorStop(0.5, `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha * 0.1})`);
+    causticGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+    ctx.fillStyle = causticGrad;
+    ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.arc(focusPoint.x, focusPoint.y, causticRad, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+};
+
+// Exit caustic bloom with config
+const drawExitCausticBloomWithConfig = (
+    ctx: CanvasRenderingContext2D,
+    exitPoint: Vec2,
+    exitDir: Vec2,
+    band: SpectralBand,
+    alpha: number,
+    dpr: number,
+    bloomIntensity: number
+) => {
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+
+    // Bloom intensity scales the sizes
+    const coreRadius = (5 + bloomIntensity * 4) * dpr;
+    const haloRadius = (30 + bloomIntensity * 30) * dpr;
+
+    const rgb = parseColorToRGB(band.color);
+
+    // Soft blue tint for flares - aurora-like
+    const softBlue = { r: 100, g: 180, b: 255 };
+
+    // Soft outer halo - VERY subtle, blue-tinted
+    const haloGrad = ctx.createRadialGradient(
+        exitPoint.x, exitPoint.y, 0,
+        exitPoint.x, exitPoint.y, haloRadius
+    );
+    // Soft blue center instead of harsh white
+    haloGrad.addColorStop(0, `rgba(${softBlue.r},${softBlue.g},${softBlue.b},${alpha * 0.03 * (0.5 + bloomIntensity * 0.5)})`);
+    haloGrad.addColorStop(0.15, `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha * 0.06 * (0.5 + bloomIntensity * 0.5)})`);
+    haloGrad.addColorStop(0.4, `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha * 0.025})`);
+    haloGrad.addColorStop(0.7, `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha * 0.01})`);
+    haloGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+    ctx.fillStyle = haloGrad;
+    ctx.beginPath();
+    ctx.arc(exitPoint.x, exitPoint.y, haloRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Soft blue core instead of white - VERY subtle
+    const coreGrad = ctx.createRadialGradient(
+        exitPoint.x, exitPoint.y, 0,
+        exitPoint.x, exitPoint.y, coreRadius
+    );
+    // Soft blue glow, barely visible
+    coreGrad.addColorStop(0, `rgba(${softBlue.r},${softBlue.g},${softBlue.b},${alpha * 0.04 * (0.5 + bloomIntensity * 0.5)})`);
+    coreGrad.addColorStop(0.5, `rgba(${softBlue.r},${softBlue.g},${softBlue.b},${alpha * 0.015})`);
+    coreGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+    ctx.fillStyle = coreGrad;
+    ctx.beginPath();
+    ctx.arc(exitPoint.x, exitPoint.y, coreRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+};
+
+// Color dispersion with config - draws soft natural rainbow bands
+const drawColorDispersionWithConfig = (
+    ctx: CanvasRenderingContext2D,
+    exitPoint: Vec2,
+    direction: Vec2,
+    band: SpectralBand,
+    maxLength: number,
+    alpha: number,
+    time: number,
+    dpr: number,
+    spreadFactor: number,
+    bloomFactor: number
+) => {
+    // Calculate end point along direction
+    const endPoint = add(exitPoint, mul(direction, maxLength));
+
+    // Wider beam for soft blended look
+    const beamWidth = 18 * dpr;
+
+    // Draw soft rainbow band - natural look without bright core
+    drawSoftRainbowBand(
+        ctx,
+        exitPoint,
+        endPoint,
+        band.color,
+        beamWidth,
+        alpha * 0.25, // Lower alpha for soft blended appearance
+        dpr
+    );
+};
+
 export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = true }) => {
+  // Config state
+  const [config, setConfig] = useState<PrismConfig>(DEFAULT_CONFIG);
+  const [panelOpen, setPanelOpen] = useState(false);
+
+  const handleConfigChange = useCallback((key: keyof PrismConfig, value: PrismConfig[keyof PrismConfig]) => {
+    setConfig(prev => ({ ...prev, [key]: value }));
+  }, []);
+
+  const handleReset = useCallback(() => {
+    setConfig(DEFAULT_CONFIG);
+  }, []);
+
+  // Config ref for animation loop access
+  const configRef = useRef<PrismConfig>(config);
+  useEffect(() => {
+    configRef.current = config;
+  }, [config]);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>();
   const mouseRef = useRef<Vec2>({ x: 0, y: 0 });
-  const smoothMouseRef = useRef<Vec2>({ x: 0, y: 0 }); 
+  // Spring physics state for buttery smooth motion
+  const springXRef = useRef<SpringState>({ pos: 0, vel: 0 });
+  const springYRef = useRef<SpringState>({ pos: 0, vel: 0 });
+  const smoothMouseRef = useRef<Vec2>({ x: 0, y: 0 });
   const rotationRef = useRef<{x:number, y:number, z:number}>({ x: 0, y: 0, z: 0 });
   const globalAlphaRef = useRef(0);
   const starsRef = useRef<Particle[]>([]);
   const dustRef = useRef<Particle[]>([]);
   const timeRef = useRef(0);
+  const initialRotationSetRef = useRef(false);
 
   useEffect(() => {
     // Initialize smoke frames
@@ -1046,6 +2300,9 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
 
             mouseRef.current = { x: clientWidth/2, y: clientHeight/2 };
             smoothMouseRef.current = { x: clientWidth/2, y: clientHeight/2 };
+            // Initialize spring state at center
+            springXRef.current = { pos: clientWidth/2, vel: 0 };
+            springYRef.current = { pos: clientHeight/2, vel: 0 };
         }
     };
     const handleMouseMove = (e: MouseEvent) => {
@@ -1075,26 +2332,52 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
       if (!ctx) return;
 
       const render = () => {
+          const cfg = configRef.current;
           const width = canvas.width;
           const height = canvas.height;
           const dpr = window.devicePixelRatio || 1;
-          
+
           timeRef.current += 0.01;
-          
-          // HEAVY SMOOTHING: Lowered factor from 0.1 to 0.04 for weighty, smooth feel
-          smoothMouseRef.current.x = lerp(smoothMouseRef.current.x, mouseRef.current.x, 0.04);
-          smoothMouseRef.current.y = lerp(smoothMouseRef.current.y, mouseRef.current.y, 0.04);
+
+          // Set initial rotation once
+          if (!initialRotationSetRef.current) {
+            rotationRef.current.x = 0;
+            rotationRef.current.y = 0;
+            rotationRef.current.z = 0;
+            initialRotationSetRef.current = true;
+          }
+
+          // Spring physics for buttery smooth motion
+          const dt = 0.016; // ~60fps timestep
+          springXRef.current = updateSpring(
+              springXRef.current,
+              mouseRef.current.x,
+              cfg.motionMass,
+              cfg.motionStiffness,
+              cfg.motionDamping,
+              dt
+          );
+          springYRef.current = updateSpring(
+              springYRef.current,
+              mouseRef.current.y,
+              cfg.motionMass,
+              cfg.motionStiffness,
+              cfg.motionDamping,
+              dt
+          );
+          smoothMouseRef.current.x = springXRef.current.pos;
+          smoothMouseRef.current.y = springYRef.current.pos;
 
           const mx = smoothMouseRef.current.x * dpr;
           const my = smoothMouseRef.current.y * dpr;
           const center = vec2(width / 2, height / 2);
-          
-          // REDUCED ROTATION: Reduced base speed and mouse influence significantly for stability
-          // This ensures the hull doesn't change shape rapidly, making refraction rays stable and smooth.
-          rotationRef.current.x += 0.0005 + (smoothMouseRef.current.y - height/2) * 0.000001;
-          rotationRef.current.y += 0.0010 + (smoothMouseRef.current.x - width/2) * 0.000001;
 
-          // 1. Background
+          // Rotation - minimal mouse influence for aurora-like calm
+          const mouseInfluence = 0.02 * 0.00001; // Almost no mouse influence on rotation
+          rotationRef.current.x += cfg.rotationSpeed + (smoothMouseRef.current.y - height/2) * mouseInfluence;
+          rotationRef.current.y += cfg.rotationSpeed * 1.5 + (smoothMouseRef.current.x - width/2) * mouseInfluence;
+
+          // 1. Background - dark with subtle gradient
           const grad = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width * 0.9);
           grad.addColorStop(0, '#0d1117');
           grad.addColorStop(0.6, '#050505');
@@ -1102,11 +2385,16 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
           ctx.fillStyle = grad;
           ctx.fillRect(0, 0, width, height);
 
-          // 1.5. Atmospheric Fog Layer
-          drawAtmosphericFog(ctx, width, height, center, timeRef.current);
+          // 1.5. Atmospheric Haze Layer - controlled by config
+          if (cfg.atmosphereHaze > 0) {
+            drawAtmosphericFogWithConfig(ctx, width, height, center, timeRef.current, cfg.atmosphereHaze, cfg.vignette);
+          }
 
-          // Prepare Geometries
-          const scale = OBJECT_SCALE * dpr;
+          // Prepare Geometries - use config crystal scale
+          const scale = cfg.crystalScale * dpr;
+
+          // Generate dynamic spectrum with Cauchy dispersion (15 samples for smooth ribbons)
+          const spectrum = generateSpectrum(cfg.iorBase, cfg.abbeNumber, cfg.dispersionStrength);
           const transformed3D = VERTS.map(v => {
               let rv = rotateX(v, rotationRef.current.x);
               rv = rotateY(rv, rotationRef.current.y);
@@ -1162,76 +2450,102 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
           if (hull.length > 0) {
               ctx.save();
 
-              // 1. Fill hull with glass gradient (center brighter, edges subtle glow)
+              // 1. Fill hull with glass gradient - surfaceGlow controls transparency
               ctx.beginPath();
               hull.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
               ctx.closePath();
 
               const cx = hull.reduce((s, p) => s + p.x, 0) / hull.length;
               const cy = hull.reduce((s, p) => s + p.y, 0) / hull.length;
-              const radius = OBJECT_SCALE * dpr;
+              const radius = cfg.crystalScale * dpr;
 
-              // Subtle ambient glow - crystal catches light (visibly transparent)
+              // Surface glow controls overall crystal brightness/transparency
+              const baseGlow = cfg.surfaceGlow;
               const glassGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-              glassGrad.addColorStop(0, 'rgba(255,255,255,0.04)');
-              glassGrad.addColorStop(0.4, 'rgba(255,255,255,0.025)');
-              glassGrad.addColorStop(0.7, 'rgba(255,255,255,0.015)');
-              glassGrad.addColorStop(1, 'rgba(255,255,255,0.06)');
+              glassGrad.addColorStop(0, `rgba(255,255,255,${baseGlow})`);
+              glassGrad.addColorStop(0.4, `rgba(255,255,255,${baseGlow * 0.6})`);
+              glassGrad.addColorStop(0.7, `rgba(255,255,255,${baseGlow * 0.4})`);
+              glassGrad.addColorStop(1, `rgba(255,255,255,${baseGlow * 1.5})`);
               ctx.fillStyle = glassGrad;
               ctx.fill();
 
-              // 2. Diamond facet edges - VERY PROMINENT (user preference)
+              // === INTERNAL CRYSTAL STRUCTURE ===
+              // Cloud veils (milky wisps inside)
+              if (cfg.veilOpacity > 0) {
+                  drawCloudVeils(ctx, hull, { x: cx, y: cy }, cfg.veilOpacity, timeRef.current, dpr);
+              }
+
+              // Internal phantom crystals (ghostly layers)
+              if (cfg.internalFacets > 0) {
+                  drawInternalPhantoms(ctx, hull, { x: cx, y: cy }, cfg.internalFacets, timeRef.current, dpr);
+              }
+
+              // Needle inclusions (rutile-like needles that catch light)
+              if (cfg.needleDensity > 0) {
+                  drawNeedleInclusions(ctx, hull, { x: cx, y: cy }, cfg.needleDensity, rayDir, timeRef.current, dpr);
+              }
+
+              // Internal fractures (rainbow-creating healed cracks)
+              if (cfg.fractureDensity > 0) {
+                  drawInternalFractures(ctx, hull, { x: cx, y: cy }, cfg.fractureDensity, rayDir, timeRef.current, dpr);
+              }
+
+              // 2. Diamond facet edges - controlled by facetDepth and edgeBrightness
               facesWithDepth.filter(f => f.isFront).forEach(f => {
                   const pts = f.indices.map(i => projectedVerts[i]);
                   ctx.beginPath();
                   pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
                   ctx.closePath();
 
-                  // Strong Fresnel-based brightness (0.25-0.85 range)
-                  const edgeOpacity = 0.25 + f.fresnel * 0.6;
+                  // facetDepth + edgeBrightness control visibility
+                  const baseOpacity = (0.3 + cfg.facetDepth * 0.7) * cfg.edgeBrightness;
+                  const edgeOpacity = baseOpacity * (0.3 + f.fresnel * 0.7);
                   ctx.strokeStyle = `rgba(255,255,255,${edgeOpacity})`;
-                  ctx.lineWidth = 0.9 * dpr;
+                  ctx.lineWidth = (0.5 + cfg.edgeBrightness * 0.8) * dpr;
                   ctx.stroke();
 
-                  // Specular flash on well-lit facets (exponential falloff)
-                  if (f.intensity > 0.4) {
-                      const flashOpacity = Math.pow(f.intensity, 2) * 0.25;
+                  // Specular flash on well-lit facets - controlled by surfaceGlow
+                  if (f.intensity > 0.3 && cfg.surfaceGlow > 0) {
+                      const flashOpacity = Math.pow(f.intensity, 2) * cfg.surfaceGlow * 2;
                       ctx.fillStyle = `rgba(255,255,255,${flashOpacity})`;
                       ctx.fill();
                   }
 
-                  // Soft prismatic rainbow fire - lower saturation, bigger glow
-                  if (f.fresnel > 0.5) {
-                      const hue = (f.fresnel * 360 + timeRef.current * 15) % 360;
-                      // Add soft glow around rainbow edge
-                      ctx.shadowBlur = 8 * dpr;
-                      ctx.shadowColor = `hsla(${hue}, 60%, 60%, 0.3)`;
-                      ctx.strokeStyle = `hsla(${hue}, 50%, 75%, ${f.fresnel * 0.12})`;
-                      ctx.lineWidth = 1.5 * dpr;
+                  // Rainbow fire on edges - controlled by rainbowFire
+                  if (f.fresnel > 0.4 && cfg.rainbowFire > 0) {
+                      const hue = (f.fresnel * 360 + timeRef.current * 20) % 360;
+                      ctx.shadowBlur = (6 + cfg.rainbowFire * 10) * dpr;
+                      ctx.shadowColor = `hsla(${hue}, 70%, 60%, ${cfg.rainbowFire * 0.8})`;
+                      ctx.strokeStyle = `hsla(${hue}, 60%, 70%, ${f.fresnel * cfg.rainbowFire * 0.6})`;
+                      ctx.lineWidth = (1 + cfg.rainbowFire) * dpr;
                       ctx.stroke();
                       ctx.shadowBlur = 0;
                   }
               });
 
-              // 2b. Back faces - VERY visible internal structure
-              facesWithDepth.filter(f => !f.isFront).forEach(f => {
-                  const pts = f.indices.map(i => projectedVerts[i]);
-                  ctx.beginPath();
-                  pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
-                  ctx.closePath();
-                  ctx.strokeStyle = `rgba(255,255,255,0.18)`;
-                  ctx.lineWidth = 0.5 * dpr;
-                  ctx.stroke();
-              });
+              // 2b. Back faces (internal structure) - controlled by facetDepth
+              if (cfg.facetDepth > 0.2) {
+                  facesWithDepth.filter(f => !f.isFront).forEach(f => {
+                      const pts = f.indices.map(i => projectedVerts[i]);
+                      ctx.beginPath();
+                      pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+                      ctx.closePath();
+                      const backOpacity = cfg.facetDepth * 0.25;
+                      ctx.strokeStyle = `rgba(255,255,255,${backOpacity})`;
+                      ctx.lineWidth = 0.4 * dpr;
+                      ctx.stroke();
+                  });
+              }
 
-              // 3. Strong diamond hull outline with glow
+              // 3. Hull outline - controlled by edgeBrightness
               ctx.beginPath();
               hull.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
               ctx.closePath();
-              ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
-              ctx.lineWidth = 1.0 * dpr;
-              ctx.shadowBlur = 10 * dpr;
-              ctx.shadowColor = 'rgba(255, 255, 255, 0.6)';
+              const outlineOpacity = 0.3 + cfg.edgeBrightness * 0.5;
+              ctx.strokeStyle = `rgba(255, 255, 255, ${outlineOpacity})`;
+              ctx.lineWidth = (0.5 + cfg.edgeBrightness * 0.8) * dpr;
+              ctx.shadowBlur = (5 + cfg.edgeBrightness * 10) * dpr;
+              ctx.shadowColor = `rgba(255, 255, 255, ${outlineOpacity})`;
               ctx.stroke();
               ctx.shadowBlur = 0;
 
@@ -1240,7 +2554,7 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
 
           // 4. Light Tracing
           const activeBeams: {p1:Vec2, p2:Vec2}[] = [];
-          const pulse = 0.92 + Math.sin(timeRef.current * 2) * 0.08;
+          const pulse = 0.92 + Math.sin(timeRef.current * 2) * 0.08; // Fixed pulse rate
 
           const traceSpectralRay = (
               startPoint: Vec2,
@@ -1252,8 +2566,8 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
           ) => {
               if (depth <= 0 || currentAlpha < 0.01) return;
 
-              const hullHit = intersectRayHull(add(startPoint, mul(direction, 1.0)), direction, hull);
-              const wallHit = intersectRayBounds(add(startPoint, mul(direction, 1.0)), direction, width, height);
+              const hullHit = intersectRayHull(add(startPoint, mul(direction, 0.01)), direction, hull);
+              const wallHit = intersectRayBounds(add(startPoint, mul(direction, 0.01)), direction, width, height);
 
               let target = null;
               let type = 'none';
@@ -1275,10 +2589,12 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
                   const maxLen = Math.sqrt(width * width + height * height);
                   drawColorDispersion(ctx, startPoint, direction, band, maxLen, modAlpha, timeRef.current, dpr);
                   // No flare at wall - just natural dispersion fade
+              } else if (isFirstExit && type === 'hull') {
+                  // Soft beam for first exit even when re-entering crystal
+                  drawSoftRainbowBand(ctx, startPoint, target.point, band.color, cfg.beamWidth * dpr, modAlpha * 0.6, dpr);
               } else if (!isFirstExit) {
-                  // Regular volumetric beam for bounces after first exit
-                  const baseWidth = 30;
-                  drawVolumetricBeam(ctx, startPoint, target.point, band.color, baseWidth * dpr, modAlpha, false, timeRef.current, dpr);
+                  // Soft beam for bounces after first exit
+                  drawSoftRainbowBand(ctx, startPoint, target.point, band.color, cfg.beamWidth * dpr, modAlpha * 0.6, dpr);
               }
 
               if (type === 'wall') {
@@ -1296,7 +2612,7 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
                        traceSpectralRay(target.point, dReflect, band, depth - 1, currentAlpha * 0.5, false);
                        return;
                   }
-                  const exitHit = intersectRayHull(add(hullHit.point, mul(dIn, 0.1)), dIn, hull, hullHit.index);
+                  const exitHit = intersectRayHull(add(hullHit.point, mul(dIn, 0.01)), dIn, hull, hullHit.index);
                   if (!exitHit) return;
 
                   // Internal caustics instead of thin line
@@ -1332,62 +2648,83 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
           const beamEnd = entryHit ? entryHit.point : add(mouse, mul(rayDir, Math.max(width, height)));
           activeBeams.push({ p1: mouse, p2: beamEnd });
 
-          // Main Incoming Beam (wider, more diffuse white volumetric)
-          drawVolumetricBeam(ctx, mouse, beamEnd, '#ffffff', 18 * dpr, globalAlphaRef.current, true, timeRef.current, dpr);
+          // Main Incoming Beam - fixed 15px width to match exit beams
+          const beamAlpha = globalAlphaRef.current * cfg.beamIntensity;
+          drawVolumetricBeamWithConfig(
+              ctx, mouse, beamEnd, '#ffffff',
+              15 * dpr, // Fixed width matching exit beams
+              beamAlpha,
+              true, timeRef.current, dpr,
+              3, 0.5 // Reduced halo for consistent beam width
+          );
 
-          // Additional sharp white core with glow (reduced brightness)
-          ctx.save();
-          ctx.shadowBlur = 10;
-          ctx.shadowColor = 'rgba(255,255,255,0.4)';
-          ctx.beginPath();
-          ctx.moveTo(mouse.x, mouse.y);
-          ctx.lineTo(beamEnd.x, beamEnd.y);
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 1.5 * dpr;
-          ctx.globalAlpha = globalAlphaRef.current * 0.5;
-          ctx.stroke();
-          ctx.shadowBlur = 0;
-          ctx.restore();
+          // Soft glow core - only if beam intensity is high enough
+          if (cfg.beamIntensity > 0.25) {
+              ctx.save();
+              const coreBloom = 8; // Reduced for cleaner beam
+              ctx.shadowBlur = coreBloom;
+              ctx.shadowColor = `rgba(255,255,255,${cfg.beamIntensity * 0.5})`;
+              ctx.beginPath();
+              ctx.moveTo(mouse.x, mouse.y);
+              ctx.lineTo(beamEnd.x, beamEnd.y);
+              ctx.strokeStyle = '#ffffff';
+              ctx.lineWidth = (1 + cfg.beamIntensity) * dpr;
+              ctx.globalAlpha = globalAlphaRef.current * cfg.beamIntensity * 0.6;
+              ctx.stroke();
+              ctx.shadowBlur = 0;
+              ctx.restore();
+          }
 
           if (entryHit && globalAlphaRef.current > 0.01) {
-              // Step 1: Crystal interior haze (soft fog for "orbs in fog" aesthetic)
-              drawCrystalHaze(ctx, hull, entryHit.point, dpr);
+              // Step 1: Crystal interior haze - controlled by scattering
+              if (cfg.scattering > 0) {
+                  drawCrystalHazeWithConfig(ctx, hull, entryHit.point, dpr, cfg.scattering, cfg.scattering);
+              }
 
-              // Step 2: Entry surface highlight (soft round bloom)
-              drawSurfaceHighlight(ctx, entryHit.point, entryHit.normal, '#ffffff', 0.8, dpr);
+              // Step 2: Entry surface highlight - controlled by surfaceGlow
+              drawSurfaceHighlight(ctx, entryHit.point, entryHit.normal, '#ffffff', cfg.surfaceGlow * 5, dpr);
 
               // Step 3: Process each spectral band
-              SPECTRUM.forEach(band => {
+              spectrum.forEach(band => {
                   const dIn = refract2D(rayDir, entryHit.normal, N_AIR, band.n);
                   if (!dIn) return;
-                  const exitHit = intersectRayHull(add(entryHit.point, mul(dIn, 0.1)), dIn, hull, entryHit.index);
+                  const exitHit = intersectRayHull(add(entryHit.point, mul(dIn, 0.01)), dIn, hull, entryHit.index);
                   if (!exitHit) return;
 
-                  // Step 4: Draw internal caustics (replaces thin lines)
-                  drawInternalCaustics(
-                      ctx,
-                      entryHit.point,
-                      exitHit.point,
-                      band,
-                      globalAlphaRef.current * pulse,
-                      timeRef.current,
-                      dpr
-                  );
+                  // Step 4: Draw internal caustics - controlled by scattering
+                  if (cfg.scattering > 0) {
+                      drawInternalCausticsWithConfig(
+                          ctx,
+                          entryHit.point,
+                          exitHit.point,
+                          band,
+                          globalAlphaRef.current * pulse * cfg.scattering,
+                          timeRef.current,
+                          dpr,
+                          cfg.scattering,
+                          cfg.absorption
+                      );
+                  }
 
                   const dOut = refract2D(dIn, exitHit.normal, band.n, N_AIR);
                   if (dOut) {
-                      // Step 5: Directional exit caustic bloom (replaces spherical flare)
-                      drawExitCausticBloom(ctx, exitHit.point, dOut, band, globalAlphaRef.current * 0.6, dpr);
+                      // Step 5: Exit caustic bloom - controlled by flareIntensity
+                      const bloomAlpha = globalAlphaRef.current * cfg.flareIntensity;
+                      drawExitCausticBloomWithConfig(ctx, exitHit.point, dOut, band, bloomAlpha, dpr, cfg.flareIntensity);
 
-                      // Step 6: External color dispersion (keep existing)
-                      const maxLen = Math.sqrt(width * width + height * height);
-                      drawColorDispersion(ctx, exitHit.point, dOut, band, maxLen, globalAlphaRef.current * pulse, timeRef.current, dpr);
+                      // Step 6: External color dispersion - controlled by exitRaySpread
+                      const maxLen = Math.sqrt(width * width + height * height) * 1.0; // Fixed length
+                      const dispersionAlpha = globalAlphaRef.current * pulse * (0.5 + cfg.exitRaySpread * 0.5);
+                      drawColorDispersionWithConfig(
+                          ctx, exitHit.point, dOut, band, maxLen, dispersionAlpha,
+                          timeRef.current, dpr, cfg.exitRaySpread, cfg.flareIntensity
+                      );
 
-                      // Step 7: Continue tracing bounces
-                      traceSpectralRay(exitHit.point, dOut, band, MAX_BOUNCES, globalAlphaRef.current * 0.8, true);
+                      // Step 7: Continue tracing bounces - absorption controls transmittance
+                      const transmittance = 1 - cfg.absorption * 0.8;
+                      traceSpectralRay(exitHit.point, dOut, band, MAX_BOUNCES, globalAlphaRef.current * transmittance, true);
                   }
               });
-              // Composite exit flare REMOVED - was not physically motivated
           }
 
           // 5. Dust (Volumetric)
@@ -1410,9 +2747,18 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
   }, []);
 
   return (
-    <div ref={containerRef} className={`relative w-full h-screen bg-[#050505] overflow-hidden ${showOverlay ? 'cursor-none' : ''}`}>
+    <div ref={containerRef} className={`relative w-full h-screen bg-[#050505] overflow-hidden ${showOverlay && !panelOpen ? 'cursor-none' : ''}`}>
       <canvas ref={canvasRef} className="block w-full h-full" />
-      
+
+      {/* Control Panel */}
+      <ControlPanel
+        config={config}
+        onChange={handleConfigChange}
+        onReset={handleReset}
+        isOpen={panelOpen}
+        onToggle={() => setPanelOpen(!panelOpen)}
+      />
+
       {/* UI Overlay */}
       {showOverlay && (
         <>
@@ -1425,7 +2771,7 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
               </p>
             </div>
           </div>
-          
+
           <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 pointer-events-none text-center w-full px-4">
             <p className="text-white/30 font-mono text-[10px] uppercase tracking-[0.3em] animate-pulse">
               Interact

@@ -7,16 +7,19 @@
             "@radix-ui/react-slot": "*",
             "@radix-ui/react-switch": "*",
             "@radix-ui/react-tabs": "*",
+            "@types/three": "^0.181.0",
             "class-variance-authority": "*",
             "clsx": "*",
             "gsap": "*",
             "lenis": "*",
+            "lil-gui": "^0.21.0",
             "lucide-react": "*",
             "motion": "*",
             "react": "^18.3.1",
             "react-dom": "^18.3.1",
             "sonner": "^2.0.3",
-            "tailwind-merge": "*"
+            "tailwind-merge": "*",
+            "three": "^0.181.2"
       },
       "devDependencies": {
             "@playwright/test": "^1.57.0",

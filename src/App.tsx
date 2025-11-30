@@ -5,8 +5,8 @@ import { ScrollTrigger } from "./lib/gsap";
 import Lenis from "lenis";
 
 // Lazy load PrismScene to isolate Three.js context and improve performance
-const PrismScene = lazy(() => 
-  import("./components/branding/interactive/PrismScene").then(module => ({ default: module.PrismScene }))
+const PrismScene = lazy(() =>
+  import("./components/website/PrismScene").then(module => ({ default: module.PrismScene }))
 );
 
 export default function App() {
