@@ -353,7 +353,7 @@ const generateSpectrum = (iorBase: number, abbeNumber: number, dispersionStrengt
 // Visual Styling (defaults, overridden by config where applicable)
 const OBJECT_SCALE = 200; // Default scale for helper functions
 const MAX_BOUNCES = 5; // More bounces for richer reflections
-const STAR_COUNT = 120; // Default star count
+const STAR_COUNT = 250; // Increased for denser starfield
 const DUST_COUNT = 60; // Default dust count
 
 // Spectrum
@@ -1222,6 +1222,78 @@ const drawAtmosphericFogWithConfig = (
             ctx.fill();
         }
     }
+    ctx.restore();
+};
+
+// --- Universe Texture (subtle nebula/cosmic clouds) ---
+const drawUniverseTexture = (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    time: number
+) => {
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+
+    // Layer 1: Large nebula clouds (purple/magenta tints)
+    const nebulaCount = 5;
+    for (let i = 0; i < nebulaCount; i++) {
+        const seed = i * 567.89;
+        const x = ((seed * 3.14) % 1) * width;
+        const y = ((seed * 2.71) % 1) * height;
+        const r = 200 + Math.sin(seed) * 150;
+
+        // Slow drift
+        const driftX = Math.sin(time * 0.01 + seed) * 30;
+        const driftY = Math.cos(time * 0.008 + seed * 1.5) * 20;
+
+        const nebGrad = ctx.createRadialGradient(
+            x + driftX, y + driftY, 0,
+            x + driftX, y + driftY, r
+        );
+
+        // Alternate between purple, blue, and magenta tints
+        const hue = (i * 60 + 240) % 360; // Purple-blue-magenta range
+        nebGrad.addColorStop(0, `hsla(${hue}, 60%, 30%, 0.02)`);
+        nebGrad.addColorStop(0.4, `hsla(${hue + 20}, 50%, 25%, 0.012)`);
+        nebGrad.addColorStop(0.7, `hsla(${hue + 40}, 40%, 20%, 0.006)`);
+        nebGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+        ctx.fillStyle = nebGrad;
+        ctx.fillRect(0, 0, width, height);
+    }
+
+    // Layer 2: Smaller cosmic dust patches
+    const dustCount = 8;
+    for (let i = 0; i < dustCount; i++) {
+        const seed = i * 123.45 + 999;
+        const x = ((seed * 7.89) % 1) * width;
+        const y = ((seed * 4.56) % 1) * height;
+        const r = 80 + Math.sin(seed * 2) * 50;
+
+        const pulse = 0.8 + Math.sin(time * 0.3 + seed) * 0.2;
+
+        const dustGrad = ctx.createRadialGradient(x, y, 0, x, y, r);
+        dustGrad.addColorStop(0, `rgba(180, 200, 255, ${0.015 * pulse})`);
+        dustGrad.addColorStop(0.5, `rgba(160, 180, 230, ${0.008 * pulse})`);
+        dustGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+        ctx.fillStyle = dustGrad;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Layer 3: Subtle color tint gradient across canvas (cosmic gradient)
+    const cosmicGrad = ctx.createLinearGradient(0, 0, width, height);
+    cosmicGrad.addColorStop(0, 'rgba(60, 20, 80, 0.015)'); // Deep purple
+    cosmicGrad.addColorStop(0.3, 'rgba(20, 40, 80, 0.01)'); // Deep blue
+    cosmicGrad.addColorStop(0.6, 'rgba(40, 60, 90, 0.008)'); // Blue-gray
+    cosmicGrad.addColorStop(1, 'rgba(80, 40, 60, 0.012)'); // Magenta hint
+
+    ctx.fillStyle = cosmicGrad;
+    ctx.fillRect(0, 0, width, height);
+
     ctx.restore();
 };
 
@@ -2384,6 +2456,9 @@ export const PrismScene: React.FC<{ showOverlay?: boolean }> = ({ showOverlay = 
           grad.addColorStop(1, '#000000');
           ctx.fillStyle = grad;
           ctx.fillRect(0, 0, width, height);
+
+          // 1.25. Universe texture - subtle nebula clouds and cosmic depth
+          drawUniverseTexture(ctx, width, height, timeRef.current);
 
           // 1.5. Atmospheric Haze Layer - controlled by config
           if (cfg.atmosphereHaze > 0) {
